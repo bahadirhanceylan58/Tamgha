@@ -123,11 +123,36 @@ export default function MapScreen() {
     };
   }
 
+  function baslatSonrakiBolum() {
+    let hedefBolge = BOLGELER[0].id;
+    let hedefSeviye = 0;
+
+    for (const b of BOLGELER) {
+      const ilerleme = state.bolgeIlerlemesi[b.id];
+      if (!ilerleme || ilerleme.kilit) continue;
+
+      const yildizlar = ilerleme.yildizlar || [0, 0, 0];
+      const eksikIndex = yildizlar.findIndex(y => y < 3);
+      
+      // Eger bu bolgede eksik bir yildiz varsa ve oynanabilirse burayi sec
+      if (eksikIndex !== -1) {
+        if (eksikIndex === 0 || yildizlar[eksikIndex - 1] > 0) {
+          hedefBolge = b.id;
+          hedefSeviye = eksikIndex;
+          break;
+        }
+      }
+      // Bolge ful ama son bolge degilse donguye devam et
+    }
+
+    setGucModal({ bolgeId: hedefBolge, seviye: hedefSeviye });
+  }
+
   return (
     <div className="screen map-screen">
       <div className="map-header">
         <button className="geri-btn" onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'home' })}>
-          &#8592; Geri
+          &#8592; Ana Menü
         </button>
         <h2 className="map-baslik">Bozkir Haritasi</h2>
         <div className="puan-badge">{state.toplamPuan} puan</div>
@@ -201,18 +226,30 @@ export default function MapScreen() {
         })}
       </div>
 
-      <div className="map-alt-nav">
+      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
         <button
-          className="btn btn-arena"
-          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'ruh_arenasi' })}
+          className="btn btn-ikincil"
+          style={{ padding: '0.5rem', fontSize: '0.85rem', flexDirection: 'column' }}
+          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'koleksiyon' })}
         >
-          <span>⚡</span> Ruh Arenasi
+          <span className="btn-simge" style={{ fontSize: '1.2rem' }}>{'\u{10C09}'}</span>
+          Koleksiyon
+        </button>
+        <button
+          className="btn btn-birincil"
+          style={{ padding: '0.5rem', fontSize: '1rem', flexDirection: 'column' }}
+          onClick={baslatSonrakiBolum}
+        >
+          <span className="btn-simge" style={{ fontSize: '1.5rem', marginBottom: '-4px' }}>{'\u{10C1A}'}</span>
+          OYNA
         </button>
         <button
           className="btn btn-ikincil"
-          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'koleksiyon' })}
+          style={{ padding: '0.5rem', fontSize: '0.85rem', flexDirection: 'column' }}
+          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'ruh_arenasi' })}
         >
-          &#9632; Koleksiyon ({state.kazanilanKartlar.length})
+          <span style={{ fontSize: '1.2rem' }}>⚡</span>
+          Arena
         </button>
       </div>
 

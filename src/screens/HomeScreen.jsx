@@ -215,15 +215,8 @@ export default function HomeScreen() {
 
         <div className="home-ikincil-butonlar">
           <button
-            className="btn btn-ikincil"
-            onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'koleksiyon' })}
-          >
-            <span className="btn-simge">{'\u{10C09}'}</span>
-            {t('koleksiyonBtn')}
-          </button>
-
-          <button
             className={`btn ${gunlukAlindi ? 'btn-kapali' : 'btn-altin'}`}
+            style={{ gridColumn: '1 / -1' }}
             onClick={gunlukAlindi ? null : gunlukKartAl}
             disabled={gunlukAlindi}
           >
