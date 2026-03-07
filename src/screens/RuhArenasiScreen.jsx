@@ -24,17 +24,16 @@ export default function RuhArenasiScreen() {
   const [sure, setSure] = useState(ARENA_SURE);
   const [bitti, setBitti] = useState(false);
   const [comboGoster, setComboGoster] = useState(null);
-  const [baslamadi, setBaslamadi] = useState(true);
 
   useEffect(() => {
-    if (baslamadi || bitti) return;
+    if (bitti) return;
     if (sure <= 0) {
       setBitti(true);
       return;
     }
     const t = setTimeout(() => setSure((s) => s - 1), 1000);
     return () => clearTimeout(t);
-  }, [sure, bitti, baslamadi]);
+  }, [sure, bitti]);
 
   useEffect(() => {
     if (tamamlananlar.size === ESLESME_SAYISI) {
@@ -43,13 +42,13 @@ export default function RuhArenasiScreen() {
   }, [tamamlananlar]);
 
   function secHayvan(idx) {
-    if (bitti || baslamadi) return;
+    if (bitti) return;
     if (tamamlananlar.has(idx)) return;
     setSecilenSol(idx === secilenSol ? null : idx);
   }
 
   function secGuc(gucIdx) {
-    if (bitti || baslamadi) return;
+    if (bitti) return;
     if (secilenSol === null) return;
     const gercekHayvanIdx = karisikGucler[gucIdx];
     if (tamamlananlar.has(gercekHayvanIdx)) return;
@@ -97,33 +96,6 @@ export default function RuhArenasiScreen() {
   const surePct = (sure / ARENA_SURE) * 100;
   const sureRenk = sure > 30 ? '#00d4ff' : sure > 10 ? '#ffaa00' : '#ff4444';
 
-  if (baslamadi) {
-    return (
-      <div className="screen arena-screen">
-        <div className="arena-intro">
-          <div className="arena-intro-ikon">⚡</div>
-          <h2 className="arena-intro-baslik">RUH ARENASI</h2>
-          <p className="arena-intro-alt">12 Hayvan Ruhu ile Mitoloji gucleri arasindaki baglari kur</p>
-          <div className="arena-intro-kural">
-            <div className="kural-item"><span className="kural-ikon">👈</span> Sol: Hayvan / Mitoloji karti sec</div>
-            <div className="kural-item"><span className="kural-ikon">👉</span> Sag: Kart gucuyle eslestir</div>
-            <div className="kural-item"><span className="kural-ikon">🔥</span> Ust uste dogru = COMBO!</div>
-            <div className="kural-item"><span className="kural-ikon">⏱</span> {ARENA_SURE} saniye icinde tamamla</div>
-          </div>
-          <button className="btn btn-arena-baslat" onClick={() => setBaslamadi(false)}>
-            <span>⚡</span> BASLAT
-          </button>
-          <button
-            className="btn btn-ikincil"
-            onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}
-            style={{ marginTop: '0.5rem' }}
-          >
-            Geri
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   if (bitti) {
     const basari = tamamlananlar.size === ESLESME_SAYISI;

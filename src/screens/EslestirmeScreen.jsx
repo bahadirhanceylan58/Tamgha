@@ -97,23 +97,22 @@ export default function EslestirmeScreen() {
   const [skor, setSkor] = useState(0);
   const [hamle, setHamle] = useState(0);
   const [bitti, setBitti] = useState(false);
-  const [baslamadi, setBaslamadi] = useState(true);
   const [efektMesaj, setEfektMesaj] = useState(null);
   const [yanlisAnim, setYanlisAnim] = useState(false);
   const blocked = useRef(false);
 
   // Sayaç
   useEffect(() => {
-    if (baslamadi || bitti) return;
+    if (bitti) return;
     if (sure <= 0) { setBitti(true); return; }
     const t = setTimeout(() => setSure(s => s - 1), 1000);
     return () => clearTimeout(t);
-  }, [sure, bitti, baslamadi]);
+  }, [sure, bitti]);
 
   // Kazanma
   useEffect(() => {
-    if (!baslamadi && tiles.every(t => t.removed)) setBitti(true);
-  }, [tiles, baslamadi]);
+    if (tiles.length > 0 && tiles.every(t => t.removed)) setBitti(true);
+  }, [tiles]);
 
   function showMsg(msg, dur = 1800) {
     setEfektMesaj(msg);
@@ -130,7 +129,7 @@ export default function EslestirmeScreen() {
   }
 
   function tasTikla(tileId) {
-    if (baslamadi || bitti || blocked.current || carpisma) return;
+    if (bitti || blocked.current || carpisma) return;
     const tile = tiles.find(t => t.id === tileId);
     if (!tile || tile.removed || tile.inTray || !isFree(tile, tiles)) return;
 
@@ -185,29 +184,6 @@ export default function EslestirmeScreen() {
   const surePct = Math.max(0, (sure / OYUN_SURESI) * 100);
   const sureRenk = sure > 60 ? '#4a9e6a' : sure > 20 ? '#c8820a' : '#c02020';
 
-  // ── INTRO ──
-  if (baslamadi) {
-    return (
-      <div className="screen mj-screen">
-        <div className="mj-intro">
-          <div className="mj-intro-ikon">&#128024;</div>
-          <h2 className="mj-baslik">ÖĞREN: TAMGA AVI</h2>
-          <p className="mj-intro-acik">
-            {state.seciliBolge ? 'Bu bölgedeki (ve diğer bazı) tamgaların eşlerini bularak karakterleri ve sesleri zihninde pekiştir.' : 'Serbest taşa dokun — önizlemeye gelir. Aynı tamgayı seçersen ikisi çarpışıp kırılır!'}
-          </p>
-          <div className="mj-kural">
-            <div>&#128070; Serbest tasa dokun → önizleme</div>
-            <div>&#10024; Esini seç → çarpışıp kırılır</div>
-            <div>&#9888; Yanlis seçersen birikme dolar (max 5)</div>
-          </div>
-          <button className="btn btn-birincil" style={{ width: '100%', marginTop: '1.2rem' }}
-            onClick={() => setBaslamadi(false)}>BASLAT</button>
-          <button className="btn btn-ikincil" style={{ width: '100%', marginTop: '0.5rem' }}
-            onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>Geri</button>
-        </div>
-      </div>
-    );
-  }
 
   // ── BİTTİ ──
   if (bitti) {
