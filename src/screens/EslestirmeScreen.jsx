@@ -47,10 +47,10 @@ function createBoard(bolgeId, seviye = 1) {
   let pool = [];
   if (bolgeId) {
     const bolgeT = getBolgeTamgalari(bolgeId);
-    const digerleri = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR, createYada()]).filter(k => !bolgeT.find(t => t.id === k.id));
+    const digerleri = shuffle([...TAMGALAR, ...MITOLOJI]).filter(k => !bolgeT.find(t => t.id === k.id));
     pool = shuffle([...bolgeT, ...digerleri]);
   } else {
-    pool = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR, createYada()]);
+    pool = shuffle([...TAMGALAR, ...MITOLOJI]);
   }
   let selectedPool = [];
   for (let i = 0; i < pairCount; i++) {
@@ -124,7 +124,7 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
 
 export default function EslestirmeScreen() {
   const { state, dispatch } = useGame();
-  const { playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio } = useAudio();
+  const { playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio } = useAudio();
   const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 1;
   const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, aktifSeviye));
   const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
@@ -181,6 +181,7 @@ export default function EslestirmeScreen() {
     if (!tile || tile.removed || tile.inTray || !isFree(tile, tiles)) return;
     if (tepsi.find(t => t.tileId === tileId)) return;
 
+    playTas();
     playClick();
     setHamle(m => m + 1);
 
@@ -302,7 +303,7 @@ export default function EslestirmeScreen() {
         <div className="mj-skor-badge">{skor} &#10022;</div>
       </div>
 
-      {/* Tray — Vita Mahjong tarzı üst alan */}
+      {/* Tepsi — üst alan */}
       <div className="mj-tepsi-alan">
         <div className="mj-tepsi">
           {Array.from({ length: MAX_TEPSI }, (_, i) => {
@@ -370,7 +371,7 @@ export default function EslestirmeScreen() {
         </div>
       </div>
 
-      {/* Alt butonlar — Vita Mahjong tarzı */}
+      {/* Alt butonlar */}
       <div className="mj-guc-butonlar">
         <button
           className="mj-guc-btn"

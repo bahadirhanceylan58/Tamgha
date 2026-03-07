@@ -62,6 +62,30 @@ export function AudioProvider({ children }) {
         });
     }, []);
 
+    const playTas = useCallback(() => {
+        if (isMuted) return;
+        try {
+            const ac = new (window.AudioContext || window.webkitAudioContext)();
+            const buf = ac.createBuffer(1, ac.sampleRate * 0.12, ac.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < d.length; i++) {
+                d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ac.sampleRate * 0.018));
+            }
+            const src = ac.createBufferSource();
+            src.buffer = buf;
+            const filt = ac.createBiquadFilter();
+            filt.type = 'bandpass';
+            filt.frequency.value = 1100;
+            filt.Q.value = 0.7;
+            const gain = ac.createGain();
+            gain.gain.setValueAtTime(0.55, ac.currentTime);
+            src.connect(filt);
+            filt.connect(gain);
+            gain.connect(ac.destination);
+            src.start();
+        } catch (_) { }
+    }, [isMuted]);
+
     const playClick = useCallback(() => {
         if (!isMuted && clickRef.current) {
             clickRef.current.currentTime = 0;
@@ -85,7 +109,7 @@ export function AudioProvider({ children }) {
 
     return (
         <AudioContext.Provider value={{
-            playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, unlocked
+            playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, unlocked
         }}>
             {children}
         </AudioContext.Provider>

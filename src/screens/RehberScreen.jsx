@@ -18,7 +18,7 @@ const NASIL_OYNANIR = [
   {
     ikon: '🀄',
     baslik: 'Taş Eşleştir',
-    aciklama: 'Mahjong tahtasında serbest taşlara dokun — tepside biriken taşlardan çift bul, eşleştir ve tahtayı temizle.',
+    aciklama: 'Taş tahtasında serbest taşlara dokun — tepside biriken taşlardan çift bul, eşleştir ve tahtayı temizle.',
   },
   {
     ikon: '📝',
@@ -111,7 +111,7 @@ export default function RehberScreen() {
             <div className="rehber-ipucu-kutu">
               <div className="rehber-ipucu-baslik">💡 Tepsi Mekaniği</div>
               <p className="rehber-ipucu-metin">
-                Mahjong'da taşa dokununca üstteki tepsiye gider.
+                Taşa dokununca üstteki tepsiye gider.
                 Aynı taştan 2 tane tepsiye alınca eşleşme olur ve tahtadan kalkar.
                 Tepsi 4 taşla dolarsa oyun biter — dikkatli seç!
               </p>

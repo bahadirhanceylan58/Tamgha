@@ -139,7 +139,7 @@ function reducer(state, action) {
       const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];
       const yeniYildizlar = [...oncekiYildizlar];
 
-      // Basit yildiz mantigi: Mahjong temizlendiği an en az 1 yildiz, basariliysa 3 yildiz
+      // Basit yildiz mantigi: tahta temizlendiği an en az 1 yildiz, basariliysa 3 yildiz
       const yildiz = action.kazandi ? 3 : 0;
       yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
 

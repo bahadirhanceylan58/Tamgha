@@ -3905,7 +3905,7 @@ body {
 }
 
 /* ══════════════════════════════════════════════
-   TAMGA AVI — MAHJONG SOLITAIRE (VITA STYLE)
+   TAMGA AVI — TAŞ EŞLEŞTİRME
 ══════════════════════════════════════════════ */
 .mj-screen {
   display: flex;
@@ -4098,7 +4098,7 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Tile base — Vita Mahjong style ── */
+/* ── Tile base ── */
 .mj-tas {
   position: absolute;
   width: 44px;
@@ -4901,7 +4901,7 @@ body {
   letter-spacing: 0.1em;
 }
 
-/* Alt güç butonları — Vita Mahjong tarzı */
+/* Alt güç butonları */
 .mj-guc-butonlar {
   flex-shrink: 0;
   display: flex;
