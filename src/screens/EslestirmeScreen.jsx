@@ -167,10 +167,53 @@ export default function EslestirmeScreen() {
     return () => clearTimeout(t);
   }, [sure, bitti]);
 
-  // Kazanma
+  // Kazanma ve Deadlock (Hamle kalmadı) kontrolü
   useEffect(() => {
-    if (tiles.length > 0 && tiles.every(t => t.removed)) setBitti(true);
-  }, [tiles]);
+    if (bitti || tiles.length === 0) return;
+
+    const onTahtaCount = tiles.filter(t => !t.removed && !t.inTray).length;
+    if (onTahtaCount === 0) {
+      if (tiles.every(t => t.removed)) setBitti(true);
+      return;
+    }
+
+    // Sadece tahtada oynanabilir durumdaysa deadlock kontrolü yap
+    if (!carpisma && !yanlisAnim) {
+      const freeTiles = tiles.filter(t => !t.removed && !t.inTray && isFree(t, tiles));
+      let possible = false;
+
+      if (secili) {
+        possible = freeTiles.some(t => t.kart.tamga === secili.kart.tamga);
+      } else {
+        for (let i = 0; i < freeTiles.length; i++) {
+          for (let j = i + 1; j < freeTiles.length; j++) {
+            if (freeTiles[i].kart.tamga === freeTiles[j].kart.tamga) {
+              possible = true; break;
+            }
+          }
+          if (possible) break;
+        }
+      }
+
+      if (!possible && freeTiles.length > 0) {
+        showMsg('Hamle kalmadı! Kartlar karıştırılıyor...', 2000);
+        const t2 = setTimeout(() => {
+          setTiles(prev => {
+            const alive = prev.filter(t => !t.removed && !t.inTray);
+            const aliveKarts = shuffle(alive.map(t => t.kart));
+            let k = 0;
+            return prev.map(t => {
+              if (!t.removed && !t.inTray) {
+                return { ...t, kart: aliveKarts[k++] };
+              }
+              return t;
+            });
+          });
+        }, 1800);
+        return () => clearTimeout(t2);
+      }
+    }
+  }, [tiles, bitti, secili, carpisma, yanlisAnim]);
 
   function showMsg(msg, dur = 1800) {
     setEfektMesaj(msg);
@@ -237,18 +280,28 @@ export default function EslestirmeScreen() {
         }, CARPISMA_MS);
 
       } else {
-        // YANLIŞ → seçili salla, yeni kart birikme yığınına gider
+        // YANLIŞ → seçili salla, yeni kart anlık InTray olur, sonra ikisi de tahtaya döner
         setYanlisAnim(true);
-        setTimeout(() => setYanlisAnim(false), 420);
-
-        const yeni = [...birikme, { id: tileId, kart: tile.kart }];
-        setBirikme(yeni);
+        blocked.current = true;
         setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
 
-        if (yeni.length >= MAX_BIRIKME) {
-          showMsg('Birikme doldu!', 900);
-          setTimeout(() => setBitti(true), 1000);
-        }
+        setTimeout(() => {
+          setYanlisAnim(false);
+          // İkisini de tahtaya geri koy
+          setTiles(prev => prev.map(t =>
+            t.id === secili.id || t.id === tileId ? { ...t, inTray: false } : t
+          ));
+          setSecili(null);
+
+          const yeni = [...birikme, { id: Date.now(), kart: tile.kart }];
+          setBirikme(yeni);
+          blocked.current = false;
+
+          if (yeni.length >= MAX_BIRIKME) {
+            showMsg('Hata Sınırı Doldu!', 900);
+            setTimeout(() => setBitti(true), 1000);
+          }
+        }, 600);
       }
     }
   }
