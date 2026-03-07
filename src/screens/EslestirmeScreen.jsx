@@ -2,47 +2,99 @@ import { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { TAMGALAR, MITOLOJI, HAYVANLAR, getBolgeTamgalari } from '../data/tamgalar';
 
-const TW = 52;
-const TH = 64;
+const TW = 46;
+const TH = 58;
 const GAP = 2;
-const LOX = 5;
+const LOX = 4;
 const LOY = 6;
-const COLS = 6;
-const ROWS = 4;
+const COLS = 8;
+const ROWS = 6;
 const MAX_BIRIKME = 5;
-const OYUN_SURESI = 180;
-const CARPISMA_MS = 960;
+const OYUN_SURESI = 300; // Artan tahtadan dolayı 5 dakika
+const CARPISMA_MS = 1200;
 
-const LAYOUT = [
-  ...Array.from({ length: ROWS }, (_, r) =>
-    Array.from({ length: COLS }, (_, c) => ({ r, c, l: 0 }))
-  ).flat(),
-  ...Array.from({ length: 2 }, (_, ri) =>
-    Array.from({ length: 4 }, (_, ci) => ({ r: ri + 1, c: ci + 1, l: 1 }))
-  ).flat(),
-  ...Array.from({ length: 2 }, (_, ri) =>
-    Array.from({ length: 2 }, (_, ci) => ({ r: ri + 1, c: ci + 2, l: 2 }))
-  ).flat(),
-];
+// Dinamik Kademeli Dizilim Oluşturucu
+function generateProgressiveLayout(seviye) {
+  // Başlangıç çift sayısı: Seviye 1 = 5 çift (10 taş), her seviyede +1 çift (2 taş) ekle.
+  // Maksimum 30 çift (60 taş) ile sınırlayalım.
+  const pairCount = Math.min(30, 4 + seviye);
+  const totalTiles = pairCount * 2;
+
+  const layout = [];
+  let tilesPlaced = 0;
+
+  // Katman kapasiteleri (genişletilmiş merkez piramit)
+  // L0: 6x8 = 48
+  // L1: 4x6 = 24
+  // L2: 4x4 = 16
+  // L3: 2x4 = 8
+  // L4: 2x2 = 4
+  const layers = [
+    { l: 0, rows: 6, cols: 8, rOffset: 0, cOffset: 0 },
+    { l: 1, rows: 4, cols: 6, rOffset: 1, cOffset: 1 },
+    { l: 2, rows: 4, cols: 4, rOffset: 1, cOffset: 2 },
+    { l: 3, rows: 2, cols: 4, rOffset: 2, cOffset: 2 },
+    { l: 4, rows: 2, cols: 2, rOffset: 2, cOffset: 3 },
+  ];
+
+  // Taşı yerleştir
+  for (const layer of layers) {
+    if (tilesPlaced >= totalTiles) break;
+
+    // Her katmandaki pozisyonları merkeze doğru sırayla doldur
+    for (let r = 0; r < layer.rows; r++) {
+      for (let c = 0; c < layer.cols; c++) {
+        if (tilesPlaced >= totalTiles) break;
+        layout.push({ r: r + layer.rOffset, c: c + layer.cOffset, l: layer.l });
+        tilesPlaced++;
+      }
+    }
+  }
+
+  // Taş sayısını cift sayiya tamamla (olası kesinti durumuna karşı)
+  if (layout.length % 2 !== 0) {
+    layout.pop();
+  }
+
+  return layout;
+}
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-function createBoard(bolgeId) {
-  let pool;
+function createBoard(bolgeId, seviye = 1) {
+  // Seçilen bölge ve seviyeye göre dinamik dizilim oluştur
+  const layout = generateProgressiveLayout(seviye);
+  const pairCount = layout.length / 2;
+
+  // Bolge taşlarını ve diğer taşları birleştir
+  let pool = [];
   if (bolgeId) {
     const bolgeT = getBolgeTamgalari(bolgeId);
-    const digerleri = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR]).filter(k => !bolgeT.find(t => t.id === k.id));
-    // Bolgenin tum kartlarini kesin al, uzerini 18 olana kadar rastgele doldur.
-    pool = shuffle([...bolgeT, ...digerleri]).slice(0, 18);
+    const digerleri = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR, createYada()]).filter(k => !bolgeT.find(t => t.id === k.id));
+    pool = shuffle([...bolgeT, ...digerleri]);
   } else {
-    pool = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR]).slice(0, 18);
+    pool = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR, createYada()]);
   }
 
-  const doubled = shuffle([...pool, ...pool]);
-  return shuffle([...LAYOUT]).map((pos, i) => ({
+  // Sadece gereken çift sayısı kadar taş al (Havuz yetmezse başa sar)
+  let selectedPool = [];
+  for (let i = 0; i < pairCount; i++) {
+    selectedPool.push(pool[i % pool.length]);
+  }
+
+  const doubled = shuffle([...selectedPool, ...selectedPool]);
+
+  return shuffle([...layout]).map((pos, i) => ({
     id: i, row: pos.r, col: pos.c, layer: pos.l,
     kart: doubled[i], removed: false, inTray: false,
   }));
+}
+
+function createYada() {
+  return {
+    id: 'yada_tasi', tamga: '💎', ses: 'YADA', fonetik: 'jada',
+    kategori: 'mitoloji', nadirlik: 'yada', bolge: 'tengri',
+  };
 }
 
 function isFree(tile, all) {
@@ -54,8 +106,10 @@ function isFree(tile, all) {
 }
 
 function tilePos(col, row, layer) {
+  // Sol kollardan (negatif colonlar) kaynaklanan offseti düzelt (en az c: -2 var)
+  const offsetCol = col + 2;
   return {
-    left: col * (TW + GAP) - layer * LOX,
+    left: offsetCol * (TW + GAP) - layer * LOX,
     top: row * (TH + GAP) - layer * LOY,
     zIndex: layer * 100 + row * 10 + col,
   };
@@ -70,8 +124,9 @@ function display(kart) {
   return { isGokt: false, main: safe[kart.tamga] ?? kart.tamga, sub: kart.ses, isMit: true, isHay: false };
 }
 
-const BOARD_W = COLS * (TW + GAP) - GAP + 8;
-const BOARD_H = ROWS * (TH + GAP) - GAP + 8;
+// Tahta genişliği 11 sütun (8 ana + sol 2 + sağ 1) x (TW + GAP)
+const BOARD_W = 11 * (TW + GAP) + 10;
+const BOARD_H = ROWS * (TH + GAP) + 10;
 
 function TasIcerik({ kart, buyuk = false }) {
   const d = display(kart);
@@ -89,10 +144,11 @@ function TasIcerik({ kart, buyuk = false }) {
 
 export default function EslestirmeScreen() {
   const { state, dispatch } = useGame();
-  const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge));
+  const aktifSeviye = state.sefer.aktif ? state.sefer.seviye : 1;
+  const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, aktifSeviye));
   const [secili, setSecili] = useState(null);    // { id, kart }
   const [birikme, setBirikme] = useState([]);      // [{ id, kart }]  max 5
-  const [carpisma, setCarpisma] = useState(null);    // { kart1, kart2 } | null
+  const [carpisma, setCarpisma] = useState(null);    // { kart1, kart2, isCombo } | null
   const [sure, setSure] = useState(OYUN_SURESI);
   const [skor, setSkor] = useState(0);
   const [hamle, setHamle] = useState(0);
@@ -143,14 +199,24 @@ export default function EslestirmeScreen() {
     } else {
       // İkinci kart
       if (secili.kart.tamga === tile.kart.tamga && secili.id !== tileId) {
-        // EŞLEŞME → çarpışma sahnesi
+        // EŞLEŞME
         blocked.current = true;
-        const puan = 100 + Math.floor(sure / 5);
+
+        // Candy Crush mantığı: "TÜRK" tamgalarından biri veya mitoloji ise kombo yapar
+        const isCombo = ['t_back', 'oe_ue', 'r_back', 'k_back'].includes(tile.kart.id) || tile.kart.kategori === 'mitoloji';
+
+        const tabanPuan = 100 + Math.floor(sure / 5);
+        const puan = isCombo ? tabanPuan * 3 : tabanPuan; // Combo 3 katı puan!
+
+        if (isCombo) {
+          showMsg('✨ MÜKEMMEL EŞLEŞME! ✨', 1500);
+        }
+
         setSkor(s => s + puan);
         setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
 
         const sid = secili.id;
-        setCarpisma({ kart1: secili.kart, kart2: tile.kart });
+        setCarpisma({ kart1: secili.kart, kart2: tile.kart, isCombo });
 
         setTimeout(() => {
           setCarpisma(null);
@@ -181,6 +247,7 @@ export default function EslestirmeScreen() {
 
   const onTahta = tiles.filter(t => !t.removed && !t.inTray);
   const eslendi = tiles.filter(t => t.removed).length / 2;
+  const toplamCift = tiles.length / 2; // Dinamik toplam çift
   const surePct = Math.max(0, (sure / OYUN_SURESI) * 100);
   const sureRenk = sure > 60 ? '#4a9e6a' : sure > 20 ? '#c8820a' : '#c02020';
 
@@ -197,7 +264,7 @@ export default function EslestirmeScreen() {
           <div className="mj-bitis-skor">{finalSkor}</div>
           <p style={{ opacity: 0.6, fontSize: '0.82rem', marginTop: '-0.2rem' }}>puan</p>
           <div className="mj-bitis-istatlar">
-            <div className="mj-stat"><span className="mj-stat-sayi">{eslendi}</span><span className="mj-stat-etiket">/{18} eslesme</span></div>
+            <div className="mj-stat"><span className="mj-stat-sayi">{eslendi}</span><span className="mj-stat-etiket">/{toplamCift} eslesme</span></div>
             <div className="mj-stat"><span className="mj-stat-sayi">{hamle}</span><span className="mj-stat-etiket">hamle</span></div>
             <div className="mj-stat"><span className="mj-stat-sayi">{sure}s</span><span className="mj-stat-etiket">kalan</span></div>
           </div>
@@ -225,7 +292,7 @@ export default function EslestirmeScreen() {
       </div>
 
       <div className="mj-durum-row">
-        <span>{eslendi}/{18} eslesme</span>
+        <span>{eslendi}/{toplamCift} eslesme</span>
         <span>{hamle} hamle</span>
       </div>
 
@@ -233,7 +300,7 @@ export default function EslestirmeScreen() {
 
       {/* Çarpışma sahnesi */}
       {carpisma && (
-        <div className="cp-overlay">
+        <div className={`cp-overlay ${carpisma.isCombo ? 'cp-combo' : ''}`}>
           <div className="cp-sahne">
             <div className={`cp-kart cp-sol ${carpisma.kart1.kategori === 'mitoloji' ? 'cp-mit' : ''} ${carpisma.kart1.kategori === 'hayvan' ? 'cp-hay' : ''}`}>
               <TasIcerik kart={carpisma.kart1} buyuk />
