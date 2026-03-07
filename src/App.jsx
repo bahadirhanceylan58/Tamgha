@@ -13,6 +13,7 @@ import SozlukSozScreen from './screens/SozlukSozScreen'
 import ProfilScreen from './screens/ProfilScreen'
 import CeviriScreen from './screens/CeviriScreen'
 import EslestirmeScreen from './screens/EslestirmeScreen'
+import RehberScreen from './screens/RehberScreen'
 
 function Router() {
   const { state } = useGame()
@@ -31,7 +32,8 @@ function Router() {
   if (ekran === 'sozluk_soz') return <SozlukSozScreen />
   if (ekran === 'profil') return <ProfilScreen />
   if (ekran === 'ceviri') return <CeviriScreen />
-  if (ekran === 'eslestirme') return <EslestirmeScreen />
+  if (ekran === 'rehber') return <RehberScreen />
+  if (ekran === 'eslestirme') return <EslestirmeScreen key={`${state.sefer?.bolgeId}-${state.sefer?.seviye}`} />
 
   return <HomeScreen />
 }

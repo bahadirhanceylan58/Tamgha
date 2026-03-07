@@ -156,15 +156,9 @@ export default function HomeScreen() {
           <span className="home-profil-ad">{state.kullaniciAdi || t('profilBtn')}</span>
         </button>
         <div style={{ display: 'flex', gap: '8px' }}>
-          {!unlocked ? (
-            <button className="home-dil-rozet" style={{ background: 'var(--altin)', color: '#000', cursor: 'pointer' }} onClick={unlockAudio}>
-              🔊 Sesi Etkinleştir
-            </button>
-          ) : (
-            <button className="home-dil-rozet" style={{ cursor: 'pointer' }} onClick={toggleMute}>
-              {isMuted ? '🔇' : '🔊'}
-            </button>
-          )}
+          <button className="home-ses-btn" onClick={!unlocked ? unlockAudio : toggleMute}>
+            {!unlocked || isMuted ? '🔇' : '🔊'}
+          </button>
           <div className="home-dil-rozet">
             {state.dil === 'en' ? '🇬🇧' : state.dil === 'ru' ? '🇷🇺' : '🇹🇷'}
           </div>

@@ -3,33 +3,21 @@ import { useGame } from '../context/GameContext';
 import { TAMGALAR, MITOLOJI, HAYVANLAR, getBolgeTamgalari, BOLGELER } from '../data/tamgalar';
 import { useAudio } from '../hooks/useAudio';
 
-const TW = 46;
-const TH = 58;
+const TW = 44;
+const TH = 55;
 const GAP = 2;
 const LOX = 4;
 const LOY = 6;
-const COLS = 8;
 const ROWS = 6;
-const MAX_BIRIKME = 5;
-const OYUN_SURESI = 300; // Artan tahtadan dolayı 5 dakika
-const CARPISMA_MS = 1200;
+const MAX_TEPSI = 4;
+const OYUN_SURESI = 300;
+const ESLESTI_MS = 520;
 
-// Dinamik Kademeli Dizilim Oluşturucu
 function generateProgressiveLayout(seviye) {
-  // Başlangıç çift sayısı: Seviye 1 = 5 çift (10 taş), her seviyede +1 çift (2 taş) ekle.
-  // Maksimum 30 çift (60 taş) ile sınırlayalım.
   const pairCount = Math.min(30, 4 + seviye);
   const totalTiles = pairCount * 2;
-
   const layout = [];
   let tilesPlaced = 0;
-
-  // Katman kapasiteleri (genişletilmiş merkez piramit)
-  // L0: 6x8 = 48
-  // L1: 4x6 = 24
-  // L2: 4x4 = 16
-  // L3: 2x4 = 8
-  // L4: 2x2 = 4
   const layers = [
     { l: 0, rows: 6, cols: 8, rOffset: 0, cOffset: 0 },
     { l: 1, rows: 4, cols: 6, rOffset: 1, cOffset: 1 },
@@ -37,12 +25,8 @@ function generateProgressiveLayout(seviye) {
     { l: 3, rows: 2, cols: 4, rOffset: 2, cOffset: 2 },
     { l: 4, rows: 2, cols: 2, rOffset: 2, cOffset: 3 },
   ];
-
-  // Taşı yerleştir
   for (const layer of layers) {
     if (tilesPlaced >= totalTiles) break;
-
-    // Her katmandaki pozisyonları merkeze doğru sırayla doldur
     for (let r = 0; r < layer.rows; r++) {
       for (let c = 0; c < layer.cols; c++) {
         if (tilesPlaced >= totalTiles) break;
@@ -51,23 +35,15 @@ function generateProgressiveLayout(seviye) {
       }
     }
   }
-
-  // Taş sayısını cift sayiya tamamla (olası kesinti durumuna karşı)
-  if (layout.length % 2 !== 0) {
-    layout.pop();
-  }
-
+  if (layout.length % 2 !== 0) layout.pop();
   return layout;
 }
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
 function createBoard(bolgeId, seviye = 1) {
-  // Seçilen bölge ve seviyeye göre dinamik dizilim oluştur
   const layout = generateProgressiveLayout(seviye);
   const pairCount = layout.length / 2;
-
-  // Bolge taşlarını ve diğer taşları birleştir
   let pool = [];
   if (bolgeId) {
     const bolgeT = getBolgeTamgalari(bolgeId);
@@ -76,21 +52,15 @@ function createBoard(bolgeId, seviye = 1) {
   } else {
     pool = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR, createYada()]);
   }
-
-  // Sadece gereken çift sayısı kadar taş al (Havuz yetmezse başa sar)
   let selectedPool = [];
   for (let i = 0; i < pairCount; i++) {
     selectedPool.push(pool[i % pool.length]);
   }
-
-  // Eğitim Zorluk Modu: Sebebini seviye > 2 ise öğrenme modu aktif olur
-  // Orijinalinde taş ikiziyle aynıdır. Zor modda ikizlerden biri "latin" okunuşunu gösterir.
   const isHardMode = seviye > 2;
   const doubled = shuffle([
     ...selectedPool.map(k => ({ ...k, displayMode: 'tamga' })),
     ...selectedPool.map(k => ({ ...k, displayMode: isHardMode ? 'latin' : 'tamga' }))
   ]);
-
   return shuffle([...layout]).map((pos, i) => ({
     id: i, row: pos.r, col: pos.c, layer: pos.l,
     kart: doubled[i], removed: false, inTray: false,
@@ -113,8 +83,7 @@ function isFree(tile, all) {
 }
 
 function tilePos(col, row, layer) {
-  // Sol kollardan (negatif colonlar) kaynaklanan offseti düzelt (en az c: -2 var)
-  const offsetCol = col + 2;
+  const offsetCol = col + 1;
   return {
     left: offsetCol * (TW + GAP) - layer * LOX,
     top: row * (TH + GAP) - layer * LOY,
@@ -122,38 +91,33 @@ function tilePos(col, row, layer) {
   };
 }
 
+const BOARD_W = 8 * (TW + GAP) + TW + 15;
+const BOARD_H = ROWS * (TH + GAP) + 15;
+
 function display(kart) {
   const isMit = kart.kategori === 'mitoloji';
   const isHay = kart.kategori === 'hayvan';
-
-  // Hard Mode için latin harfini gösterme mantığı
   if (kart.displayMode === 'latin' && !isMit && !isHay) {
-    // Latin görünümünde ana harf olarak 'ses' (veya fonetik okunuşu) kullan
     return { isGokt: false, main: kart.ses.split(' ')[0], sub: kart.fonetik, isMit: false, isHay: false, isLatin: true };
   }
-
   if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: kart.ses, isMit: false, isHay: false, isLatin: false };
   if (isHay) return { isGokt: false, main: kart.tamga, sub: kart.ses, isMit: false, isHay: true, isLatin: false };
-  const safe = { '💀': '☽', '🤍': '◈' };
+  const safe = { '☀': '☉', '🌙': '☽', '💀': '✠', '✦': '✦', '🤍': '◈', '👑': '♛', '💎': '◈' };
   return { isGokt: false, main: safe[kart.tamga] ?? kart.tamga, sub: kart.ses, isMit: true, isHay: false, isLatin: false };
 }
 
-// Tahta genişliği 11 sütun (8 ana + sol 2 + sağ 1) x (TW + GAP)
-const BOARD_W = 11 * (TW + GAP) + 10;
-const BOARD_H = ROWS * (TH + GAP) + 10;
-
-function TasIcerik({ kart, buyuk = false }) {
+function TasIcerik({ kart, buyuk = false, tepsi = false }) {
   const d = display(kart);
-  // Eğer özel latin görünümündeyse (Hard Mode) farklı bir class ile gösterilebilir
-  const anaClass = buyuk
-    ? (d.isGokt ? 'cp-tamga' : 'cp-emoji')
-    : (d.isGokt ? 'mj-ana mj-ana-gokt' : (d.isLatin ? 'mj-ana mj-ana-latin' : 'mj-ana mj-ana-emoji'));
-
+  const anaClass = tepsi
+    ? (d.isGokt ? 'mj-tepsi-gokt' : 'mj-tepsi-ana')
+    : buyuk
+      ? (d.isGokt ? 'cp-tamga' : 'cp-emoji')
+      : (d.isGokt ? 'mj-ana mj-ana-gokt' : (d.isLatin ? 'mj-ana mj-ana-latin' : 'mj-ana mj-ana-emoji'));
   return (
     <>
       <span className={anaClass}>{d.main}</span>
-      <span className={buyuk ? 'cp-ses' : 'mj-ses'}>{d.sub}</span>
-      {!buyuk && (d.isMit || d.isHay) && <span className="mj-ozel-bant" />}
+      <span className={tepsi ? 'mj-tepsi-ses' : buyuk ? 'cp-ses' : 'mj-ses'}>{d.sub}</span>
+      {!buyuk && !tepsi && (d.isMit || d.isHay) && <span className="mj-ozel-bant" />}
     </>
   );
 }
@@ -161,20 +125,17 @@ function TasIcerik({ kart, buyuk = false }) {
 export default function EslestirmeScreen() {
   const { state, dispatch } = useGame();
   const { playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio } = useAudio();
-  const aktifSeviye = state.sefer.aktif ? state.sefer.seviye : 1;
+  const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 1;
   const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, aktifSeviye));
-  const [secili, setSecili] = useState(null);    // { id, kart }
-  const [birikme, setBirikme] = useState([]);      // [{ id, kart }]  max 5
-  const [carpisma, setCarpisma] = useState(null);    // { kart1, kart2, isCombo } | null
+  const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
+  const [carpisma, setCarpisma] = useState(null);
   const [sure, setSure] = useState(OYUN_SURESI);
   const [skor, setSkor] = useState(0);
   const [hamle, setHamle] = useState(0);
   const [bitti, setBitti] = useState(false);
   const [efektMesaj, setEfektMesaj] = useState(null);
-  const [yanlisAnim, setYanlisAnim] = useState(false);
   const blocked = useRef(false);
 
-  // Sayaç
   useEffect(() => {
     if (bitti) return;
     if (sure <= 0) { setBitti(true); return; }
@@ -182,68 +143,24 @@ export default function EslestirmeScreen() {
     return () => clearTimeout(t);
   }, [sure, bitti]);
 
-  // Kazanma ve Deadlock (Hamle kalmadı) kontrolü
+  // Kazanma kontrolü
   useEffect(() => {
-    if (bitti || tiles.length === 0) return;
-
+    if (bitti) return;
     const onTahtaCount = tiles.filter(t => !t.removed && !t.inTray).length;
-    if (onTahtaCount === 0) {
-      if (tiles.every(t => t.removed)) {
-        setBitti(true);
-        // Kazanma anında puan ve ilerlemeyi kaydet
-        if (!bitti) {
-          const finalSkor = skor + sure * 5;
-          dispatch({
-            type: 'ESLESTIRME_TAMAMLA',
-            bolgeId: state.seciliBolge || 'orhun',
-            seviye: aktifSeviye,
-            puan: finalSkor,
-            kazandi: true
-          });
-        }
-      }
-      return;
+    if (onTahtaCount === 0 && tiles.every(t => t.removed)) {
+      setBitti(true);
+      const finalSkor = skor + sure * 5;
+      dispatch({
+        type: 'ESLESTIRME_TAMAMLA',
+        bolgeId: state.seciliBolge || 'orhun',
+        seviye: aktifSeviye,
+        puan: finalSkor,
+        kazandi: true
+      });
     }
+  }, [tiles, bitti]);
 
-    // Sadece tahtada oynanabilir durumdaysa deadlock kontrolü yap
-    if (!carpisma && !yanlisAnim) {
-      const freeTiles = tiles.filter(t => !t.removed && !t.inTray && isFree(t, tiles));
-      let possible = false;
-
-      if (secili) {
-        possible = freeTiles.some(t => t.kart.tamga === secili.kart.tamga);
-      } else {
-        for (let i = 0; i < freeTiles.length; i++) {
-          for (let j = i + 1; j < freeTiles.length; j++) {
-            if (freeTiles[i].kart.tamga === freeTiles[j].kart.tamga) {
-              possible = true; break;
-            }
-          }
-          if (possible) break;
-        }
-      }
-
-      if (!possible && freeTiles.length > 0) {
-        showMsg('Hamle kalmadı! Kartlar karıştırılıyor...', 2000);
-        const t2 = setTimeout(() => {
-          setTiles(prev => {
-            const alive = prev.filter(t => !t.removed && !t.inTray);
-            const aliveKarts = shuffle(alive.map(t => t.kart));
-            let k = 0;
-            return prev.map(t => {
-              if (!t.removed && !t.inTray) {
-                return { ...t, kart: aliveKarts[k++] };
-              }
-              return t;
-            });
-          });
-        }, 1800);
-        return () => clearTimeout(t2);
-      }
-    }
-  }, [tiles, bitti, secili, carpisma, yanlisAnim]);
-
-  function showMsg(msg, dur = 1800) {
+  function showMsg(msg, dur = 1500) {
     setEfektMesaj(msg);
     setTimeout(() => setEfektMesaj(null), dur);
   }
@@ -258,88 +175,76 @@ export default function EslestirmeScreen() {
   }
 
   function tasTikla(tileId) {
-    unlockAudio(); // Müziği başlatmayı dener (otomatik başlamadıysa)
-
+    unlockAudio();
     if (bitti || blocked.current || carpisma) return;
     const tile = tiles.find(t => t.id === tileId);
     if (!tile || tile.removed || tile.inTray || !isFree(tile, tiles)) return;
+    if (tepsi.find(t => t.tileId === tileId)) return;
 
     playClick();
     setHamle(m => m + 1);
 
-    if (!secili) {
-      // Birinci kart → önizlemeye al
-      setSecili({ id: tileId, kart: tile.kart });
-      setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
+    const yeniEleman = { id: Date.now() + Math.random(), kart: tile.kart, tileId, eslesti: false };
+    const yeniTepsi = [...tepsi, yeniEleman];
+    setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
 
+    // Tepside çift ara (yeni eklenenle eşleşen)
+    let pairIdx = -1;
+    for (let i = 0; i < yeniTepsi.length - 1; i++) {
+      if (yeniTepsi[i].kart.tamga === yeniTepsi[yeniTepsi.length - 1].kart.tamga) {
+        pairIdx = i; break;
+      }
+    }
+
+    if (pairIdx >= 0) {
+      const a = yeniTepsi[pairIdx];
+      const b = yeniTepsi[yeniTepsi.length - 1];
+      blocked.current = true;
+
+      const isCombo = ['t_back', 'oe_ue', 'r_back', 'k_back'].includes(tile.kart.id) || tile.kart.kategori === 'mitoloji';
+      const tabanPuan = 100 + Math.floor(sure / 5);
+      const puan = isCombo ? tabanPuan * 3 : tabanPuan;
+      if (isCombo) { playCombo(); showMsg('MUKEMMEL ESLEME!'); }
+      else { playMatch(); }
+      setSkor(s => s + puan);
+
+      // Esleseni parlat
+      setTepsi(yeniTepsi.map((t, idx) =>
+        t.tileId === a.tileId || t.tileId === b.tileId ? { ...t, eslesti: true } : t
+      ));
+      setCarpisma({ kart1: a.kart, kart2: b.kart, isCombo });
+
+      setTimeout(() => {
+        setCarpisma(null);
+        setTiles(prev => prev.map(t =>
+          t.id === a.tileId || t.id === b.tileId
+            ? { ...t, removed: true, inTray: false } : t
+        ));
+        setTepsi(prev => prev.filter(t => t.tileId !== a.tileId && t.tileId !== b.tileId));
+        blocked.current = false;
+        applyPower(tile.kart);
+      }, ESLESTI_MS);
     } else {
-      // İkinci kart
-      if (secili.kart.tamga === tile.kart.tamga && secili.id !== tileId) {
-        // EŞLEŞME
-        blocked.current = true;
-
-        // Candy Crush mantığı: "TÜRK" tamgalarından biri veya mitoloji ise kombo yapar
-        const isCombo = ['t_back', 'oe_ue', 'r_back', 'k_back'].includes(tile.kart.id) || tile.kart.kategori === 'mitoloji';
-
-        const tabanPuan = 100 + Math.floor(sure / 5);
-        const puan = isCombo ? tabanPuan * 3 : tabanPuan; // Combo 3 katı puan!
-
-        if (isCombo) {
-          playCombo();
-          showMsg('✨ MÜKEMMEL EŞLEŞME! ✨', 1500);
-        } else {
-          playMatch();
-        }
-
-        setSkor(s => s + puan);
-        setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
-
-        const sid = secili.id;
-        setCarpisma({ kart1: secili.kart, kart2: tile.kart, isCombo });
-
-        setTimeout(() => {
-          setCarpisma(null);
-          setTiles(prev => prev.map(t =>
-            t.id === sid || t.id === tileId ? { ...t, removed: true, inTray: false } : t
-          ));
-          setSecili(null);
-          blocked.current = false;
-          applyPower(tile.kart);
-        }, CARPISMA_MS);
-
-      } else {
-        // YANLIŞ → seçili salla, yeni kart anlık InTray olur, sonra ikisi de tahtaya döner
-        setYanlisAnim(true);
-        blocked.current = true;
-        setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
-
-        setTimeout(() => {
-          setYanlisAnim(false);
-          // İkisini de tahtaya geri koy
-          setTiles(prev => prev.map(t =>
-            t.id === secili.id || t.id === tileId ? { ...t, inTray: false } : t
-          ));
-          setSecili(null);
-
-          const yeni = [...birikme, { id: Date.now(), kart: tile.kart }];
-          setBirikme(yeni);
-          blocked.current = false;
-
-          if (yeni.length >= MAX_BIRIKME) {
-            showMsg('Hata Sınırı Doldu!', 900);
-            setTimeout(() => setBitti(true), 1000);
-          }
-        }, 600);
+      setTepsi(yeniTepsi);
+      if (yeniTepsi.length >= MAX_TEPSI) {
+        showMsg('Tepsi doldu! Oyun bitti.', 1000);
+        setTimeout(() => setBitti(true), 1200);
       }
     }
   }
 
+  function geriAl() {
+    if (tepsi.length === 0 || blocked.current || carpisma) return;
+    const last = tepsi[tepsi.length - 1];
+    setTiles(prev => prev.map(t => t.id === last.tileId ? { ...t, inTray: false } : t));
+    setTepsi(prev => prev.slice(0, -1));
+  }
+
   const onTahta = tiles.filter(t => !t.removed && !t.inTray);
   const eslendi = tiles.filter(t => t.removed).length / 2;
-  const toplamCift = tiles.length / 2; // Dinamik toplam çift
+  const toplamCift = tiles.length / 2;
   const surePct = Math.max(0, (sure / OYUN_SURESI) * 100);
   const sureRenk = sure > 60 ? '#4a9e6a' : sure > 20 ? '#c8820a' : '#c02020';
-
 
   // ── BİTTİ ──
   if (bitti) {
@@ -348,8 +253,8 @@ export default function EslestirmeScreen() {
     return (
       <div className="screen mj-screen">
         <div className="mj-bitis">
-          <div className="mj-bitis-ikon">{kazandi ? '🏆' : eslendi >= 12 ? '⭐' : '⏱'}</div>
-          <h2 className="mj-baslik">{kazandi ? 'TEMIZLEDIN!' : eslendi >= 12 ? 'BASARILI!' : birikme.length >= MAX_BIRIKME ? 'BİRİKME DOLDU' : 'SÜRE DOLDU'}</h2>
+          <div className="mj-bitis-ikon">{kazandi ? '🏆' : eslendi >= toplamCift * 0.7 ? '⭐' : '⏱'}</div>
+          <h2 className="mj-baslik">{kazandi ? 'TEMIZLEDIN!' : tepsi.length >= MAX_TEPSI ? 'TEPSI DOLDU' : 'SURE DOLDU'}</h2>
           <div className="mj-bitis-skor">{finalSkor}</div>
           <p style={{ opacity: 0.6, fontSize: '0.82rem', marginTop: '-0.2rem' }}>puan</p>
           <div className="mj-bitis-istatlar">
@@ -357,28 +262,23 @@ export default function EslestirmeScreen() {
             <div className="mj-stat"><span className="mj-stat-sayi">{hamle}</span><span className="mj-stat-etiket">hamle</span></div>
             <div className="mj-stat"><span className="mj-stat-sayi">{sure}s</span><span className="mj-stat-etiket">kalan</span></div>
           </div>
-
           {kazandi ? (
             <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => {
               const bolge = BOLGELER.find(b => b.id === (state.seciliBolge || 'orhun'));
               if (bolge && aktifSeviye < bolge.seviyeSayisi - 1) {
-                // Sonraki seviyeye geç
                 dispatch({ type: 'SEFER_BASLAT', bolgeId: bolge.id, seviye: aktifSeviye + 1 });
               } else {
-                // Bölge bitti, haritaya dön
                 dispatch({ type: 'NAVIGATE', ekran: 'map' });
               }
             }}>
               {(BOLGELER.find(b => b.id === (state.seciliBolge || 'orhun'))?.seviyeSayisi - 1 > aktifSeviye)
-                ? 'Sonraki Bölüm'
-                : 'Bölge Tamamlandı!'}
+                ? 'Sonraki Bolum' : 'Bolge Tamamlandi!'}
             </button>
           ) : (
             <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => window.location.reload()}>Tekrar Oyna</button>
           )}
-
           <button className="btn btn-ikincil" style={{ width: '100%', marginTop: '0.5rem' }}
-            onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>Haritaya Dön</button>
+            onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>Haritaya Don</button>
         </div>
       </div>
     );
@@ -390,7 +290,7 @@ export default function EslestirmeScreen() {
       {/* Header */}
       <div className="mj-header">
         <button className="geri-btn" onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>&#8592;</button>
-        <button className="geri-btn" style={{ marginLeft: '10px', fontSize: '1rem', padding: '0.4rem' }} onClick={toggleMute}>
+        <button className="geri-btn" style={{ marginLeft: '6px', fontSize: '1rem', padding: '0.4rem' }} onClick={toggleMute}>
           {isMuted ? '🔇' : '🔊'}
         </button>
         <div className="mj-sure-wrap">
@@ -402,6 +302,27 @@ export default function EslestirmeScreen() {
         <div className="mj-skor-badge">{skor} &#10022;</div>
       </div>
 
+      {/* Tray — Vita Mahjong tarzı üst alan */}
+      <div className="mj-tepsi-alan">
+        <div className="mj-tepsi">
+          {Array.from({ length: MAX_TEPSI }, (_, i) => {
+            const t = tepsi[i];
+            if (!t) return <div key={i} className="mj-tepsi-slot" />;
+            const d = display(t.kart);
+            return (
+              <div key={i} className={[
+                'mj-tepsi-tas',
+                t.eslesti ? 'mj-tepsi-eslesti' : '',
+                d.isMit ? 'mj-tepsi-mit' : '',
+                d.isHay ? 'mj-tepsi-hay' : '',
+              ].filter(Boolean).join(' ')}>
+                <TasIcerik kart={t.kart} tepsi />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="mj-durum-row">
         <span>{eslendi}/{toplamCift} eslesme</span>
         <span>{hamle} hamle</span>
@@ -409,7 +330,7 @@ export default function EslestirmeScreen() {
 
       {efektMesaj && <div className="mj-efekt-mesaj">{efektMesaj}</div>}
 
-      {/* Çarpışma sahnesi */}
+      {/* Carpısma sahnesi */}
       {carpisma && (
         <div className={`cp-overlay ${carpisma.isCombo ? 'cp-combo' : ''}`}>
           <div className="cp-sahne">
@@ -449,51 +370,16 @@ export default function EslestirmeScreen() {
         </div>
       </div>
 
-      {/* Alt alan: önizleme + birikme */}
-      <div className="mj-alt-alan">
-        {/* Seçili önizleme */}
-        <div className="mj-secili-alan">
-          {secili ? (
-            <div className={[
-              'mj-secili-kart',
-              secili.kart.kategori === 'mitoloji' ? 'mj-tas-mit' : '',
-              secili.kart.kategori === 'hayvan' ? 'mj-tas-hay' : '',
-              yanlisAnim ? 'mj-secili-yanlis' : '',
-            ].filter(Boolean).join(' ')}>
-              <TasIcerik kart={secili.kart} />
-            </div>
-          ) : (
-            <div className="mj-secili-bos">?</div>
-          )}
-          <span className="mj-secili-etiket">Seçili</span>
-        </div>
-
-        {/* Birikme — kartlar üst üste yığılır */}
-        <div className="mj-birikme-alan">
-          <span className="mj-birikme-etiket">Birikme {birikme.length}/{MAX_BIRIKME}</span>
-          <div className="mj-birikme-yigin" style={{ width: `${44 + (MAX_BIRIKME - 1) * 10}px` }}>
-            {/* Boş slot göstergeleri */}
-            {Array.from({ length: MAX_BIRIKME }, (_, i) => (
-              <div key={`slot-${i}`} className="mj-birikme-slot"
-                style={{ left: i * 10, zIndex: i }} />
-            ))}
-            {/* Yığılan kartlar */}
-            {birikme.map((entry, i) => {
-              const d = display(entry.kart);
-              return (
-                <div key={entry.id}
-                  className={[
-                    'mj-birikme-tas',
-                    d.isMit ? 'mj-birikme-mit' : '',
-                    d.isHay ? 'mj-birikme-hay' : '',
-                  ].filter(Boolean).join(' ')}
-                  style={{ left: i * 10, zIndex: i + 10 }}>
-                  <span className={d.isGokt ? 'mj-birikme-gokt' : 'mj-birikme-emoji'}>{d.main}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      {/* Alt butonlar — Vita Mahjong tarzı */}
+      <div className="mj-guc-butonlar">
+        <button
+          className="mj-guc-btn"
+          onClick={geriAl}
+          disabled={tepsi.length === 0 || !!carpisma}
+        >
+          <span className="mj-guc-ikon">&#8617;</span>
+          <span className="mj-guc-yazi">Geri Al</span>
+        </button>
       </div>
     </div>
   );

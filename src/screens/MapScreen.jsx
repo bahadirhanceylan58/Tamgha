@@ -149,22 +149,30 @@ export default function MapScreen() {
         })}
       </div>
 
-      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', padding: '0.5rem 1rem' }}>
+      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.6rem', padding: '0.5rem 1rem' }}>
         <button
-          className="btn btn-ikincil"
-          style={{ padding: '0.8rem', fontSize: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}
+          className="btn btn-altin"
+          style={{ padding: '0.7rem 0.4rem', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}
           onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'koleksiyon' })}
         >
-          <span className="btn-simge" style={{ fontSize: '1.2rem' }}>{'\u{10C09}'}</span>
+          <span style={{ fontSize: '1.2rem' }}>{'\u{10C09}'}</span>
           Koleksiyon
         </button>
         <button
           className="btn btn-birincil"
-          style={{ padding: '0.8rem', fontSize: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}
+          style={{ padding: '0.7rem 0.4rem', fontSize: '1rem', fontWeight: '700', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', boxShadow: '0 0 12px rgba(200,100,30,0.6)', border: '2px solid #ff9944' }}
           onClick={baslatSonrakiBolum}
         >
-          <span className="btn-simge" style={{ fontSize: '1.2rem', marginBottom: '-4px' }}>{'\u{10C1A}'}</span>
-          İlerle
+          <span style={{ fontSize: '1.3rem' }}>{'\u{10C1A}'}</span>
+          Oyna
+        </button>
+        <button
+          className="btn btn-altin"
+          style={{ padding: '0.7rem 0.4rem', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}
+          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'rehber' })}
+        >
+          <span style={{ fontSize: '1.2rem' }}>📖</span>
+          Nasıl Oynanır
         </button>
       </div>
 
