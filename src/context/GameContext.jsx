@@ -10,10 +10,10 @@ const INITIAL_STATE = {
   seciliSeviye: null,
   kazanilanKartlar: [],
   bolgeIlerlemesi: {
-    orhun: { yildizlar: [0, 0, 0], kilit: false },
-    selenga: { yildizlar: [0, 0, 0], kilit: true },
-    altay: { yildizlar: [0, 0, 0], kilit: true },
-    tengri_yurdu: { yildizlar: [0, 0, 0], kilit: true },
+    orhun: { yildizlar: [0, 0, 0, 0, 0], kilit: false },
+    selenga: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
+    altay: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
+    tengri_yurdu: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
   },
   toplamPuan: 0,
   gunlukKartTalep: null,
@@ -34,14 +34,21 @@ function yukleKayit() {
       const parsed = JSON.parse(kayit);
       // tengri_yurdu yoksa ekle (eski kayitlar icin)
       const bolgeIlerlemesi = {
-        orhun: { yildizlar: [0, 0, 0], kilit: false },
-        selenga: { yildizlar: [0, 0, 0], kilit: true },
-        altay: { yildizlar: [0, 0, 0], kilit: true },
-        tengri_yurdu: { yildizlar: [0, 0, 0], kilit: true },
+        orhun: { yildizlar: [0, 0, 0, 0, 0], kilit: false },
+        selenga: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
+        altay: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
+        tengri_yurdu: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
         ...(parsed.bolgeIlerlemesi || {}),
       };
       if (!bolgeIlerlemesi.tengri_yurdu) {
-        bolgeIlerlemesi.tengri_yurdu = { yildizlar: [0, 0, 0], kilit: true };
+        bolgeIlerlemesi.tengri_yurdu = { yildizlar: [0, 0, 0, 0, 0], kilit: true };
+      }
+      // Eski kayıt: 3 elemanlı yıldız dizilerini 5'e genişlet
+      for (const k of Object.keys(bolgeIlerlemesi)) {
+        const y = bolgeIlerlemesi[k].yildizlar;
+        if (y.length < 5) {
+          bolgeIlerlemesi[k] = { ...bolgeIlerlemesi[k], yildizlar: [...y, ...Array(5 - y.length).fill(0)] };
+        }
       }
       return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr' };
     }
@@ -70,20 +77,20 @@ function reducer(state, action) {
 
     case 'QUIZ_TAMAMLA': {
       const { bolgeId, seviye, yildiz, kazanilanIds } = action;
-      const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0];
+      const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];
       const yeniYildizlar = [...oncekiYildizlar];
       yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
 
       const toplamYildiz = yeniYildizlar.reduce((a, b) => a + b, 0);
       const bolgeKilidiAc = {};
 
-      if (bolgeId === 'orhun' && toplamYildiz >= 3) {
+      if (bolgeId === 'orhun' && toplamYildiz >= 5) {
         bolgeKilidiAc.selenga = { ...state.bolgeIlerlemesi.selenga, kilit: false };
       }
-      if (bolgeId === 'selenga' && toplamYildiz >= 3) {
+      if (bolgeId === 'selenga' && toplamYildiz >= 5) {
         bolgeKilidiAc.altay = { ...state.bolgeIlerlemesi.altay, kilit: false };
       }
-      if (bolgeId === 'altay' && toplamYildiz >= 3) {
+      if (bolgeId === 'altay' && toplamYildiz >= 5) {
         bolgeKilidiAc.tengri_yurdu = { ...state.bolgeIlerlemesi.tengri_yurdu, kilit: false };
       }
 

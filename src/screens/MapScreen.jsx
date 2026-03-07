@@ -112,7 +112,7 @@ export default function MapScreen() {
     (acc, b) => acc + b.yildizlar.reduce((a, y) => a + y, 0),
     0
   );
-  const maxYildiz = BOLGELER.length * 3 * 3;
+  const maxYildiz = BOLGELER.reduce((acc, b) => acc + b.seviyeSayisi * 3, 0);
 
   // Secilen guc ile seviye secildikten hemen baslat
   function handleGucSecVeBaslat({ bolgeId, seviye }) {
@@ -131,7 +131,8 @@ export default function MapScreen() {
       const ilerleme = state.bolgeIlerlemesi[b.id];
       if (!ilerleme || ilerleme.kilit) continue;
 
-      const yildizlar = ilerleme.yildizlar || [0, 0, 0];
+      const bolge2 = BOLGELER.find(x => x.id === b.id);
+      const yildizlar = ilerleme.yildizlar || Array(bolge2?.seviyeSayisi || 5).fill(0);
       const eksikIndex = yildizlar.findIndex(y => y < 3);
       
       // Eger bu bolgede eksik bir yildiz varsa ve oynanabilirse burayi sec
@@ -209,7 +210,7 @@ export default function MapScreen() {
 
               {!kilit && (
                 <div className="bolge-seviyeler">
-                  {[0, 1, 2].map((seviye) => (
+                  {Array.from({ length: bolge.seviyeSayisi }, (_, i) => i).map((seviye) => (
                     <SeviyeButon
                       key={seviye}
                       bolgeId={bolge.id}
@@ -226,7 +227,7 @@ export default function MapScreen() {
         })}
       </div>
 
-      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.4rem' }}>
         <button
           className="btn btn-ikincil"
           style={{ padding: '0.5rem', fontSize: '0.85rem', flexDirection: 'column' }}
@@ -250,6 +251,14 @@ export default function MapScreen() {
         >
           <span style={{ fontSize: '1.2rem' }}>⚡</span>
           Arena
+        </button>
+        <button
+          className="btn btn-ikincil"
+          style={{ padding: '0.5rem', fontSize: '0.85rem', flexDirection: 'column' }}
+          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'eslestirme' })}
+        >
+          <span style={{ fontSize: '1.2rem' }}>🀄</span>
+          Tamga Avı
         </button>
       </div>
 

@@ -1,132 +1,45 @@
-import { useState, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
-import { SOZLUK, SOZLUK_KATEGORILER } from '../data/sozluk';
-import { getT } from '../i18n/translations';
-
-const KAT_ADI = {
-  tr: { hepsi: 'Hepsi', toplum: 'Toplum', doga: 'Doğa', isim: 'İsimler', fiil: 'Fiiller' },
-  en: { hepsi: 'All', toplum: 'Society', doga: 'Nature', isim: 'Nouns', fiil: 'Verbs' },
-  ru: { hepsi: 'Все', toplum: 'Общество', doga: 'Природа', isim: 'Имена', fiil: 'Глаголы' },
-};
 
 export default function SozlukScreen() {
-  const { state, dispatch } = useGame();
-  const dil = state.dil || 'tr';
-  const t = getT(dil);
-  const [kategori, setKategori] = useState('hepsi');
-  const [arama, setArama] = useState('');
-  const [acikKelime, setAcikKelime] = useState(null);
-
-  const katAdi = KAT_ADI[dil] || KAT_ADI.tr;
-
-  const filtreliKelimeler = useMemo(() => {
-    return SOZLUK.filter((k) => {
-      const katEsles = kategori === 'hepsi' || k.kategori === kategori;
-      const aramaEsles = !arama ||
-        k.goktürkce.toLowerCase().includes(arama.toLowerCase()) ||
-        k.tr.toLowerCase().includes(arama.toLowerCase()) ||
-        k.en.toLowerCase().includes(arama.toLowerCase()) ||
-        k.ru.toLowerCase().includes(arama.toLowerCase());
-      return katEsles && aramaEsles;
-    });
-  }, [kategori, arama]);
-
-  function kelimeAnlam(k) {
-    if (dil === 'en') return k.en;
-    if (dil === 'ru') return k.ru;
-    return k.tr;
-  }
+  const { dispatch } = useGame();
 
   return (
-    <div className="screen sozluk-screen">
-      {/* Header */}
-      <div className="sozluk-header">
-        <button className="geri-btn" onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'home' })}>
-          &#8592; {t('geri').replace('← ', '')}
+    <div className="screen sozluk-secim-screen">
+      <div className="sozluk-secim-header">
+        <button
+          className="geri-btn"
+          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'home' })}
+        >
+          &#8592;
         </button>
-        <div className="sozluk-baslik-grup">
-          <h2 className="sozluk-baslik">{t('sozluk')}</h2>
-          <p className="sozluk-altyazi">{t('sozlukAlt')}</p>
-        </div>
-        <div className="sozluk-sayi">{filtreliKelimeler.length}</div>
+        <h2 className="sozluk-secim-baslik">Sözlük</h2>
       </div>
 
-      {/* Arama */}
-      <div className="sozluk-arama-sarici">
-        <span className="sozluk-arama-ikon">🔍</span>
-        <input
-          className="sozluk-arama"
-          type="text"
-          placeholder={t('ara')}
-          value={arama}
-          onChange={(e) => setArama(e.target.value)}
-        />
-        {arama && (
-          <button className="sozluk-temizle" onClick={() => setArama('')}>✕</button>
-        )}
-      </div>
-
-      {/* Kategori sekmeleri */}
-      <div className="sozluk-kat-row">
-        {SOZLUK_KATEGORILER.map((kat) => (
-          <button
-            key={kat.id}
-            className={`sozluk-kat-btn ${kategori === kat.id ? 'aktif' : ''}`}
-            onClick={() => setKategori(kat.id)}
-          >
-            <span>{kat.ikon}</span>
-            <span>{katAdi[kat.id]}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Kelime listesi */}
-      <div className="sozluk-liste">
-        {filtreliKelimeler.length === 0 && (
-          <div className="sozluk-bos">
-            <span>🔍</span>
-            <p>Kelime bulunamadı</p>
+      <div className="sozluk-secim-icerik">
+        <button
+          className="sozluk-secim-kart"
+          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'sozluk_dlt' })}
+        >
+          <div className="sozluk-secim-ikon">📜</div>
+          <div className="sozluk-secim-bilgi">
+            <span className="sozluk-secim-ad">Divanü Lügati't-Türk</span>
+            <span className="sozluk-secim-alt">Kaşgarlı Mahmud · 11. yy · 7918 kelime</span>
           </div>
-        )}
-        {filtreliKelimeler.map((k) => (
-          <div
-            key={k.id}
-            className={`sozluk-satir ${acikKelime === k.id ? 'acik' : ''}`}
-            onClick={() => setAcikKelime(acikKelime === k.id ? null : k.id)}
-          >
-            <div className="sozluk-satir-ust">
-              <span className="sozluk-tamga">{k.tamga}</span>
-              <div className="sozluk-kelime-bilgi">
-                <span className="sozluk-goktürkce">{k.goktürkce}</span>
-                <span className="sozluk-anlam">{kelimeAnlam(k)}</span>
-              </div>
-              <span className="sozluk-ok">{acikKelime === k.id ? '▲' : '▼'}</span>
-            </div>
+          <span className="sozluk-secim-ok">›</span>
+        </button>
 
-            {acikKelime === k.id && (
-              <div className="sozluk-detay">
-                <div className="sozluk-detay-diller">
-                  <div className="sozluk-dil-satir">
-                    <span className="sozluk-dil-bayrak">🇹🇷</span>
-                    <span>{k.tr}</span>
-                  </div>
-                  <div className="sozluk-dil-satir">
-                    <span className="sozluk-dil-bayrak">🇬🇧</span>
-                    <span>{k.en}</span>
-                  </div>
-                  <div className="sozluk-dil-satir">
-                    <span className="sozluk-dil-bayrak">🇷🇺</span>
-                    <span>{k.ru}</span>
-                  </div>
-                </div>
-                <div className="sozluk-ornek">
-                  <span className="sozluk-ornek-etiket">{t('ornek')}:</span>
-                  <span className="sozluk-ornek-metin">{k.ornek}</span>
-                </div>
-              </div>
-            )}
+        <button
+          className="sozluk-secim-kart"
+          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'sozluk_gokt' })}
+        >
+          <div className="sozluk-secim-ikon">𐱅</div>
+          <div className="sozluk-secim-bilgi">
+            <span className="sozluk-secim-ad">Göktürkçe Sözlük</span>
+            <span className="sozluk-secim-alt">Orhun Yazıtları · 8. yy · 65 kelime</span>
           </div>
-        ))}
+          <span className="sozluk-secim-ok">›</span>
+        </button>
+
       </div>
     </div>
   );

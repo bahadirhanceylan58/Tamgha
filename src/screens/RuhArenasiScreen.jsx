@@ -209,6 +209,7 @@ export default function RuhArenasiScreen() {
               <button
                 key={kart.id}
                 className={`arena-kart sol-kart
+                  ${kart.kategori === 'mitoloji' ? 'arena-kart-mitoloji' : 'arena-kart-hayvan'}
                   ${secili ? 'arena-kart-secili' : ''}
                   ${tamamlandi ? 'arena-kart-tamam' : ''}
                   ${yanlis ? 'arena-kart-yanlis' : ''}
@@ -216,9 +217,12 @@ export default function RuhArenasiScreen() {
                 onClick={() => secHayvan(idx)}
                 disabled={tamamlandi}
               >
+                {tamamlandi && <span className="arena-tamam-ikon">✓</span>}
                 <span className="arena-kart-tamga">{kart.tamga}</span>
                 <span className="arena-kart-ses">{kart.ses}</span>
-                {tamamlandi && <span className="arena-tamam-ikon">✓</span>}
+                <span className="arena-kart-aciklama-kisa">
+                  {kart.kategori === 'mitoloji' ? 'Mitoloji' : 'Hayvan Ruhu'}
+                </span>
               </button>
             );
           })}
@@ -239,16 +243,18 @@ export default function RuhArenasiScreen() {
             return (
               <button
                 key={`guc-${gucIdx}`}
-                className={`arena-kart sag-kart
+                className={`arena-kart sag-kart arena-kart-guc
                   ${tamamlandi ? 'arena-kart-tamam' : ''}
                   ${yanlis ? 'arena-kart-yanlis' : ''}
+                  ${secilenSol !== null && !tamamlandi ? 'arena-kart-hedef' : ''}
                 `}
                 onClick={() => secGuc(gucIdx)}
                 disabled={tamamlandi || secilenSol === null}
               >
+                {tamamlandi && <span className="arena-tamam-ikon">✓</span>}
                 <span className="arena-kart-ikon">{kart.guc.ikon}</span>
                 <span className="arena-kart-guc-adi">{kart.guc.adi}</span>
-                {tamamlandi && <span className="arena-tamam-ikon">✓</span>}
+                <span className="arena-kart-aciklama-kisa">{kart.guc.aciklama}</span>
               </button>
             );
           })}
