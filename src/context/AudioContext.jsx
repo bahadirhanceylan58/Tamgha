@@ -1,0 +1,99 @@
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+
+const AudioContext = createContext();
+
+// Reliable ASMR-style sounds (Mixkit / SoundJay placeholders - User should replace with local files for best results)
+const SOUNDS = {
+    bgm: 'https://assets.mixkit.co/active-storage/sfx/2436/2436-preview.mp3', // Nature/Wind Ambient
+    click: 'https://assets.mixkit.co/active-storage/sfx/2568/2568-preview.mp3', // Soft wood tap
+    match: 'https://assets.mixkit.co/active-storage/sfx/2012/2012-preview.mp3', // Ethereal shimmer
+    combo: 'https://assets.mixkit.co/active-storage/sfx/2000/2000-preview.mp3'  // Magical burst
+};
+
+export function AudioProvider({ children }) {
+    const [isMuted, setIsMuted] = useState(false);
+    const [unlocked, setUnlocked] = useState(false);
+
+    const bgmRef = useRef(null);
+    const clickRef = useRef(null);
+    const matchRef = useRef(null);
+    const comboRef = useRef(null);
+
+    useEffect(() => {
+        bgmRef.current = new Audio(SOUNDS.bgm);
+        bgmRef.current.loop = true;
+        bgmRef.current.volume = 0.3;
+
+        clickRef.current = new Audio(SOUNDS.click);
+        clickRef.current.volume = 0.6;
+
+        matchRef.current = new Audio(SOUNDS.match);
+        matchRef.current.volume = 0.5;
+
+        comboRef.current = new Audio(SOUNDS.combo);
+        comboRef.current.volume = 0.8;
+
+        return () => {
+            if (bgmRef.current) {
+                bgmRef.current.pause();
+                bgmRef.current.src = "";
+            }
+        };
+    }, []);
+
+    const unlockAudio = useCallback(() => {
+        if (unlocked) return;
+
+        // Play a silent buffer to unlock audio on mobile/modern browsers
+        const silent = new Audio();
+        silent.play().catch(() => { });
+
+        if (bgmRef.current && !isMuted) {
+            bgmRef.current.play().catch(e => console.log("Audio unlock failed:", e));
+        }
+        setUnlocked(true);
+    }, [unlocked, isMuted]);
+
+    const toggleMute = useCallback(() => {
+        setIsMuted(prev => {
+            const next = !prev;
+            if (bgmRef.current) bgmRef.current.muted = next;
+            return next;
+        });
+    }, []);
+
+    const playClick = useCallback(() => {
+        if (!isMuted && clickRef.current) {
+            clickRef.current.currentTime = 0;
+            clickRef.current.play().catch(() => { });
+        }
+    }, [isMuted]);
+
+    const playMatch = useCallback(() => {
+        if (!isMuted && matchRef.current) {
+            matchRef.current.currentTime = 0;
+            matchRef.current.play().catch(() => { });
+        }
+    }, [isMuted]);
+
+    const playCombo = useCallback(() => {
+        if (!isMuted && comboRef.current) {
+            comboRef.current.currentTime = 0;
+            comboRef.current.play().catch(() => { });
+        }
+    }, [isMuted]);
+
+    return (
+        <AudioContext.Provider value={{
+            playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, unlocked
+        }}>
+            {children}
+        </AudioContext.Provider>
+    );
+}
+
+export function useAudio() {
+    const context = useContext(AudioContext);
+    if (!context) throw new Error("useAudio must be used within AudioProvider");
+    return context;
+}

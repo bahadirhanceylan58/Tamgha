@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { TAMGALAR, HAYVANLAR, findKartById, NADIRLIK } from '../data/tamgalar';
 import { getT } from '../i18n/translations';
+import { useAudio } from '../hooks/useAudio';
 
 const YUZUCU_TAMGALAR = ['\u{10C00}', '\u{10C09}', '\u{10C1A}', '\u{10C43}', '\u{10C23}', '\u{10C3A}', '\u{10C03}', '\u{10C2D}'];
 
@@ -97,6 +98,7 @@ function DogumYiliModal({ onKapat, onKaydet }) {
 
 export default function HomeScreen() {
   const { state, dispatch } = useGame();
+  const { unlockAudio, unlocked, isMuted, toggleMute } = useAudio();
   const t = getT(state.dil || 'tr');
   const [dogumModalAcik, setDogumModalAcik] = useState(false);
   const bugun = new Date().toDateString();
@@ -153,8 +155,19 @@ export default function HomeScreen() {
           <span className="home-profil-avatar">{state.avatar || '\u{10C00}'}</span>
           <span className="home-profil-ad">{state.kullaniciAdi || t('profilBtn')}</span>
         </button>
-        <div className="home-dil-rozet">
-          {state.dil === 'en' ? '🇬🇧' : state.dil === 'ru' ? '🇷🇺' : '🇹🇷'}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {!unlocked ? (
+            <button className="home-dil-rozet" style={{ background: 'var(--altin)', color: '#000', cursor: 'pointer' }} onClick={unlockAudio}>
+              🔊 Sesi Etkinleştir
+            </button>
+          ) : (
+            <button className="home-dil-rozet" style={{ cursor: 'pointer' }} onClick={toggleMute}>
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+          )}
+          <div className="home-dil-rozet">
+            {state.dil === 'en' ? '🇬🇧' : state.dil === 'ru' ? '🇷🇺' : '🇹🇷'}
+          </div>
         </div>
       </div>
 

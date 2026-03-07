@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
-import { TAMGALAR, MITOLOJI, HAYVANLAR, getBolgeTamgalari } from '../data/tamgalar';
+import { TAMGALAR, MITOLOJI, HAYVANLAR, getBolgeTamgalari, BOLGELER } from '../data/tamgalar';
 import { useAudio } from '../hooks/useAudio';
 
 const TW = 46;
@@ -188,7 +188,20 @@ export default function EslestirmeScreen() {
 
     const onTahtaCount = tiles.filter(t => !t.removed && !t.inTray).length;
     if (onTahtaCount === 0) {
-      if (tiles.every(t => t.removed)) setBitti(true);
+      if (tiles.every(t => t.removed)) {
+        setBitti(true);
+        // Kazanma anında puan ve ilerlemeyi kaydet
+        if (!bitti) {
+          const finalSkor = skor + sure * 5;
+          dispatch({
+            type: 'ESLESTIRME_TAMAMLA',
+            bolgeId: state.seciliBolge || 'orhun',
+            seviye: aktifSeviye,
+            puan: finalSkor,
+            kazandi: true
+          });
+        }
+      }
       return;
     }
 
@@ -344,7 +357,26 @@ export default function EslestirmeScreen() {
             <div className="mj-stat"><span className="mj-stat-sayi">{hamle}</span><span className="mj-stat-etiket">hamle</span></div>
             <div className="mj-stat"><span className="mj-stat-sayi">{sure}s</span><span className="mj-stat-etiket">kalan</span></div>
           </div>
-          <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => window.location.reload()}>Tekrar Oyna</button>
+
+          {kazandi ? (
+            <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => {
+              const bolge = BOLGELER.find(b => b.id === (state.seciliBolge || 'orhun'));
+              if (bolge && aktifSeviye < bolge.seviyeSayisi - 1) {
+                // Sonraki seviyeye geç
+                dispatch({ type: 'SEFER_BASLAT', bolgeId: bolge.id, seviye: aktifSeviye + 1 });
+              } else {
+                // Bölge bitti, haritaya dön
+                dispatch({ type: 'NAVIGATE', ekran: 'map' });
+              }
+            }}>
+              {(BOLGELER.find(b => b.id === (state.seciliBolge || 'orhun'))?.seviyeSayisi - 1 > aktifSeviye)
+                ? 'Sonraki Bölüm'
+                : 'Bölge Tamamlandı!'}
+            </button>
+          ) : (
+            <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => window.location.reload()}>Tekrar Oyna</button>
+          )}
+
           <button className="btn btn-ikincil" style={{ width: '100%', marginTop: '0.5rem' }}
             onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>Haritaya Dön</button>
         </div>

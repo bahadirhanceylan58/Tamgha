@@ -134,6 +134,28 @@ function reducer(state, action) {
     case 'GUC_KULLAN':
       return { ...state, aktifGuc: null };
 
+    case 'ESLESTIRME_TAMAMLA': {
+      const { bolgeId, seviye, puan } = action;
+      const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];
+      const yeniYildizlar = [...oncekiYildizlar];
+
+      // Basit yildiz mantigi: Mahjong temizlendiği an en az 1 yildiz, basariliysa 3 yildiz
+      const yildiz = action.kazandi ? 3 : 0;
+      yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
+
+      return {
+        ...state,
+        bolgeIlerlemesi: {
+          ...state.bolgeIlerlemesi,
+          [bolgeId]: {
+            ...state.bolgeIlerlemesi[bolgeId],
+            yildizlar: yeniYildizlar,
+          }
+        },
+        toplamPuan: state.toplamPuan + puan,
+      };
+    }
+
     case 'QUIZ_TAMAMLA': {
       const { bolgeId, seviye, yildiz, kazanilanIds } = action;
       const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];

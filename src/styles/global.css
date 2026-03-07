@@ -2,6 +2,8 @@
    TAMGHA - Goktürk Temasi
    ═══════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+Old+Turkic&family=Outfit:wght@300;400;600&display=swap');
+
 :root {
   --bg: #0d0800;
   --bg-orta: #1a1000;
@@ -4108,13 +4110,19 @@ body {
   font-size: 1.6rem;
 }
 
-/* Latin (Hard Mode) */
+/* Latin (Hard Mode) - ASMR Feel */
 .mj-ana-latin {
   font-family: 'Cinzel', serif;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #1a1a1a;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  color: #1a150f;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+  filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.1));
+}
+
+.mj-tas-serbest:hover .mj-ana-latin {
+  color: #c8820a;
+  text-shadow: 0 0 8px rgba(200, 130, 10, 0.3);
 }
 
 /* Small ses / name label */

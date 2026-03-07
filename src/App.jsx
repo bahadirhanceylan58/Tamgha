@@ -1,4 +1,5 @@
 import { GameProvider, useGame } from './context/GameContext'
+import { AudioProvider } from './context/AudioContext'
 import HomeScreen from './screens/HomeScreen'
 import MapScreen from './screens/MapScreen'
 import QuizScreen from './screens/QuizScreen'
@@ -37,10 +38,12 @@ function Router() {
 
 export default function App() {
   return (
-    <GameProvider>
-      <div className="oyun-sarici">
-        <Router />
-      </div>
-    </GameProvider>
+    <AudioProvider>
+      <GameProvider>
+        <div className="oyun-sarici">
+          <Router />
+        </div>
+      </GameProvider>
+    </AudioProvider>
   )
 }
