@@ -125,12 +125,15 @@ export default function QuizScreen() {
     return <KartKazanEkrani />;
   }
 
-  const bolge = BOLGELER.find((b) => b.id === state.seciliBolge);
-  const seviye = state.seciliSeviye ?? 0;
-  const aktifGuc = state.aktifGuc;
+  // Sefer aktifse sefer objesini, degilse normal secili state'leri kullan
+  const bolgeId = state.sefer?.aktif ? state.sefer.bolgeId : state.seciliBolge;
+  const seviye = state.sefer?.aktif ? state.sefer.seviye : (state.seciliSeviye ?? 0);
+  const aktifGuc = state.sefer?.aktif ? state.sefer.guc : state.aktifGuc;
+
+  const bolge = BOLGELER.find((b) => b.id === bolgeId);
 
   const [sorular] = useState(() => {
-    let q = generateQuestions(state.seciliBolge, SORU_SAYISI);
+    let q = generateQuestions(bolgeId, SORU_SAYISI);
     // secim_sil gucu: her soruda bir yanlis secenek kaldir
     if (aktifGuc?.id === 'secim_sil') {
       q = q.map((s) => {
@@ -249,9 +252,14 @@ export default function QuizScreen() {
     const karisik = [...bolgeTamgalari].sort(() => Math.random() - 0.5);
     const kazanilanIds = karisik.slice(0, Math.min(kazanilanSayi, bolgeTamgalari.length)).map((t) => t.id);
 
+    // Sefer'deysek Quiz biterken Sefer'i de kapat
+    if (state.sefer?.aktif) {
+      dispatch({ type: 'SEFER_BITIR' });
+    }
+
     dispatch({
       type: 'QUIZ_TAMAMLA',
-      bolgeId: state.seciliBolge,
+      bolgeId: bolgeId,
       seviye,
       yildiz,
       kazanilanIds,
@@ -296,10 +304,10 @@ export default function QuizScreen() {
             {yildiz === 3
               ? 'Mukemmel! Tum tamgalari dogru bildin!'
               : yildiz === 2
-              ? 'Cok iyi! Biraz daha pratik yapabilirsin.'
-              : yildiz === 1
-              ? 'Baslangic iyi. Tamgalari tekrar incele.'
-              : 'Endislenme! Her deneme daha iyiye goturur.'}
+                ? 'Cok iyi! Biraz daha pratik yapabilirsin.'
+                : yildiz === 1
+                  ? 'Baslangic iyi. Tamgalari tekrar incele.'
+                  : 'Endislenme! Her deneme daha iyiye goturur.'}
           </p>
           <p className="sonuc-kart-mesaj">
             {Math.max(1, yildiz)} kart kazaniyorsun!

@@ -46,8 +46,10 @@ function GucRozet({ guc, onTemizle }) {
   );
 }
 
-// Guc secim modal
-function GucSecimModal({ kazanilanKartlar, onSec, onKapat }) {
+// Sefer Hazirlik Modal
+function SeferHazirlikModal({ kazanilanKartlar, seviyeDetay, onKapat, onSeferBaslat }) {
+  const [seciliGuc, setSeciliGuc] = useState(null);
+
   const mevcut = kazanilanKartlar
     .map((id) => findKartById(id))
     .filter((k) => k && k.guc)
@@ -55,35 +57,47 @@ function GucSecimModal({ kazanilanKartlar, onSec, onKapat }) {
 
   return (
     <div className="guc-modal-overlay" onClick={onKapat}>
-      <div className="guc-modal" onClick={(e) => e.stopPropagation()}>
-        <h3 className="guc-modal-baslik">⚡ Ruh Gucu Sec</h3>
-        <p className="guc-modal-alt">Quiz icin bir ruh gucu aktive et</p>
-        <div className="guc-modal-liste">
-          {mevcut.length === 0 && (
-            <p className="guc-bos">Henuz hic ruh gucu kazanmadın. Hayvan ruhu veya mitoloji karti topla!</p>
-          )}
-          {mevcut.map((kart) => {
-            const nadirlik = NADIRLIK[kart.nadirlik] || NADIRLIK.demir;
-            return (
-              <button
-                key={kart.id}
-                className="guc-kart"
-                style={{ '--guc-renk': nadirlik.renk }}
-                onClick={() => onSec(kart.guc)}
-              >
-                <span className="guc-kart-tamga">{kart.tamga}</span>
-                <div className="guc-kart-bilgi">
-                  <span className="guc-kart-hayvan">{kart.ses}</span>
-                  <span className="guc-kart-guc-adi">{kart.guc.ikon} {kart.guc.adi}</span>
-                  <span className="guc-kart-aciklama">{kart.guc.aciklama}</span>
-                </div>
-              </button>
-            );
-          })}
+      <div className="guc-modal" onClick={(e) => e.stopPropagation()} style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+        <h3 className="guc-modal-baslik" style={{ marginBottom: '0.2rem' }}>⚔️ Sefere Çık</h3>
+        <p className="guc-modal-alt" style={{ marginBottom: '1rem' }}>Seviye {seviyeDetay.seviye + 1} Sefiri</p>
+
+        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#c8860a', marginBottom: '10px' }}>
+          Peş peşe 3 zorlu aşamadan geçeceksin:<br />
+          Öğren (Tamga Avı) ➔ Savaş (Arena) ➔ Sınav
+        </p>
+
+        <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '12px', padding: '10px', flex: 1, overflowY: 'auto' }}>
+          <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#aaa', marginBottom: '10px' }}>Sefer için ruh gücü kuşan:</p>
+          <div className="guc-modal-liste" style={{ maxHeight: 'none', padding: 0 }}>
+            {mevcut.length === 0 && (
+              <p className="guc-bos">Henüz hiç ruh gücü kazanmadın.</p>
+            )}
+            {mevcut.map((kart) => {
+              const nadirlik = NADIRLIK[kart.nadirlik] || NADIRLIK.demir;
+              const secili = seciliGuc?.id === kart.guc.id;
+              return (
+                <button
+                  key={kart.id}
+                  className="guc-kart"
+                  style={{ '--guc-renk': nadirlik.renk, border: secili ? `2px solid ${nadirlik.renk}` : '1px solid rgba(255,255,255,0.1)' }}
+                  onClick={() => setSeciliGuc(secili ? null : kart.guc)}
+                >
+                  <span className="guc-kart-tamga">{kart.tamga}</span>
+                  <div className="guc-kart-bilgi">
+                    <span className="guc-kart-hayvan">{kart.ses}</span>
+                    <span className="guc-kart-guc-adi">{kart.guc.ikon} {kart.guc.adi}</span>
+                    <span className="guc-kart-aciklama">{kart.guc.aciklama}</span>
+                  </div>
+                  {secili && <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: nadirlik.renk, fontSize: '1.5rem' }}>✓</span>}
+                </button>
+              );
+            })}
+          </div>
+          <button className="btn btn-birincil" onClick={() => onSeferBaslat(seciliGuc)} style={{ width: '100%', marginTop: '0.8rem', padding: '0.8rem' }}>
+            ⚔️ Sefere Çık!
+          </button>
         </div>
-        <button className="btn btn-ikincil" onClick={() => onSec(null)} style={{ width: '100%', marginTop: '0.5rem' }}>
-          Gucsuz Baslat
-        </button>
+
       </div>
     </div>
   );
@@ -91,21 +105,17 @@ function GucSecimModal({ kazanilanKartlar, onSec, onKapat }) {
 
 export default function MapScreen() {
   const { state, dispatch } = useGame();
-  const [gucModal, setGucModal] = useState(null); // { bolgeId, seviye }
+  const [seviyeModal, setSeviyeModal] = useState(null); // { bolgeId, seviye }
   const [seciliGuc, setSeciliGuc] = useState(null);
 
   function seviyeTikla(bolgeId, seviye) {
-    setGucModal({ bolgeId, seviye });
+    setSeviyeModal({ bolgeId, seviye });
   }
 
-  function gucSec(guc) {
-    setSeciliGuc(guc);
-    setGucModal(null);
-  }
-
-  function quizBaslat(bolgeId, seviye) {
-    dispatch({ type: 'QUIZ_BASLAT', bolgeId, seviye, guc: seciliGuc });
-    setSeciliGuc(null);
+  function handleSeferBaslat(guc) {
+    if (!seviyeModal) return;
+    dispatch({ type: 'SEFER_BASLAT', bolgeId: seviyeModal.bolgeId, seviye: seviyeModal.seviye, guc });
+    setSeviyeModal(null);
   }
 
   const toplamYildiz = Object.values(state.bolgeIlerlemesi).reduce(
@@ -113,15 +123,6 @@ export default function MapScreen() {
     0
   );
   const maxYildiz = BOLGELER.reduce((acc, b) => acc + b.seviyeSayisi * 3, 0);
-
-  // Secilen guc ile seviye secildikten hemen baslat
-  function handleGucSecVeBaslat({ bolgeId, seviye }) {
-    return (guc) => {
-      dispatch({ type: 'QUIZ_BASLAT', bolgeId, seviye, guc });
-      setGucModal(null);
-      setSeciliGuc(null);
-    };
-  }
 
   function baslatSonrakiBolum() {
     let hedefBolge = BOLGELER[0].id;
@@ -134,7 +135,7 @@ export default function MapScreen() {
       const bolge2 = BOLGELER.find(x => x.id === b.id);
       const yildizlar = ilerleme.yildizlar || Array(bolge2?.seviyeSayisi || 5).fill(0);
       const eksikIndex = yildizlar.findIndex(y => y < 3);
-      
+
       // Eger bu bolgede eksik bir yildiz varsa ve oynanabilirse burayi sec
       if (eksikIndex !== -1) {
         if (eksikIndex === 0 || yildizlar[eksikIndex - 1] > 0) {
@@ -146,7 +147,7 @@ export default function MapScreen() {
       // Bolge ful ama son bolge degilse donguye devam et
     }
 
-    setGucModal({ bolgeId: hedefBolge, seviye: hedefSeviye });
+    setSeviyeModal({ bolgeId: hedefBolge, seviye: hedefSeviye });
   }
 
   return (
@@ -227,10 +228,10 @@ export default function MapScreen() {
         })}
       </div>
 
-      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.4rem' }}>
+      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', padding: '0.5rem 1rem' }}>
         <button
           className="btn btn-ikincil"
-          style={{ padding: '0.5rem', fontSize: '0.85rem', flexDirection: 'column' }}
+          style={{ padding: '0.8rem', fontSize: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}
           onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'koleksiyon' })}
         >
           <span className="btn-simge" style={{ fontSize: '1.2rem' }}>{'\u{10C09}'}</span>
@@ -238,35 +239,20 @@ export default function MapScreen() {
         </button>
         <button
           className="btn btn-birincil"
-          style={{ padding: '0.5rem', fontSize: '1rem', flexDirection: 'column' }}
+          style={{ padding: '0.8rem', fontSize: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}
           onClick={baslatSonrakiBolum}
         >
-          <span className="btn-simge" style={{ fontSize: '1.5rem', marginBottom: '-4px' }}>{'\u{10C1A}'}</span>
-          OYNA
-        </button>
-        <button
-          className="btn btn-ikincil"
-          style={{ padding: '0.5rem', fontSize: '0.85rem', flexDirection: 'column' }}
-          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'ruh_arenasi' })}
-        >
-          <span style={{ fontSize: '1.2rem' }}>⚡</span>
-          Arena
-        </button>
-        <button
-          className="btn btn-ikincil"
-          style={{ padding: '0.5rem', fontSize: '0.85rem', flexDirection: 'column' }}
-          onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'eslestirme' })}
-        >
-          <span style={{ fontSize: '1.2rem' }}>🀄</span>
-          Tamga Avı
+          <span className="btn-simge" style={{ fontSize: '1.2rem', marginBottom: '-4px' }}>{'\u{10C1A}'}</span>
+          İlerle
         </button>
       </div>
 
-      {gucModal && (
-        <GucSecimModal
+      {seviyeModal && (
+        <SeferHazirlikModal
           kazanilanKartlar={state.kazanilanKartlar}
-          onSec={handleGucSecVeBaslat(gucModal)}
-          onKapat={() => setGucModal(null)}
+          seviyeDetay={seviyeModal}
+          onSeferBaslat={handleSeferBaslat}
+          onKapat={() => setSeviyeModal(null)}
         />
       )}
     </div>

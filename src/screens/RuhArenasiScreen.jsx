@@ -89,6 +89,9 @@ export default function RuhArenasiScreen() {
         : kazanilacakKartlar;
 
     dispatch({ type: 'ARENA_KAZAN', kazanilanIds: sonucKartlar, puan });
+    if (state.sefer?.aktif) {
+      dispatch({ type: 'SEFER_ILERLE' });
+    }
   }
 
   const surePct = (sure / ARENA_SURE) * 100;
@@ -146,9 +149,15 @@ export default function RuhArenasiScreen() {
           <p className="arena-kazan-mesaj">
             {Math.min(3, Math.ceil(tamamlananlar.size / 2))} Hayvan Ruhu karti kazaniyorsun!
           </p>
-          <button className="btn btn-birincil" onClick={bitisKartiKazan}>
-            Kartlari Al!
-          </button>
+          {state.sefer?.aktif ? (
+            <button className="btn btn-birincil" onClick={bitisKartiKazan}>
+              Kartları Al ve Sınava Gir 📝
+            </button>
+          ) : (
+            <button className="btn btn-birincil" onClick={bitisKartiKazan}>
+              Kartlari Al!
+            </button>
+          )}
         </div>
       </div>
     );

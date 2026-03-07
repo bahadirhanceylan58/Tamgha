@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
-import { TAMGALAR, MITOLOJI, HAYVANLAR } from '../data/tamgalar';
+import { TAMGALAR, MITOLOJI, HAYVANLAR, getBolgeTamgalari } from '../data/tamgalar';
 
 const TW = 52;
 const TH = 64;
@@ -27,8 +27,17 @@ const LAYOUT = [
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-function createBoard() {
-  const pool    = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR]).slice(0, 18);
+function createBoard(bolgeId) {
+  let pool;
+  if (bolgeId) {
+    const bolgeT = getBolgeTamgalari(bolgeId);
+    const digerleri = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR]).filter(k => !bolgeT.find(t => t.id === k.id));
+    // Bolgenin tum kartlarini kesin al, uzerini 18 olana kadar rastgele doldur.
+    pool = shuffle([...bolgeT, ...digerleri]).slice(0, 18);
+  } else {
+    pool = shuffle([...TAMGALAR, ...MITOLOJI, ...HAYVANLAR]).slice(0, 18);
+  }
+
   const doubled = shuffle([...pool, ...pool]);
   return shuffle([...LAYOUT]).map((pos, i) => ({
     id: i, row: pos.r, col: pos.c, layer: pos.l,
@@ -46,8 +55,8 @@ function isFree(tile, all) {
 
 function tilePos(col, row, layer) {
   return {
-    left:   col * (TW + GAP) - layer * LOX,
-    top:    row * (TH + GAP) - layer * LOY,
+    left: col * (TW + GAP) - layer * LOX,
+    top: row * (TH + GAP) - layer * LOY,
     zIndex: layer * 100 + row * 10 + col,
   };
 }
@@ -55,8 +64,8 @@ function tilePos(col, row, layer) {
 function display(kart) {
   const isMit = kart.kategori === 'mitoloji';
   const isHay = kart.kategori === 'hayvan';
-  if (!isMit && !isHay) return { isGokt: true,  main: kart.tamga, sub: kart.ses, isMit: false, isHay: false };
-  if (isHay)            return { isGokt: false, main: kart.tamga, sub: kart.ses, isMit: false, isHay: true  };
+  if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: kart.ses, isMit: false, isHay: false };
+  if (isHay) return { isGokt: false, main: kart.tamga, sub: kart.ses, isMit: false, isHay: true };
   const safe = { '💀': '☽', '🤍': '◈' };
   return { isGokt: false, main: safe[kart.tamga] ?? kart.tamga, sub: kart.ses, isMit: true, isHay: false };
 }
@@ -79,15 +88,15 @@ function TasIcerik({ kart, buyuk = false }) {
 }
 
 export default function EslestirmeScreen() {
-  const { dispatch } = useGame();
-  const [tiles, setTiles]       = useState(() => createBoard());
-  const [secili, setSecili]     = useState(null);    // { id, kart }
-  const [birikme, setBirikme]   = useState([]);      // [{ id, kart }]  max 5
+  const { state, dispatch } = useGame();
+  const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge));
+  const [secili, setSecili] = useState(null);    // { id, kart }
+  const [birikme, setBirikme] = useState([]);      // [{ id, kart }]  max 5
   const [carpisma, setCarpisma] = useState(null);    // { kart1, kart2 } | null
-  const [sure, setSure]         = useState(OYUN_SURESI);
-  const [skor, setSkor]         = useState(0);
-  const [hamle, setHamle]       = useState(0);
-  const [bitti, setBitti]       = useState(false);
+  const [sure, setSure] = useState(OYUN_SURESI);
+  const [skor, setSkor] = useState(0);
+  const [hamle, setHamle] = useState(0);
+  const [bitti, setBitti] = useState(false);
   const [baslamadi, setBaslamadi] = useState(true);
   const [efektMesaj, setEfektMesaj] = useState(null);
   const [yanlisAnim, setYanlisAnim] = useState(false);
@@ -115,7 +124,7 @@ export default function EslestirmeScreen() {
     if (!kart.guc) return;
     switch (kart.guc.id) {
       case 'ulgen_isik': setSure(s => Math.min(s + 30, OYUN_SURESI + 60)); showMsg('Ulgen — +30 saniye!'); break;
-      case 'sure_uzat':  setSure(s => Math.min(s + 20, OYUN_SURESI + 60)); showMsg(`${kart.ses} — +20 saniye!`); break;
+      case 'sure_uzat': setSure(s => Math.min(s + 20, OYUN_SURESI + 60)); showMsg(`${kart.ses} — +20 saniye!`); break;
       default: showMsg(`${kart.ses} ruhu serbest kaldi!`, 1200); break;
     }
   }
@@ -171,9 +180,9 @@ export default function EslestirmeScreen() {
     }
   }
 
-  const onTahta  = tiles.filter(t => !t.removed && !t.inTray);
-  const eslendi  = tiles.filter(t => t.removed).length / 2;
-  const surePct  = Math.max(0, (sure / OYUN_SURESI) * 100);
+  const onTahta = tiles.filter(t => !t.removed && !t.inTray);
+  const eslendi = tiles.filter(t => t.removed).length / 2;
+  const surePct = Math.max(0, (sure / OYUN_SURESI) * 100);
   const sureRenk = sure > 60 ? '#4a9e6a' : sure > 20 ? '#c8820a' : '#c02020';
 
   // ── INTRO ──
@@ -182,11 +191,9 @@ export default function EslestirmeScreen() {
       <div className="screen mj-screen">
         <div className="mj-intro">
           <div className="mj-intro-ikon">&#128024;</div>
-          <h2 className="mj-baslik">TAMGA AVI</h2>
+          <h2 className="mj-baslik">ÖĞREN: TAMGA AVI</h2>
           <p className="mj-intro-acik">
-            Serbest tasa dokun — önizlemeye gelir. Ayni tamgayi seçersen
-            ikisi çarpışıp kırılır! Yanlis seçersen birikme alanına gider.
-            Birikme 5 dolunca oyun biter.
+            {state.seciliBolge ? 'Bu bölgedeki (ve diğer bazı) tamgaların eşlerini bularak karakterleri ve sesleri zihninde pekiştir.' : 'Serbest taşa dokun — önizlemeye gelir. Aynı tamgayı seçersen ikisi çarpışıp kırılır!'}
           </p>
           <div className="mj-kural">
             <div>&#128070; Serbest tasa dokun → önizleme</div>
@@ -204,7 +211,7 @@ export default function EslestirmeScreen() {
 
   // ── BİTTİ ──
   if (bitti) {
-    const kazandi   = tiles.every(t => t.removed);
+    const kazandi = tiles.every(t => t.removed);
     const finalSkor = skor + (kazandi ? sure * 5 : 0);
     return (
       <div className="screen mj-screen">
@@ -266,17 +273,17 @@ export default function EslestirmeScreen() {
       <div className="mj-tahta-kap">
         <div className="mj-tahta" style={{ width: BOARD_W, height: BOARD_H }}>
           {onTahta.map(tile => {
-            const free  = isFree(tile, tiles);
-            const d     = display(tile.kart);
-            const pos   = tilePos(tile.col, tile.row, tile.layer);
+            const free = isFree(tile, tiles);
+            const d = display(tile.kart);
+            const pos = tilePos(tile.col, tile.row, tile.layer);
             return (
               <div
                 key={tile.id}
                 className={[
                   'mj-tas',
-                  free         ? 'mj-tas-serbest' : 'mj-tas-kapali',
-                  d.isMit      ? 'mj-tas-mit'     : '',
-                  d.isHay      ? 'mj-tas-hay'     : '',
+                  free ? 'mj-tas-serbest' : 'mj-tas-kapali',
+                  d.isMit ? 'mj-tas-mit' : '',
+                  d.isHay ? 'mj-tas-hay' : '',
                 ].filter(Boolean).join(' ')}
                 style={{ left: pos.left, top: pos.top, zIndex: pos.zIndex }}
                 onClick={() => tasTikla(tile.id)}
@@ -296,7 +303,7 @@ export default function EslestirmeScreen() {
             <div className={[
               'mj-secili-kart',
               secili.kart.kategori === 'mitoloji' ? 'mj-tas-mit' : '',
-              secili.kart.kategori === 'hayvan'   ? 'mj-tas-hay' : '',
+              secili.kart.kategori === 'hayvan' ? 'mj-tas-hay' : '',
               yanlisAnim ? 'mj-secili-yanlis' : '',
             ].filter(Boolean).join(' ')}>
               <TasIcerik kart={secili.kart} />

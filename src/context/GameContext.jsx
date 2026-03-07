@@ -25,6 +25,15 @@ const INITIAL_STATE = {
   kullaniciAdi: '',
   avatar: '\u{10C00}',
   dil: 'tr', // tr | en | ru
+
+  // Sefer Modu (Campaign)
+  sefer: {
+    aktif: false,
+    bolgeId: null,
+    seviye: null,
+    guc: null,
+    asama: 0, // 0: Eşleştirme, 1: Arena, 2: Quiz
+  }
 };
 
 function yukleKayit() {
@@ -50,7 +59,7 @@ function yukleKayit() {
           bolgeIlerlemesi[k] = { ...bolgeIlerlemesi[k], yildizlar: [...y, ...Array(5 - y.length).fill(0)] };
         }
       }
-      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr' };
+      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 } };
     }
   } catch (e) {
     // ignore
@@ -61,7 +70,41 @@ function yukleKayit() {
 function reducer(state, action) {
   switch (action.type) {
     case 'NAVIGATE':
-      return { ...state, ekran: action.ekran, seciliBolge: action.bolge ?? state.seciliBolge };
+      return {
+        ...state,
+        ekran: action.ekran,
+        seciliBolge: action.bolge ?? state.seciliBolge,
+        sefer: action.ekran === 'home' || action.ekran === 'map' ? { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 } : state.sefer
+      };
+
+    case 'SEFER_BASLAT':
+      return {
+        ...state,
+        sefer: { aktif: true, bolgeId: action.bolgeId, seviye: action.seviye, guc: action.guc, asama: 0 },
+        ekran: 'eslestirme',
+        seciliBolge: action.bolgeId,
+        seciliSeviye: action.seviye,
+        aktifGuc: action.guc || null,
+      };
+
+    case 'SEFER_ILERLE': {
+      const yeniAsama = state.sefer.asama + 1;
+      let yeniEkran = state.ekran;
+      if (yeniAsama === 1) yeniEkran = 'ruh_arenasi';
+      else if (yeniAsama === 2) yeniEkran = 'quiz';
+
+      return {
+        ...state,
+        sefer: { ...state.sefer, asama: yeniAsama },
+        ekran: yeniEkran
+      };
+    }
+
+    case 'SEFER_BITIR':
+      return {
+        ...state,
+        sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 }
+      };
 
     case 'QUIZ_BASLAT':
       return {
@@ -70,6 +113,22 @@ function reducer(state, action) {
         seciliBolge: action.bolgeId,
         seciliSeviye: action.seviye,
         aktifGuc: action.guc ?? null,
+      };
+
+    case 'ESLESTIRME_BASLAT':
+      return {
+        ...state,
+        ekran: 'eslestirme',
+        seciliBolge: action.bolgeId,
+        aktifGuc: null,
+      };
+
+    case 'ARENA_BASLAT':
+      return {
+        ...state,
+        ekran: 'ruh_arenasi',
+        seciliBolge: action.bolgeId,
+        aktifGuc: null,
       };
 
     case 'GUC_KULLAN':
@@ -129,7 +188,7 @@ function reducer(state, action) {
     }
 
     case 'HARITAYA_DON':
-      return { ...state, ekran: 'map', yeniKazanilanKartlar: [] };
+      return { ...state, ekran: 'map', yeniKazanilanKartlar: [], sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 } };
 
     case 'DOGUM_YILI_KAYDET': {
       const { yil, hayvanId } = action;
