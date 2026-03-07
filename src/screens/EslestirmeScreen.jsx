@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { TAMGALAR, MITOLOJI, HAYVANLAR, getBolgeTamgalari } from '../data/tamgalar';
+import { useAudio } from '../hooks/useAudio';
 
 const TW = 46;
 const TH = 58;
@@ -144,6 +145,7 @@ function TasIcerik({ kart, buyuk = false }) {
 
 export default function EslestirmeScreen() {
   const { state, dispatch } = useGame();
+  const { playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio } = useAudio();
   const aktifSeviye = state.sefer.aktif ? state.sefer.seviye : 1;
   const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, aktifSeviye));
   const [secili, setSecili] = useState(null);    // { id, kart }
@@ -185,10 +187,13 @@ export default function EslestirmeScreen() {
   }
 
   function tasTikla(tileId) {
+    unlockAudio(); // Müziği başlatmayı dener (otomatik başlamadıysa)
+
     if (bitti || blocked.current || carpisma) return;
     const tile = tiles.find(t => t.id === tileId);
     if (!tile || tile.removed || tile.inTray || !isFree(tile, tiles)) return;
 
+    playClick();
     setHamle(m => m + 1);
 
     if (!secili) {
@@ -209,7 +214,10 @@ export default function EslestirmeScreen() {
         const puan = isCombo ? tabanPuan * 3 : tabanPuan; // Combo 3 katı puan!
 
         if (isCombo) {
+          playCombo();
           showMsg('✨ MÜKEMMEL EŞLEŞME! ✨', 1500);
+        } else {
+          playMatch();
         }
 
         setSkor(s => s + puan);
@@ -282,6 +290,9 @@ export default function EslestirmeScreen() {
       {/* Header */}
       <div className="mj-header">
         <button className="geri-btn" onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>&#8592;</button>
+        <button className="geri-btn" style={{ marginLeft: '10px', fontSize: '1rem', padding: '0.4rem' }} onClick={toggleMute}>
+          {isMuted ? '🔇' : '🔊'}
+        </button>
         <div className="mj-sure-wrap">
           <div className="mj-sure-bar">
             <div className="mj-sure-ic" style={{ width: `${surePct}%`, background: sureRenk }} />
