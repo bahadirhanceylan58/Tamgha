@@ -83,7 +83,13 @@ function createBoard(bolgeId, seviye = 1) {
     selectedPool.push(pool[i % pool.length]);
   }
 
-  const doubled = shuffle([...selectedPool, ...selectedPool]);
+  // Eğitim Zorluk Modu: Sebebini seviye > 2 ise öğrenme modu aktif olur
+  // Orijinalinde taş ikiziyle aynıdır. Zor modda ikizlerden biri "latin" okunuşunu gösterir.
+  const isHardMode = seviye > 2;
+  const doubled = shuffle([
+    ...selectedPool.map(k => ({ ...k, displayMode: 'tamga' })),
+    ...selectedPool.map(k => ({ ...k, displayMode: isHardMode ? 'latin' : 'tamga' }))
+  ]);
 
   return shuffle([...layout]).map((pos, i) => ({
     id: i, row: pos.r, col: pos.c, layer: pos.l,
@@ -119,10 +125,17 @@ function tilePos(col, row, layer) {
 function display(kart) {
   const isMit = kart.kategori === 'mitoloji';
   const isHay = kart.kategori === 'hayvan';
-  if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: kart.ses, isMit: false, isHay: false };
-  if (isHay) return { isGokt: false, main: kart.tamga, sub: kart.ses, isMit: false, isHay: true };
+
+  // Hard Mode için latin harfini gösterme mantığı
+  if (kart.displayMode === 'latin' && !isMit && !isHay) {
+    // Latin görünümünde ana harf olarak 'ses' (veya fonetik okunuşu) kullan
+    return { isGokt: false, main: kart.ses.split(' ')[0], sub: kart.fonetik, isMit: false, isHay: false, isLatin: true };
+  }
+
+  if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: kart.ses, isMit: false, isHay: false, isLatin: false };
+  if (isHay) return { isGokt: false, main: kart.tamga, sub: kart.ses, isMit: false, isHay: true, isLatin: false };
   const safe = { '💀': '☽', '🤍': '◈' };
-  return { isGokt: false, main: safe[kart.tamga] ?? kart.tamga, sub: kart.ses, isMit: true, isHay: false };
+  return { isGokt: false, main: safe[kart.tamga] ?? kart.tamga, sub: kart.ses, isMit: true, isHay: false, isLatin: false };
 }
 
 // Tahta genişliği 11 sütun (8 ana + sol 2 + sağ 1) x (TW + GAP)
@@ -131,12 +144,14 @@ const BOARD_H = ROWS * (TH + GAP) + 10;
 
 function TasIcerik({ kart, buyuk = false }) {
   const d = display(kart);
+  // Eğer özel latin görünümündeyse (Hard Mode) farklı bir class ile gösterilebilir
+  const anaClass = buyuk
+    ? (d.isGokt ? 'cp-tamga' : 'cp-emoji')
+    : (d.isGokt ? 'mj-ana mj-ana-gokt' : (d.isLatin ? 'mj-ana mj-ana-latin' : 'mj-ana mj-ana-emoji'));
+
   return (
     <>
-      <span className={buyuk
-        ? (d.isGokt ? 'cp-tamga' : 'cp-emoji')
-        : (d.isGokt ? 'mj-ana mj-ana-gokt' : 'mj-ana mj-ana-emoji')
-      }>{d.main}</span>
+      <span className={anaClass}>{d.main}</span>
       <span className={buyuk ? 'cp-ses' : 'mj-ses'}>{d.sub}</span>
       {!buyuk && (d.isMit || d.isHay) && <span className="mj-ozel-bant" />}
     </>

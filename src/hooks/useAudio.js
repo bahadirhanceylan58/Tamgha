@@ -3,10 +3,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 // Geçici ücretsiz ses kaynakları (Google Actions Free Sounds)
 // Sonradan public/audio/ klasörüne kendi mp3/ogg dosyalarınızı atıp bu yolları (örneğin '/audio/bg-music.mp3' şeklinde) değiştirebilirsiniz.
 const SOUNDS = {
-    bgm: 'https://actions.google.com/sounds/v1/weather/blowing_wind.ogg', // Bozkır/Altay Rüzgarı ASMR
-    click: 'https://actions.google.com/sounds/v1/ui/wood_click.ogg',      // Taş tıklama (ahşap sesi)
-    match: 'https://actions.google.com/sounds/v1/magic/magic_chime.ogg',    // Normal eşleşme tınısı
-    combo: 'https://actions.google.com/sounds/v1/science_fiction/sci_fi_hover_craft.ogg'// Şamanik gizemli / devasa kombo efekti
+    bgm: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=wind-outside-sound-ambient-141941.mp3', // Bozkır/Altay Rüzgarı ASMR
+    click: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8ced61c94.mp3?filename=ui-click-43196.mp3',      // Taş tıklama
+    match: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_245e3f56ce.mp3?filename=magical-twinkle-144062.mp3',    // Normal eşleşme tınısı
+    combo: 'https://cdn.pixabay.com/download/audio/2024/09/16/audio_982b6b55eb.mp3?filename=epic-deep-impact-1-240167.mp3'// Şamanik gizemli kombo
 };
 
 export function useAudio() {

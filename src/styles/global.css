@@ -4108,6 +4108,15 @@ body {
   font-size: 1.6rem;
 }
 
+/* Latin (Hard Mode) */
+.mj-ana-latin {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
 /* Small ses / name label */
 .mj-ses {
   font-size: 0.4rem;
