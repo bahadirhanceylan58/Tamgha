@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+
 import { useGame } from '../context/GameContext';
 import { BOLGELER, getBolgeTamgalari } from '../data/tamgalar';
 
@@ -24,11 +24,6 @@ function SeviyeButon({ seviye, ilerleme, kilit, onClick }) {
 export default function MapScreen() {
   const { state, dispatch } = useGame();
   const aktifBolum = state.eslestirmeBolum || 1;
-  const [bolumSayfa, setBolumSayfa] = useState(Math.floor((aktifBolum - 1) / 5));
-
-  useEffect(() => {
-    setBolumSayfa(Math.floor((aktifBolum - 1) / 5));
-  }, [aktifBolum]);
 
   function seviyeTikla(bolgeId, seviye) {
     dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null });
@@ -46,22 +41,6 @@ export default function MapScreen() {
     dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum: aktifBolum });
   }
 
-  function eslestirmeBolumSec(bolum) {
-    dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum });
-  }
-
-  function bolumAciklama(bolum) {
-    if (bolum >= 15) {
-      const adim = Math.floor((bolum - 15) / 5) + 1;
-      return `Göktürk + Mitoloji + 12 Hayvan + Latin (${adim * 5})`;
-    }
-    if (bolum >= 11) return 'Göktürk + Mitoloji + 12 Hayvan';
-    if (bolum >= 5) return 'Göktürk Harfleri + Mitoloji';
-    return 'Göktürk Harfleri';
-  }
-
-  const pctIlerleme = Math.min((aktifBolum / 50) * 100, 100);
-
   return (
     <div className="screen map-screen">
       <div className="map-header">
@@ -70,55 +49,6 @@ export default function MapScreen() {
         </button>
         <h2 className="map-baslik">Bozkır Haritası</h2>
         <div className="puan-badge">{state.toplamPuan.toLocaleString()} puan</div>
-      </div>
-
-      {/* Birleşik İlerleme Paneli */}
-      <div className="ilerleme-panel">
-        <div className="ilerleme-panel-ust">
-          <div className="ilerleme-bolum-kutu">
-            <span className="ilerleme-bolum-b">B</span>
-            <span className="ilerleme-bolum-sayi">{aktifBolum}</span>
-            <span className="ilerleme-bolum-kalan">/50</span>
-          </div>
-          <div className="ilerleme-panel-sag">
-            <div className="ilerleme-panel-baslik">{bolumAciklama(aktifBolum)}</div>
-            <div className="ilerleme-bar-ince">
-              <div className="ilerleme-bar-dolgu" style={{ width: `${pctIlerleme}%` }} />
-            </div>
-            <div className="ilerleme-panel-alt">{aktifBolum}. Bölüm &bull; %{Math.round(pctIlerleme)} tamamlandı</div>
-          </div>
-        </div>
-
-        <div className="ilerleme-bolum-nav">
-          <button
-            className="ilerleme-nav-btn"
-            onClick={() => setBolumSayfa(p => Math.max(0, p - 1))}
-            disabled={bolumSayfa === 0}
-          >&#8249;</button>
-          <div className="ilerleme-bolum-grid">
-            {Array.from({ length: 5 }, (_, i) => {
-              const no = bolumSayfa * 5 + i + 1;
-              if (no > 50) return <span key={i} />;
-              const aktif = no <= aktifBolum;
-              const simdiki = no === aktifBolum;
-              return (
-                <button
-                  key={no}
-                  className={`ilerleme-bolum-btn${aktif ? ' aktif' : ' kilit'}${simdiki ? ' simdiki' : ''}`}
-                  disabled={!aktif}
-                  onClick={aktif ? () => eslestirmeBolumSec(no) : undefined}
-                >
-                  {no}
-                </button>
-              );
-            })}
-          </div>
-          <button
-            className="ilerleme-nav-btn"
-            onClick={() => setBolumSayfa(p => Math.min(9, p + 1))}
-            disabled={bolumSayfa === 9}
-          >&#8250;</button>
-        </div>
       </div>
 
       {/* Bölgeler */}

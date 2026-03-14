@@ -9,8 +9,17 @@ const GAP = 2;
 const LOX = 4;
 const LOY = 6;
 const MAX_TEPSI = 4;
-const OYUN_SURESI = 300;
 const ESLESTI_MS = 520;
+
+// Bölüm 1-10: 240sn | 11-20: 210sn | 21-30: 180sn | 31-40: 150sn | 41-50: 120sn
+function bolumSuresi(bolum) {
+  if (bolum <= 10) return 240;
+  if (bolum <= 20) return 210;
+  if (bolum <= 30) return 180;
+  if (bolum <= 40) return 150;
+  return 120;
+}
+const OYUN_SURESI = 240; // fallback (sure barı için)
 const TOPLAM_BOLUM = 50;
 
 // Piramit düzenleri: seviye 1'de az taş, seviye arttıkça büyür
@@ -262,6 +271,14 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
     : buyuk
       ? (d.isGokt ? 'cp-tamga' : 'cp-ozel')
       : (d.isGokt ? 'mj-ana mj-ana-gokt' : (d.isLatin ? 'mj-ana mj-ana-latin' : 'mj-ana mj-ana-ozel'));
+  if (!tepsi && !buyuk && kart.gorsel) {
+    return (
+      <>
+        <img src={kart.gorsel} alt={kart.ses} className="mj-tas-gorsel" />
+        <span className="mj-ses mj-ses-gorsel">{d.sub}</span>
+      </>
+    );
+  }
   return (
     <>
       <span className={anaClass}>{d.main}</span>
@@ -282,7 +299,8 @@ export default function EslestirmeScreen() {
   const boardDims = getBoardDims(getLayout(bolum));
   const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
   const [carpisma, setCarpisma] = useState(null);
-  const [sure, setSure] = useState(OYUN_SURESI);
+  const maxSure = bolumSuresi(startBolum);
+  const [sure, setSure] = useState(maxSure);
   const [skor, setSkor] = useState(0);
   const [hamle, setHamle] = useState(0);
   const [bitti, setBitti] = useState(false);
@@ -331,8 +349,8 @@ export default function EslestirmeScreen() {
   function applyPower(kart) {
     if (!kart.guc) return;
     switch (kart.guc.id) {
-      case 'ulgen_isik': setSure(s => Math.min(s + 30, OYUN_SURESI + 60)); showMsg('Ulgen â€” +30 saniye!'); break;
-      case 'sure_uzat': setSure(s => Math.min(s + 20, OYUN_SURESI + 60)); showMsg(`${kart.ses} â€” +20 saniye!`); break;
+      case 'ulgen_isik': setSure(s => Math.min(s + 30, maxSure + 60)); showMsg('Ulgen — +30 saniye!'); break;
+      case 'sure_uzat': setSure(s => Math.min(s + 20, maxSure + 60)); showMsg(`${kart.ses} — +20 saniye!`); break;
       default: showMsg(`${kart.ses} ruhu serbest kaldi!`, 1200); break;
     }
   }
@@ -407,7 +425,7 @@ export default function EslestirmeScreen() {
   const onTahta = tiles.filter(t => !t.removed && !t.inTray);
   const eslendi = tiles.filter(t => t.removed).length / 2;
   const toplamCift = tiles.length / 2;
-  const surePct = Math.max(0, (sure / OYUN_SURESI) * 100);
+  const surePct = Math.max(0, (sure / maxSure) * 100);
   const sureRenk = sure > 60 ? '#4a9e6a' : sure > 20 ? '#c8820a' : '#c02020';
 
   // â”€â”€ BİTTİ â”€â”€

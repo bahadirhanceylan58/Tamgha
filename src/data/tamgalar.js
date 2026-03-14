@@ -715,7 +715,7 @@ export const MITOLOJI = [
   {
     id: 'mit_mergen', tamga: '🏹', ses: 'MERGEN', fonetik: 'mergen',
     kategori: 'mitoloji', nadirlik: 'efsane', bolge: 'tengri_yurdu',
-    gorsel: '/mitoloji/mergen.png',
+    gorsel: '/mergen.png',
     aciklama: 'Avcılık ve okçuluğun kutsal ruhu. Hiç ıskalamayan efsanevi nişancı. Bozkırın gözü, okun efendisi.',
     tarih: 'Türk destanlarında Mergen, tanrısal isabetlilik sembolüdür. "Mergen" kelimesi hem "bilge" hem "nişancı" anlamı taşır.',
     ornek: '"ER MERGEN" - Yiğit Nişancı',
