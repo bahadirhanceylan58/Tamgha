@@ -33,7 +33,10 @@ const INITIAL_STATE = {
     seviye: null,
     guc: null,
     asama: 0, // 0: Eşleştirme, 1: Arena, 2: Quiz
-  }
+  },
+
+  // Taş eşleştirme global bölüm ilerlemesi (1-50)
+  eslestirmeBolum: 1,
 };
 
 function yukleKayit() {
@@ -152,6 +155,7 @@ function reducer(state, action) {
             yildizlar: yeniYildizlar,
           }
         },
+        eslestirmeBolum: action.kazandi ? Math.min((state.eslestirmeBolum || 1) + 1, 50) : state.eslestirmeBolum,
         toplamPuan: state.toplamPuan + puan,
       };
     }

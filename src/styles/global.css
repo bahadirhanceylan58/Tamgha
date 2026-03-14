@@ -1,6 +1,6 @@
-/* ═══════════════════════════════════════════════
-   TAMGHA - Goktürk Temasi
-   ═══════════════════════════════════════════════ */
+﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TAMGHA - GoktÃ¼rk Temasi
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+Old+Turkic&family=Outfit:wght@300;400;600&display=swap');
 
@@ -73,14 +73,14 @@ body {
   background: var(--bg);
   /* Desktop shadow frames */
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 160, 23, 0.1);
-  /* Güvenli alan - çentikli telefonlar */
+  /* GÃ¼venli alan - Ã§entikli telefonlar */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }
 
-/* ── Genel Ekran ── */
+/* â”€â”€ Genel Ekran â”€â”€ */
 .screen {
   width: 100%;
   height: 100%;
@@ -89,9 +89,10 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
+  min-height: 0;
 }
 
-/* ── Butonlar ── */
+/* â”€â”€ Butonlar â”€â”€ */
 .btn {
   display: flex;
   align-items: center;
@@ -177,9 +178,9 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    HOME SCREEN
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .home-screen {
   background: radial-gradient(ellipse at top, #2a1505 0%, #0d0800 60%);
   justify-content: space-between;
@@ -337,9 +338,9 @@ body {
   z-index: 1;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MAP SCREEN
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .map-screen {
   background: var(--bg);
   padding-bottom: 1rem;
@@ -542,9 +543,9 @@ body {
   padding: 0.75rem 1rem;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    QUIZ SCREEN
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .quiz-screen {
   background: var(--bg);
   padding-bottom: 1rem;
@@ -848,9 +849,9 @@ body {
   font-size: 1rem;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    KART KAZAN SCREEN
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .kart-kazan-screen {
   background: radial-gradient(ellipse at center, #1a0a30 0%, #0a0510 100%);
   align-items: center;
@@ -1055,9 +1056,9 @@ body {
   max-width: 280px;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    KOLEKSIYON SCREEN
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .koleksiyon-screen {
   background: var(--bg);
 }
@@ -1328,9 +1329,9 @@ body {
   text-align: center;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SCROLLBAR
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 ::-webkit-scrollbar {
   width: 3px;
 }
@@ -1344,9 +1345,9 @@ body {
   border-radius: 2px;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    AKTIF GUC ROZET (Map + Quiz)
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .aktif-guc-rozet {
   display: flex;
   align-items: center;
@@ -1403,9 +1404,9 @@ body {
   color: #00d4ff;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    GUC SECIM MODAL
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .guc-modal-overlay {
   position: absolute;
   inset: 0;
@@ -1518,9 +1519,9 @@ body {
   font-style: italic;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MAP - TENGRI YURDU + ARENA BUTON
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .bolge-tengri .bolge-kart-ust {
   position: relative;
   overflow: hidden;
@@ -1579,9 +1580,9 @@ body {
   box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    RUH ARENASI SCREEN
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .arena-screen {
   background: radial-gradient(ellipse at top, #0a0020 0%, #000010 70%);
   overflow: hidden;
@@ -1874,7 +1875,7 @@ body {
   cursor: not-allowed;
 }
 
-/* Hayvan kartı - amber */
+/* Hayvan kartÄ± - amber */
 .arena-kart-hayvan {
   border-color: rgba(255, 160, 50, 0.25);
   background: linear-gradient(160deg, rgba(40, 20, 0, 0.8), rgba(20, 10, 0, 0.9));
@@ -1889,7 +1890,7 @@ body {
   box-shadow: 0 4px 20px rgba(255, 120, 0, 0.3);
 }
 
-/* Mitoloji kartı - mor */
+/* Mitoloji kartÄ± - mor */
 .arena-kart-mitoloji {
   border-color: rgba(180, 80, 255, 0.3);
   background: linear-gradient(160deg, rgba(30, 0, 50, 0.85), rgba(15, 0, 30, 0.9));
@@ -1904,7 +1905,7 @@ body {
   box-shadow: 0 4px 20px rgba(160, 60, 255, 0.35);
 }
 
-/* Güç kartı - cyan */
+/* GÃ¼Ã§ kartÄ± - cyan */
 .arena-kart-guc {
   border-color: rgba(0, 180, 220, 0.2);
   background: linear-gradient(160deg, rgba(0, 20, 40, 0.85), rgba(0, 10, 25, 0.9));
@@ -1919,7 +1920,7 @@ body {
   box-shadow: 0 4px 20px rgba(0, 180, 220, 0.3);
 }
 
-/* Hedef olabilecek güç kartı (sol seçili) */
+/* Hedef olabilecek gÃ¼Ã§ kartÄ± (sol seÃ§ili) */
 .arena-kart-hedef {
   border-color: rgba(0, 212, 255, 0.35) !important;
   background: linear-gradient(160deg, rgba(0, 30, 55, 0.9), rgba(0, 15, 35, 0.95)) !important;
@@ -2103,9 +2104,9 @@ body {
   font-size: 0.9rem;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    KOLEKSIYON - KATEGORI SEKMELERI
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .kategori-sekmeler {
   display: flex;
   gap: 0.4rem;
@@ -2209,9 +2210,9 @@ body {
   font-family: inherit !important;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    QUIZ - GUCLER
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .btn-ipucu {
   margin: 0 1rem;
   padding: 0.5rem;
@@ -2275,9 +2276,9 @@ body {
   font-style: italic;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DOGUM YILI / TAKVIM RUHU
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .dogum-overlay {
   position: fixed;
   inset: 0;
@@ -2569,9 +2570,9 @@ body {
   box-shadow: 0 0 12px rgba(var(--nadirlik-renk, 212, 160, 23), 0.2);
 }
 
-/* ══════════════════════════════════════════════
-   HOME - PROFİL SATIRI & ALT BUTONLAR
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   HOME - PROFÄ°L SATIRI & ALT BUTONLAR
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .home-profil-satir {
   display: flex;
   align-items: center;
@@ -2635,9 +2636,9 @@ body {
   padding: 10px 8px;
 }
 
-/* ══════════════════════════════════════════════
-   SÖZLÜK
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SÃ–ZLÃœK
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .sozluk-screen {
   display: flex;
   flex-direction: column;
@@ -2797,7 +2798,7 @@ body {
   flex: 1;
 }
 
-.sozluk-goktürkce {
+.sozluk-goktÃ¼rkce {
   display: block;
   font-size: 1rem;
   font-weight: 700;
@@ -2867,9 +2868,9 @@ body {
   opacity: 0.6;
 }
 
-/* ══════════════════════════════════════════════
-   SÖZLÜK SEÇİM EKRANI
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SÃ–ZLÃœK SEÃ‡Ä°M EKRANI
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .sozluk-secim-screen {
   display: flex;
   flex-direction: column;
@@ -2950,9 +2951,9 @@ body {
   flex-shrink: 0;
 }
 
-/* ══════════════════════════════════════════════
-   PROFİL
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PROFÄ°L
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .profil-screen {
   display: flex;
   flex-direction: column;
@@ -2983,12 +2984,12 @@ body {
   gap: 14px;
 }
 
-/* Eski kullanılmıyor, yeni: profil-kimlik-kart */
+/* Eski kullanÄ±lmÄ±yor, yeni: profil-kimlik-kart */
 .profil-kimlik {
   display: none;
 }
 
-/* Yeni kimlik kartı */
+/* Yeni kimlik kartÄ± */
 .profil-kimlik-kart {
   position: relative;
   display: flex;
@@ -3003,7 +3004,7 @@ body {
   box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(212,160,23,0.15);
 }
 
-/* Arka plan dekoratif tamgaları */
+/* Arka plan dekoratif tamgalarÄ± */
 .profil-kart-bg-tamgalar {
   position: absolute;
   inset: 0;
@@ -3028,7 +3029,7 @@ body {
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
-/* Göktürk isim — büyük, parlak */
+/* GÃ¶ktÃ¼rk isim â€” bÃ¼yÃ¼k, parlak */
 .profil-gokt-ad {
   font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
   font-size: 2rem;
@@ -3056,7 +3057,7 @@ body {
   letter-spacing: 0.06em;
 }
 
-/* İlerleme çubuğu kart içinde */
+/* Ä°lerleme Ã§ubuÄŸu kart iÃ§inde */
 .profil-kart-ilerleme {
   display: flex;
   align-items: center;
@@ -3264,9 +3265,9 @@ body {
   line-height: 1.2;
 }
 
-/* ══════════════════════════════════════════════
-   İSİM ÇARKI
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Ä°SÄ°M Ã‡ARKI
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .isim-carki-screen {
   display: flex;
   flex-direction: column;
@@ -3653,9 +3654,9 @@ body {
   background: var(--sinir);
 }
 
-/* ══════════════════════════════════════════════
-   CEVİRİ EKRANI
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   CEVÄ°RÄ° EKRANI
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .ceviri-screen {
   background: var(--bg);
 }
@@ -3741,7 +3742,7 @@ body {
   margin-top: 0.25rem;
 }
 
-/* Hızlı örnekler */
+/* HÄ±zlÄ± Ã¶rnekler */
 .ceviri-ornekler {
   display: flex;
   flex-wrap: wrap;
@@ -3766,7 +3767,7 @@ body {
   transform: scale(0.96);
 }
 
-/* Çıktı */
+/* Ã‡Ä±ktÄ± */
 .ceviri-cikis-bolum {}
 
 .ceviri-cikis-baslik {
@@ -3829,7 +3830,7 @@ body {
   font-style: italic;
 }
 
-/* Harf eşleştirme */
+/* Harf eÅŸleÅŸtirme */
 .ceviri-eslestirme {}
 
 .ceviri-harf-satir {
@@ -3891,9 +3892,9 @@ body {
   line-height: 1.5;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    RESPONSIVE
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media (min-height: 700px) {
   .logo-tamga {
     font-size: 6rem;
@@ -3904,13 +3905,14 @@ body {
   }
 }
 
-/* ══════════════════════════════════════════════
-   TAMGA AVI — TAŞ EŞLEŞTİRME
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TAMGA AVI â€” TAÅ EÅLEÅTÄ°RME
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .mj-screen {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   background: radial-gradient(circle at center, #1b3d22 0%, #0d2112 70%, #050d07 100%);
   background-image:
     radial-gradient(circle at center, rgba(16, 45, 25, 0.95) 0%, rgba(5, 15, 8, 0.98) 100%),
@@ -3918,7 +3920,7 @@ body {
   overflow: hidden;
 }
 
-/* ── Intro / Bitis shared ── */
+/* â”€â”€ Intro / Bitis shared â”€â”€ */
 .mj-intro {
   flex: 1;
   display: flex;
@@ -3966,7 +3968,7 @@ body {
   color: rgba(255, 255, 255, 0.75);
 }
 
-/* ── Header ── */
+/* â”€â”€ Header â”€â”€ */
 .mj-header {
   display: flex;
   align-items: center;
@@ -4040,7 +4042,7 @@ body {
   letter-spacing: 0.03em;
 }
 
-/* ── Status row ── */
+/* â”€â”€ Status row â”€â”€ */
 .mj-durum-row {
   display: flex;
   justify-content: space-between;
@@ -4051,7 +4053,7 @@ body {
   letter-spacing: 0.04em;
 }
 
-/* ── Effect message ── */
+/* â”€â”€ Effect message â”€â”€ */
 .mj-efekt-mesaj {
   position: absolute;
   top: 50%;
@@ -4083,7 +4085,7 @@ body {
   }
 }
 
-/* ── Board container ── */
+/* â”€â”€ Board container â”€â”€ */
 .mj-tahta-kap {
   flex: 1;
   display: flex;
@@ -4091,6 +4093,7 @@ body {
   justify-content: center;
   overflow: auto;
   padding: 0.5rem 0.3rem;
+  min-height: 0;
 }
 
 .mj-tahta {
@@ -4098,7 +4101,7 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Tile base ── */
+/* â”€â”€ Tile base â”€â”€ */
 .mj-tas {
   position: absolute;
   width: 44px;
@@ -4153,7 +4156,7 @@ body {
     inset 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-/* Covered / locked — greyed out */
+/* Covered / locked â€” greyed out */
 .mj-tas-kapali {
   cursor: default;
   background: linear-gradient(135deg, #c5c0b0 0%, #a8a290 60%, #908a75 100%);
@@ -4166,7 +4169,7 @@ body {
   filter: brightness(0.85) contrast(0.9);
 }
 
-/* Selected — gold glow */
+/* Selected â€” gold glow */
 .mj-tas-secili {
   background: linear-gradient(160deg, #fffce0, #ffe850, #ffc010);
   border-color: #c07000;
@@ -4179,7 +4182,7 @@ body {
   transform: translateY(-4px);
 }
 
-/* Wrong match — red flash */
+/* Wrong match â€” red flash */
 .mj-tas-yanlis {
   background: linear-gradient(160deg, #fff0f0, #ffb0a0, #ff6050) !important;
   border-color: #c01818 !important;
@@ -4187,7 +4190,7 @@ body {
   transform: translateX(-2px);
 }
 
-/* Mitoloji — ivory tile, deep indigo border */
+/* Mitoloji â€” ivory tile, deep indigo border */
 .mj-tas-mit {
   background: linear-gradient(135deg, #f8f0ff 0%, #ede0f8 40%, #d8c8ec 80%, #c0a8d8 100%);
   border-color: #5040a0;
@@ -4201,14 +4204,13 @@ body {
     inset 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
-.mj-tas-mit .mj-ana-emoji {
+.mj-tas-mit .mj-ana-ozel {
   font-size: 1.7rem;
   color: #3828a0;
-  filter: none;
   text-shadow: 0 0 5px rgba(80, 50, 180, 0.3);
 }
 
-/* Hayvan — parchment tile, amber border */
+/* Hayvan â€” parchment tile, amber border */
 .mj-tas-hay {
   background: linear-gradient(135deg, #fdf5e0 0%, #f5e8c0 50%, #e0cc98 100%);
   border-color: #9a7020;
@@ -4222,25 +4224,30 @@ body {
     inset 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
-.mj-tas-hay .mj-ana-emoji {
-  filter: sepia(0.55) saturate(0.75) contrast(0.9);
+.mj-tas-hay .mj-ana-ozel {
+  color: #3b3a25;
+  text-shadow: 0 0 6px rgba(120, 90, 30, 0.35);
 }
 
-/* ── Tile content ── */
+/* â”€â”€ Tile content â”€â”€ */
 .mj-ana {
   line-height: 1;
   text-align: center;
 }
 
-/* Göktürk Unicode char */
+/* GÃ¶ktÃ¼rk Unicode char */
 .mj-ana-gokt {
   font-size: 1.65rem;
   color: #2a1508;
 }
 
-/* Emoji (hayvan/mitoloji) */
-.mj-ana-emoji {
-  font-size: 1.5rem;
+/* Özel (mitoloji/hayvan) - Göktürk stili */
+.mj-ana-ozel {
+  font-family: 'Noto Serif Old Turkic', 'Segoe UI Historic', serif;
+  font-size: 1.55rem;
+  letter-spacing: 0.04em;
+  color: #2b1a0d;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 /* Latin (Hard Mode) - ASMR Feel */
@@ -4301,7 +4308,7 @@ body {
   background: linear-gradient(90deg, #1a7038, #40c870, #1a7038);
 }
 
-/* ── Bitis ── */
+/* â”€â”€ Bitis â”€â”€ */
 .mj-bitis {
   flex: 1;
   display: flex;
@@ -4351,7 +4358,7 @@ body {
   text-align: center;
 }
 
-/* ── Tepsi (tray) ── */
+/* â”€â”€ Tepsi (tray) â”€â”€ */
 .mj-tepsi-alan {
   flex-shrink: 0;
   padding: 6px 12px 8px;
@@ -4366,7 +4373,7 @@ body {
   gap: 8px;
 }
 
-/* Boş slot */
+/* BoÅŸ slot */
 .mj-tepsi-slot {
   width: 56px;
   height: 68px;
@@ -4376,7 +4383,7 @@ body {
   flex-shrink: 0;
 }
 
-/* Dolu tepsi taşı */
+/* Dolu tepsi taÅŸÄ± */
 .mj-tepsi-tas {
   width: 56px;
   height: 68px;
@@ -4421,7 +4428,7 @@ body {
     inset 0 1px 3px rgba(255, 255, 255, 0.9);
 }
 
-/* Eşleşen tepsi taşı — yeşil parlar, küçülür */
+/* EÅŸleÅŸen tepsi taÅŸÄ± â€” yeÅŸil parlar, kÃ¼Ã§Ã¼lÃ¼r */
 .mj-tepsi-eslesti {
   background: linear-gradient(160deg, #e0ffe8, #70e890, #20b848) !important;
   border-color: #10902a !important;
@@ -4446,7 +4453,7 @@ body {
   }
 }
 
-/* Tepsi taş içeriği */
+/* Tepsi taÅŸ iÃ§eriÄŸi */
 .mj-tepsi-ana {
   font-size: 1.3rem;
   line-height: 1;
@@ -4480,9 +4487,9 @@ body {
   color: #145820;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    CARPISMA SAHNESI
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .cp-overlay {
   position: fixed;
   inset: 0;
@@ -4516,7 +4523,7 @@ body {
   }
 }
 
-/* ── Shamanic Collision Scene (Giant) ── */
+/* â”€â”€ Shamanic Collision Scene (Giant) â”€â”€ */
 .cp-overlay {
   position: absolute;
   inset: 0;
@@ -4566,9 +4573,10 @@ body {
   line-height: 1;
 }
 
-.cp-emoji {
+.cp-ozel {
   font-size: 5rem;
   line-height: 1;
+  font-family: 'Noto Serif Old Turkic', 'Segoe UI Historic', serif;
 }
 
 .cp-ses {
@@ -4616,7 +4624,7 @@ body {
   }
 }
 
-/* ── Candy Crush Style Combo Mükemmel Eşleşme ── */
+/* â”€â”€ Candy Crush Style Combo MÃ¼kemmel EÅŸleÅŸme â”€â”€ */
 .cp-combo .cp-sahne {
   background:
     radial-gradient(circle at center, rgba(255, 255, 100, 0.8) 0%, transparent 50%),
@@ -4634,7 +4642,7 @@ body {
 }
 
 .cp-combo .cp-tamga,
-.cp-combo .cp-emoji {
+.cp-combo .cp-ozel {
   color: #ffd000;
   text-shadow: 0 0 20px #ff6600, 0 0 40px #ff0000;
 }
@@ -4767,14 +4775,14 @@ body {
   }
 }
 
-/* Büyük taş içeriği */
+/* BÃ¼yÃ¼k taÅŸ iÃ§eriÄŸi */
 .cp-tamga {
   font-size: 4.2rem;
   line-height: 1;
   color: #1e0e00;
 }
 
-.cp-emoji {
+.cp-ozel {
   font-size: 3.6rem;
   line-height: 1;
 }
@@ -4796,9 +4804,9 @@ body {
   color: #145820;
 }
 
-/* ══════════════════════════════════════════════
-   ALT ALAN: ÖNİZLEME + BİRİKME
-══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   ALT ALAN: Ã–NÄ°ZLEME + BÄ°RÄ°KME
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .mj-alt-alan {
   flex-shrink: 0;
   display: flex;
@@ -4811,7 +4819,7 @@ body {
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Seçili önizleme */
+/* SeÃ§ili Ã¶nizleme */
 .mj-secili-alan {
   display: flex;
   flex-direction: column;
@@ -4863,7 +4871,7 @@ body {
   color: rgba(212, 170, 80, 0.25);
 }
 
-/* Seçili kart — yanlış eşleşince salla */
+/* SeÃ§ili kart â€” yanlÄ±ÅŸ eÅŸleÅŸince salla */
 .mj-secili-yanlis {
   animation: secili-salla 0.42s ease !important;
   border-color: #c02020 !important;
@@ -4901,7 +4909,7 @@ body {
   letter-spacing: 0.1em;
 }
 
-/* Alt güç butonları */
+/* Alt gÃ¼Ã§ butonlarÄ± */
 .mj-guc-butonlar {
   flex-shrink: 0;
   display: flex;
@@ -4953,9 +4961,9 @@ body {
   opacity: 0.8;
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    REHBER EKRANI
-══════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .rehber-screen {
   background: var(--bg);
   display: flex;
@@ -5010,7 +5018,7 @@ body {
   padding: 1rem;
 }
 
-/* Nasıl Oynanır */
+/* NasÄ±l OynanÄ±r */
 .rehber-giris {
   display: flex;
   align-items: center;
@@ -5158,3 +5166,4 @@ body {
   text-align: center;
   opacity: 0.7;
 }
+

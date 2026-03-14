@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
-import { TAMGALAR, MITOLOJI, HAYVANLAR, getBolgeTamgalari, BOLGELER } from '../data/tamgalar';
+import { TAMGALAR, MITOLOJI, HAYVANLAR, BOLGELER } from '../data/tamgalar';
 import { useAudio } from '../hooks/useAudio';
 
 const TW = 44;
@@ -11,36 +11,37 @@ const LOY = 6;
 const MAX_TEPSI = 4;
 const OYUN_SURESI = 300;
 const ESLESTI_MS = 520;
+const TOPLAM_BOLUM = 50;
 
-// Piramit düzenleri: seviye 1'de az taş, seviye arttıkça büyür
+// Piramit dÃ¼zenleri: seviye 1'de az taÅŸ, seviye arttÄ±kÃ§a bÃ¼yÃ¼r
 const PIRAMIT_DUZENLER = [
-  // Seviye 1: 8 taş (4 çift) — mini piramit
+  // Seviye 1: 8 taÅŸ (4 Ã§ift) â€” mini piramit
   [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:3,c:2,l:0}],
-  // Seviye 2: 12 taş (6 çift) — orta piramit
+  // Seviye 2: 12 taÅŸ (6 Ã§ift) â€” orta piramit
   [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
    {r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0}],
-  // Seviye 3: 16 taş (8 çift) — piramit + 1 üst katman
+  // Seviye 3: 16 taÅŸ (8 Ã§ift) â€” piramit + 1 Ã¼st katman
   [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
    {r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:4,c:2,l:0},
    {r:1,c:2,l:1},{r:2,c:2,l:1},{r:3,c:2,l:1}],
-  // Seviye 4: 20 taş (10 çift) — geniş piramit
+  // Seviye 4: 20 taÅŸ (10 Ã§ift) â€” geniÅŸ piramit
   [{r:0,c:3,l:0},{r:0,c:4,l:0},
    {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},
    {r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
    {r:4,c:3,l:0},{r:4,c:4,l:0},
    {r:1,c:3,l:1},{r:2,c:3,l:1}],
-  // Seviye 5: 24 taş (12 çift) — tam piramit 2 katman
+  // Seviye 5: 24 taÅŸ (12 Ã§ift) â€” tam piramit 2 katman
   [{r:0,c:3,l:0},{r:0,c:4,l:0},
    {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},
    {r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
    {r:4,c:3,l:0},{r:4,c:4,l:0},
    {r:1,c:3,l:1},{r:1,c:4,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1}],
-  // Seviye 6+: 28 taş (14 çift) — dev piramit
+  // Seviye 6+: 28 taÅŸ (14 Ã§ift) â€” dev piramit
   [{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},{r:0,c:6,l:0},
    {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},{r:1,c:6,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},{r:2,c:7,l:0},
@@ -65,25 +66,41 @@ function getBoardDims(layout) {
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-function createBoard(bolgeId, seviye = 1) {
+// Latin harfler: 15. bÃ¶lÃ¼mden sonra her 5 bÃ¶lÃ¼mde +5 harf
+function latinHarfSayisi(bolum) {
+  if (bolum < 15) return 0;
+  const adim = Math.floor((bolum - 15) / 5) + 1;
+  return Math.min(TAMGALAR.length, adim * 5);
+}
+
+function aktifHarfIdleri(bolum) {
+  const sayi = latinHarfSayisi(bolum);
+  return new Set(TAMGALAR.slice(0, sayi).map((t) => t.id));
+}
+
+function kartHavuzu(bolum) {
+  const havuz = [...TAMGALAR];
+  if (bolum >= 5) havuz.push(...MITOLOJI);
+  if (bolum >= 11) havuz.push(...HAYVANLAR);
+  return havuz;
+}
+
+function createBoard(bolgeId, seviye = 1, bolum = 1) {
   const layout = getLayout(seviye);
   const pairCount = layout.length / 2;
-  let pool = [];
-  if (bolgeId) {
-    const bolgeT = getBolgeTamgalari(bolgeId);
-    const digerleri = shuffle([...TAMGALAR, ...MITOLOJI]).filter(k => !bolgeT.find(t => t.id === k.id));
-    pool = shuffle([...bolgeT, ...digerleri]);
-  } else {
-    pool = shuffle([...TAMGALAR, ...MITOLOJI]);
-  }
+  const pool = shuffle(kartHavuzu(bolum));
   let selectedPool = [];
   for (let i = 0; i < pairCount; i++) {
     selectedPool.push(pool[i % pool.length]);
   }
-  const isHardMode = seviye > 2;
+  const latinSet = aktifHarfIdleri(bolum);
+  const latinAcik = bolum >= 15;
   const doubled = shuffle([
     ...selectedPool.map(k => ({ ...k, displayMode: 'tamga' })),
-    ...selectedPool.map(k => ({ ...k, displayMode: isHardMode ? 'latin' : 'tamga' }))
+    ...selectedPool.map(k => ({
+      ...k,
+      displayMode: (latinAcik && k.kategori !== 'mitoloji' && k.kategori !== 'hayvan' && latinSet.has(k.id)) ? 'latin' : 'tamga'
+    }))
   ]);
   return shuffle([...layout]).map((pos, i) => ({
     id: i, row: pos.r, col: pos.c, layer: pos.l,
@@ -93,7 +110,7 @@ function createBoard(bolgeId, seviye = 1) {
 
 function createYada() {
   return {
-    id: 'yada_tasi', tamga: '💎', ses: 'YADA', fonetik: 'jada',
+    id: 'yada_tasi', tamga: 'ğŸ’', ses: 'YADA', fonetik: 'jada',
     kategori: 'mitoloji', nadirlik: 'yada', bolge: 'tengri',
   };
 }
@@ -116,16 +133,103 @@ function tilePos(col, row, layer) {
 }
 
 
+// === Latin -> Göktürk mini dönüşüm (özet) ===
+const LIGATURLER = [
+  { l: 'ng', t: '\u{10C2D}' }, { l: 'nç', t: '\u{10C28}' }, { l: 'nt', t: '\u{10C26}' },
+  { l: 'nd', t: '\u{10C26}' }, { l: 'lt', t: '\u{10C21}' }, { l: 'ld', t: '\u{10C21}' },
+  { l: 'ny', t: '\u{10C2A}' }, { l: 'ok', t: '\u{10C38}' }, { l: 'uk', t: '\u{10C38}' },
+  { l: 'ko', t: '\u{10C38}' }, { l: 'ku', t: '\u{10C38}' }, { l: 'ök', t: '\u{10C1C}' },
+  { l: 'ük', t: '\u{10C1C}' }, { l: 'kö', t: '\u{10C1C}' }, { l: 'kü', t: '\u{10C1C}' },
+  { l: 'ik', t: '\u{10C36}' }, { l: 'ki', t: '\u{10C36}' }, { l: 'ık', t: '\u{10C36}' },
+  { l: 'kı', t: '\u{10C36}' }, { l: 'uç', t: '\u{10C30}' }, { l: 'oç', t: '\u{10C30}' },
+  { l: 'iç', t: '\u{10C31}' },
+];
+
+const SESLER = {
+  a: { back: '\u{10C00}', front: '\u{10C00}' }, e: { back: '\u{10C00}', front: '\u{10C00}' },
+  ı: { back: '\u{10C03}', front: '\u{10C03}' }, i: { back: '\u{10C03}', front: '\u{10C03}' },
+  o: { back: '\u{10C06}', front: '\u{10C06}' }, u: { back: '\u{10C06}', front: '\u{10C06}' },
+  ö: { back: '\u{10C07}', front: '\u{10C07}' }, ü: { back: '\u{10C07}', front: '\u{10C07}' },
+  b: { back: '\u{10C09}', front: '\u{10C0B}' }, k: { back: '\u{10C34}', front: '\u{10C1A}' },
+  t: { back: '\u{10C43}', front: '\u{10C45}' }, n: { back: '\u{10C23}', front: '\u{10C24}' },
+  r: { back: '\u{10C3A}', front: '\u{10C3C}' }, g: { back: '\u{10C0D}', front: '\u{10C0F}' },
+  ğ: { back: '\u{10C0D}', front: '\u{10C0F}' }, d: { back: '\u{10C11}', front: '\u{10C13}' },
+  y: { back: '\u{10C16}', front: '\u{10C18}' }, l: { back: '\u{10C1E}', front: '\u{10C20}' },
+  m: { back: '\u{10C22}', front: '\u{10C22}' }, s: { back: '\u{10C3D}', front: '\u{10C3E}' },
+  z: { back: '\u{10C14}', front: '\u{10C14}' }, ç: { back: '\u{10C32}', front: '\u{10C32}' },
+  ş: { back: '\u{10C41}', front: '\u{10C41}' }, p: { back: '\u{10C2F}', front: '\u{10C2F}' },
+  h: { back: '\u{10C34}', front: '\u{10C1A}' }, f: { back: '\u{10C2F}', front: '\u{10C2F}' },
+  v: { back: '\u{10C09}', front: '\u{10C0B}' }, c: { back: '\u{10C32}', front: '\u{10C32}' },
+  j: { back: '\u{10C32}', front: '\u{10C32}' }, w: { back: '\u{10C09}', front: '\u{10C0B}' },
+  x: { back: '\u{10C34}', front: '\u{10C1A}' }, q: { back: '\u{10C34}', front: '\u{10C1A}' },
+};
+
+const VOWEL_HARMONY = new Map([
+  ['a', 'back'], ['ı', 'back'], ['o', 'back'], ['u', 'back'],
+  ['e', 'front'], ['i', 'front'], ['ö', 'front'], ['ü', 'front'],
+]);
+const DUZ_UNLU = new Set(['a', 'e', 'ı', 'i']);
+
+function getCharHarmony(lower, pos) {
+  let bestDist = Infinity;
+  let bestHarmony = 'back';
+  for (let j = 0; j < lower.length; j++) {
+    const h = VOWEL_HARMONY.get(lower[j]);
+    if (h !== undefined) {
+      const dist = Math.abs(j - pos);
+      if (dist < bestDist || (dist === bestDist && j > pos)) {
+        bestDist = dist;
+        bestHarmony = h;
+      }
+    }
+  }
+  return bestHarmony;
+}
+
+function cevirKelime(kelime) {
+  const harfler = [];
+  let i = 0;
+  const lower = kelime.toLowerCase();
+  const son = lower.length - 1;
+  while (i < lower.length) {
+    if (i < son) {
+      const iki = lower.slice(i, i + 2);
+      const lig = LIGATURLER.find((l) => l.l === iki);
+      if (lig) {
+        harfler.push(lig.t);
+        i += 2;
+        continue;
+      }
+    }
+    const ch = lower[i];
+    const ses = SESLER[ch];
+    if (ses) {
+      if (DUZ_UNLU.has(ch) && i > 0 && i < son) { i++; continue; }
+      const uyum = getCharHarmony(lower, i);
+      harfler.push(ses[uyum]);
+    }
+    i++;
+  }
+  return harfler.join('');
+}
+
+function gokturkMonogram(kart) {
+  const raw = (kart.ses || '').replace(/[^A-Za-zÇĞİÖŞÜçğıöşü\s]/g, '').trim();
+  if (!raw) return '#';
+  const kelime = raw.split(/\s+/)[0];
+  const tamga = cevirKelime(kelime);
+  return tamga.slice(0, 2) || '#';
+}
+
 function display(kart) {
   const isMit = kart.kategori === 'mitoloji';
   const isHay = kart.kategori === 'hayvan';
   if (kart.displayMode === 'latin' && !isMit && !isHay) {
-    return { isGokt: false, main: kart.ses.split(' ')[0], sub: kart.fonetik, isMit: false, isHay: false, isLatin: true };
+    return { isGokt: false, main: kart.ses.split(' ')[0], sub: kart.fonetik, isMit: false, isHay: false, isLatin: true, isOzel: false };
   }
-  if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: kart.ses, isMit: false, isHay: false, isLatin: false };
-  if (isHay) return { isGokt: false, main: kart.tamga, sub: kart.ses, isMit: false, isHay: true, isLatin: false };
-  const safe = { '☀': '☉', '🌙': '☽', '💀': '✠', '✦': '✦', '🤍': '◈', '👑': '♛', '💎': '◈' };
-  return { isGokt: false, main: safe[kart.tamga] ?? kart.tamga, sub: kart.ses, isMit: true, isHay: false, isLatin: false };
+  if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: kart.ses, isMit: false, isHay: false, isLatin: false, isOzel: false };
+  const mono = gokturkMonogram(kart);
+  return { isGokt: false, main: mono, sub: kart.ses, isMit, isHay, isLatin: false, isOzel: true };
 }
 
 function TasIcerik({ kart, buyuk = false, tepsi = false }) {
@@ -133,13 +237,13 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
   const anaClass = tepsi
     ? (d.isGokt ? 'mj-tepsi-gokt' : 'mj-tepsi-ana')
     : buyuk
-      ? (d.isGokt ? 'cp-tamga' : 'cp-emoji')
-      : (d.isGokt ? 'mj-ana mj-ana-gokt' : (d.isLatin ? 'mj-ana mj-ana-latin' : 'mj-ana mj-ana-emoji'));
+      ? (d.isGokt ? 'cp-tamga' : 'cp-ozel')
+      : (d.isGokt ? 'mj-ana mj-ana-gokt' : (d.isLatin ? 'mj-ana mj-ana-latin' : 'mj-ana mj-ana-ozel'));
   return (
     <>
       <span className={anaClass}>{d.main}</span>
       <span className={tepsi ? 'mj-tepsi-ses' : buyuk ? 'cp-ses' : 'mj-ses'}>{d.sub}</span>
-      {!buyuk && !tepsi && (d.isMit || d.isHay) && <span className="mj-ozel-bant" />}
+      {!buyuk && !tepsi && d.isOzel && <span className="mj-ozel-bant" />}
     </>
   );
 }
@@ -147,9 +251,11 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
 export default function EslestirmeScreen() {
   const { state, dispatch } = useGame();
   const { playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio } = useAudio();
-  const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 1;
-  const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, aktifSeviye));
-  const boardDims = getBoardDims(getLayout(aktifSeviye));
+  const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 0; // 0-based index
+  const seviyeNo = aktifSeviye + 1; // 1-based for layout
+  const bolum = Math.min(state.eslestirmeBolum || 1, TOPLAM_BOLUM);
+  const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, seviyeNo, bolum));
+  const boardDims = getBoardDims(getLayout(seviyeNo));
   const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
   const [carpisma, setCarpisma] = useState(null);
   const [sure, setSure] = useState(OYUN_SURESI);
@@ -160,13 +266,18 @@ export default function EslestirmeScreen() {
   const blocked = useRef(false);
 
   useEffect(() => {
+    // Start BGM after the user enters the game (level click is a gesture)
+    unlockAudio();
+  }, [unlockAudio]);
+
+  useEffect(() => {
     if (bitti) return;
     if (sure <= 0) { setBitti(true); return; }
     const t = setTimeout(() => setSure(s => s - 1), 1000);
     return () => clearTimeout(t);
   }, [sure, bitti]);
 
-  // Kazanma kontrolü
+  // Kazanma kontrolÃ¼
   useEffect(() => {
     if (bitti) return;
     const onTahtaCount = tiles.filter(t => !t.removed && !t.inTray).length;
@@ -191,8 +302,8 @@ export default function EslestirmeScreen() {
   function applyPower(kart) {
     if (!kart.guc) return;
     switch (kart.guc.id) {
-      case 'ulgen_isik': setSure(s => Math.min(s + 30, OYUN_SURESI + 60)); showMsg('Ulgen — +30 saniye!'); break;
-      case 'sure_uzat': setSure(s => Math.min(s + 20, OYUN_SURESI + 60)); showMsg(`${kart.ses} — +20 saniye!`); break;
+      case 'ulgen_isik': setSure(s => Math.min(s + 30, OYUN_SURESI + 60)); showMsg('Ulgen â€” +30 saniye!'); break;
+      case 'sure_uzat': setSure(s => Math.min(s + 20, OYUN_SURESI + 60)); showMsg(`${kart.ses} â€” +20 saniye!`); break;
       default: showMsg(`${kart.ses} ruhu serbest kaldi!`, 1200); break;
     }
   }
@@ -212,7 +323,7 @@ export default function EslestirmeScreen() {
     const yeniTepsi = [...tepsi, yeniEleman];
     setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
 
-    // Tepside çift ara (yeni eklenenle eşleşen)
+    // Tepside Ã§ift ara (yeni eklenenle eÅŸleÅŸen)
     let pairIdx = -1;
     for (let i = 0; i < yeniTepsi.length - 1; i++) {
       if (yeniTepsi[i].kart.tamga === yeniTepsi[yeniTepsi.length - 1].kart.tamga) {
@@ -270,14 +381,14 @@ export default function EslestirmeScreen() {
   const surePct = Math.max(0, (sure / OYUN_SURESI) * 100);
   const sureRenk = sure > 60 ? '#4a9e6a' : sure > 20 ? '#c8820a' : '#c02020';
 
-  // ── BİTTİ ──
+  // â”€â”€ BÄ°TTÄ° â”€â”€
   if (bitti) {
     const kazandi = tiles.every(t => t.removed);
     const finalSkor = skor + (kazandi ? sure * 5 : 0);
     return (
       <div className="screen mj-screen">
         <div className="mj-bitis">
-          <div className="mj-bitis-ikon">{kazandi ? '🏆' : eslendi >= toplamCift * 0.7 ? '⭐' : '⏱'}</div>
+          <div className="mj-bitis-ikon">{kazandi ? '\u{1F3C6}' : eslendi >= toplamCift * 0.7 ? '\u{2B50}' : '\u{23F1}'}</div>
           <h2 className="mj-baslik">{kazandi ? 'TEMIZLEDIN!' : tepsi.length >= MAX_TEPSI ? 'TEPSI DOLDU' : 'SURE DOLDU'}</h2>
           <div className="mj-bitis-skor">{finalSkor}</div>
           <p style={{ opacity: 0.6, fontSize: '0.82rem', marginTop: '-0.2rem' }}>puan</p>
@@ -308,14 +419,14 @@ export default function EslestirmeScreen() {
     );
   }
 
-  // ── OYUN ──
+  // â”€â”€ OYUN â”€â”€
   return (
     <div className="screen mj-screen" style={{ position: 'relative' }}>
       {/* Header */}
       <div className="mj-header">
         <button className="geri-btn" onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>&#8592;</button>
         <button className="geri-btn" style={{ marginLeft: '6px', fontSize: '1rem', padding: '0.4rem' }} onClick={toggleMute}>
-          {isMuted ? '🔇' : '🔊'}
+          {isMuted ? '\u{1F507}' : '\u{1F50A}'}
         </button>
         <div className="mj-sure-wrap">
           <div className="mj-sure-bar">
@@ -324,12 +435,12 @@ export default function EslestirmeScreen() {
           <span className="mj-sure-sayi" style={{ color: sureRenk }}>{sure}s</span>
         </div>
         <div className="mj-skor-badge">
-          <span style={{ fontSize: '0.65rem', opacity: 0.7, display: 'block', lineHeight: 1 }}>S{aktifSeviye}</span>
+          <span style={{ fontSize: '0.65rem', opacity: 0.7, display: 'block', lineHeight: 1 }}>B{bolum}/50</span>
           {skor} &#10022;
         </div>
       </div>
 
-      {/* Tepsi — üst alan */}
+      {/* Tepsi â€” Ã¼st alan */}
       <div className="mj-tepsi-alan">
         <div className="mj-tepsi">
           {Array.from({ length: MAX_TEPSI }, (_, i) => {
@@ -357,7 +468,7 @@ export default function EslestirmeScreen() {
 
       {efektMesaj && <div className="mj-efekt-mesaj">{efektMesaj}</div>}
 
-      {/* Carpısma sahnesi */}
+      {/* CarpÄ±sma sahnesi */}
       {carpisma && (
         <div className={`cp-overlay ${carpisma.isCombo ? 'cp-combo' : ''}`}>
           <div className="cp-sahne">
@@ -411,3 +522,4 @@ export default function EslestirmeScreen() {
     </div>
   );
 }
+

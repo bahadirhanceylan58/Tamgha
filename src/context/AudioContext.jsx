@@ -4,7 +4,7 @@ const AudioContext = createContext();
 
 // Reliable ASMR-style sounds (Mixkit / SoundJay placeholders - User should replace with local files for best results)
 const SOUNDS = {
-    bgm: 'https://assets.mixkit.co/active-storage/sfx/2436/2436-preview.mp3', // Nature/Wind Ambient
+    bgm: '/intro.mp3', // Local intro music
     click: 'https://assets.mixkit.co/active-storage/sfx/2568/2568-preview.mp3', // Soft wood tap
     match: 'https://assets.mixkit.co/active-storage/sfx/2012/2012-preview.mp3', // Ethereal shimmer
     combo: 'https://assets.mixkit.co/active-storage/sfx/2000/2000-preview.mp3'  // Magical burst
@@ -22,7 +22,7 @@ export function AudioProvider({ children }) {
     useEffect(() => {
         bgmRef.current = new Audio(SOUNDS.bgm);
         bgmRef.current.loop = true;
-        bgmRef.current.volume = 0.3;
+        bgmRef.current.volume = 0.22;
 
         clickRef.current = new Audio(SOUNDS.click);
         clickRef.current.volume = 0.6;
