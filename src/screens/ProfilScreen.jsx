@@ -243,6 +243,18 @@ export default function ProfilScreen() {
             })}
           </div>
         </div>
+
+        {/* Gizlilik */}
+        <div className="profil-bolum">
+          <a
+            href="/privacy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="profil-gizlilik-btn"
+          >
+            🔒 {dil === 'en' ? 'Privacy Policy' : dil === 'ru' ? 'Политика конфиденциальности' : 'Gizlilik Politikası'}
+          </a>
+        </div>
       </div>
     </div>
   );

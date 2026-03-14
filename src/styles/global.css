@@ -3497,6 +3497,24 @@ body {
   line-height: 1.2;
 }
 
+.profil-gizlilik-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  border-radius: 8px;
+  color: var(--metin-soluk);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.profil-gizlilik-btn:hover {
+  border-color: var(--altin);
+  color: var(--altin);
+}
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Ä°SÄ°M Ã‡ARKI
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
