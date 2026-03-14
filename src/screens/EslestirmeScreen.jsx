@@ -8,41 +8,65 @@ const TH = 55;
 const GAP = 2;
 const LOX = 4;
 const LOY = 6;
-const ROWS = 6;
 const MAX_TEPSI = 4;
 const OYUN_SURESI = 300;
 const ESLESTI_MS = 520;
 
-function generateProgressiveLayout(seviye) {
-  const pairCount = Math.min(30, 4 + seviye);
-  const totalTiles = pairCount * 2;
-  const layout = [];
-  let tilesPlaced = 0;
-  const layers = [
-    { l: 0, rows: 6, cols: 8, rOffset: 0, cOffset: 0 },
-    { l: 1, rows: 4, cols: 6, rOffset: 1, cOffset: 1 },
-    { l: 2, rows: 4, cols: 4, rOffset: 1, cOffset: 2 },
-    { l: 3, rows: 2, cols: 4, rOffset: 2, cOffset: 2 },
-    { l: 4, rows: 2, cols: 2, rOffset: 2, cOffset: 3 },
-  ];
-  for (const layer of layers) {
-    if (tilesPlaced >= totalTiles) break;
-    for (let r = 0; r < layer.rows; r++) {
-      for (let c = 0; c < layer.cols; c++) {
-        if (tilesPlaced >= totalTiles) break;
-        layout.push({ r: r + layer.rOffset, c: c + layer.cOffset, l: layer.l });
-        tilesPlaced++;
-      }
-    }
-  }
-  if (layout.length % 2 !== 0) layout.pop();
-  return layout;
+// Piramit düzenleri: seviye 1'de az taş, seviye arttıkça büyür
+const PIRAMIT_DUZENLER = [
+  // Seviye 1: 8 taş (4 çift) — mini piramit
+  [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
+   {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:3,c:2,l:0}],
+  // Seviye 2: 12 taş (6 çift) — orta piramit
+  [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
+   {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
+   {r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0}],
+  // Seviye 3: 16 taş (8 çift) — piramit + 1 üst katman
+  [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
+   {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
+   {r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:4,c:2,l:0},
+   {r:1,c:2,l:1},{r:2,c:2,l:1},{r:3,c:2,l:1}],
+  // Seviye 4: 20 taş (10 çift) — geniş piramit
+  [{r:0,c:3,l:0},{r:0,c:4,l:0},
+   {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
+   {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},
+   {r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
+   {r:4,c:3,l:0},{r:4,c:4,l:0},
+   {r:1,c:3,l:1},{r:2,c:3,l:1}],
+  // Seviye 5: 24 taş (12 çift) — tam piramit 2 katman
+  [{r:0,c:3,l:0},{r:0,c:4,l:0},
+   {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
+   {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},
+   {r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
+   {r:4,c:3,l:0},{r:4,c:4,l:0},
+   {r:1,c:3,l:1},{r:1,c:4,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1}],
+  // Seviye 6+: 28 taş (14 çift) — dev piramit
+  [{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},{r:0,c:6,l:0},
+   {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},{r:1,c:6,l:0},
+   {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},{r:2,c:7,l:0},
+   {r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},{r:3,c:6,l:0},
+   {r:4,c:3,l:0},{r:4,c:4,l:0},{r:4,c:5,l:0},
+   {r:1,c:4,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},{r:3,c:4,l:1}],
+];
+
+function getLayout(seviye) {
+  const idx = Math.min(seviye - 1, PIRAMIT_DUZENLER.length - 1);
+  return PIRAMIT_DUZENLER[idx];
+}
+
+function getBoardDims(layout) {
+  const maxC = Math.max(...layout.map(p => p.c ?? p.col));
+  const maxR = Math.max(...layout.map(p => p.r ?? p.row));
+  return {
+    w: (maxC + 2) * (TW + GAP) + 20,
+    h: (maxR + 1) * (TH + GAP) + 20,
+  };
 }
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
 function createBoard(bolgeId, seviye = 1) {
-  const layout = generateProgressiveLayout(seviye);
+  const layout = getLayout(seviye);
   const pairCount = layout.length / 2;
   let pool = [];
   if (bolgeId) {
@@ -91,8 +115,6 @@ function tilePos(col, row, layer) {
   };
 }
 
-const BOARD_W = 8 * (TW + GAP) + TW + 15;
-const BOARD_H = ROWS * (TH + GAP) + 15;
 
 function display(kart) {
   const isMit = kart.kategori === 'mitoloji';
@@ -127,6 +149,7 @@ export default function EslestirmeScreen() {
   const { playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio } = useAudio();
   const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 1;
   const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, aktifSeviye));
+  const boardDims = getBoardDims(getLayout(aktifSeviye));
   const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
   const [carpisma, setCarpisma] = useState(null);
   const [sure, setSure] = useState(OYUN_SURESI);
@@ -300,7 +323,10 @@ export default function EslestirmeScreen() {
           </div>
           <span className="mj-sure-sayi" style={{ color: sureRenk }}>{sure}s</span>
         </div>
-        <div className="mj-skor-badge">{skor} &#10022;</div>
+        <div className="mj-skor-badge">
+          <span style={{ fontSize: '0.65rem', opacity: 0.7, display: 'block', lineHeight: 1 }}>S{aktifSeviye}</span>
+          {skor} &#10022;
+        </div>
       </div>
 
       {/* Tepsi — üst alan */}
@@ -347,7 +373,7 @@ export default function EslestirmeScreen() {
 
       {/* Tahta */}
       <div className="mj-tahta-kap">
-        <div className="mj-tahta" style={{ width: BOARD_W, height: BOARD_H }}>
+        <div className="mj-tahta" style={{ width: boardDims.w, height: boardDims.h }}>
           {onTahta.map(tile => {
             const free = isFree(tile, tiles);
             const d = display(tile.kart);
