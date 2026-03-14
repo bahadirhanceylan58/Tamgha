@@ -33,7 +33,7 @@ function Router() {
   if (ekran === 'profil') return <ProfilScreen />
   if (ekran === 'ceviri') return <CeviriScreen />
   if (ekran === 'rehber') return <RehberScreen />
-  if (ekran === 'eslestirme') return <EslestirmeScreen key={`${state.sefer?.bolgeId}-${state.sefer?.seviye}`} />
+  if (ekran === 'eslestirme') return <EslestirmeScreen key={state.seferSayaci} />
 
   return <HomeScreen />
 }

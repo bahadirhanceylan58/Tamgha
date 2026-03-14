@@ -37,6 +37,8 @@ const INITIAL_STATE = {
 
   // Taş eşleştirme global bölüm ilerlemesi (1-50)
   eslestirmeBolum: 1,
+  // Her SEFER_BASLAT'ta artar — EslestirmeScreen remount için key olarak kullanılır
+  seferSayaci: 0,
 };
 
 function yukleKayit() {
@@ -88,6 +90,7 @@ function reducer(state, action) {
         seciliBolge: action.bolgeId,
         seciliSeviye: action.seviye,
         aktifGuc: action.guc || null,
+        seferSayaci: (state.seferSayaci || 0) + 1,
         ...(action.bolum ? { eslestirmeBolum: action.bolum } : {}),
       };
 
