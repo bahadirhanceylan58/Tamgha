@@ -62,7 +62,7 @@ function yukleKayit() {
           bolgeIlerlemesi[k] = { ...bolgeIlerlemesi[k], yildizlar: [...y, ...Array(5 - y.length).fill(0)] };
         }
       }
-      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 } };
+      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 }, eslestirmeBolum: parsed.eslestirmeBolum ?? 1 };
     }
   } catch (e) {
     // ignore
@@ -143,9 +143,11 @@ function reducer(state, action) {
       const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];
       const yeniYildizlar = [...oncekiYildizlar];
 
-      // Basit yildiz mantigi: tahta temizlendiği an en az 1 yildiz, basariliysa 3 yildiz
-      const yildiz = action.kazandi ? 3 : 0;
-      yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
+      // Yıldız güncelle (seviye yalnızca 0-4 aralığındaysa geçerli)
+      if (seviye >= 0 && seviye < yeniYildizlar.length) {
+        const yildiz = action.kazandi ? 3 : 0;
+        yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
+      }
 
       return {
         ...state,
@@ -273,9 +275,10 @@ export function GameProvider({ children }) {
       kullaniciAdi: state.kullaniciAdi,
       avatar: state.avatar,
       dil: state.dil,
+      eslestirmeBolum: state.eslestirmeBolum,
     };
     localStorage.setItem('tamgha_kayit', JSON.stringify(kayit));
-  }, [state.kazanilanKartlar, state.bolgeIlerlemesi, state.toplamPuan, state.gunlukKartTalep, state.dogumYili, state.dogumHayvaniId, state.kullaniciAdi, state.avatar, state.dil]);
+  }, [state.kazanilanKartlar, state.bolgeIlerlemesi, state.toplamPuan, state.gunlukKartTalep, state.dogumYili, state.dogumHayvaniId, state.kullaniciAdi, state.avatar, state.dil, state.eslestirmeBolum]);
 
   return <GameContext.Provider value={{ state, dispatch }}>{children}</GameContext.Provider>;
 }

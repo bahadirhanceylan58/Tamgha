@@ -50,9 +50,14 @@ const PIRAMIT_DUZENLER = [
    {r:1,c:4,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},{r:3,c:4,l:1}],
 ];
 
-function getLayout(seviye) {
-  const idx = Math.min(seviye - 1, PIRAMIT_DUZENLER.length - 1);
-  return PIRAMIT_DUZENLER[idx];
+// bolum 1-50 → piramit düzeni
+function getLayout(bolum) {
+  if (bolum <= 4)  return PIRAMIT_DUZENLER[0]; // 8 taş
+  if (bolum <= 9)  return PIRAMIT_DUZENLER[1]; // 12 taş
+  if (bolum <= 14) return PIRAMIT_DUZENLER[2]; // 16 taş
+  if (bolum <= 19) return PIRAMIT_DUZENLER[3]; // 20 taş
+  if (bolum <= 24) return PIRAMIT_DUZENLER[4]; // 24 taş
+  return PIRAMIT_DUZENLER[5];                  // 28 taş (bölüm 25-50)
 }
 
 function getBoardDims(layout) {
@@ -85,8 +90,8 @@ function kartHavuzu(bolum) {
   return havuz;
 }
 
-function createBoard(bolgeId, seviye = 1, bolum = 1) {
-  const layout = getLayout(seviye);
+function createBoard(bolgeId, bolum = 1) {
+  const layout = getLayout(bolum);
   const pairCount = layout.length / 2;
   const pool = shuffle(kartHavuzu(bolum));
   let selectedPool = [];
@@ -170,6 +175,24 @@ const VOWEL_HARMONY = new Map([
 ]);
 const DUZ_UNLU = new Set(['a', 'e', 'ı', 'i']);
 
+function temizYazi(s) {
+  if (!s) return s;
+  const map = {
+    'Ã¶': 'ö', 'Ã–': 'Ö', 'Ã¼': 'ü', 'Ãœ': 'Ü',
+    'Ã§': 'ç', 'Ã‡': 'Ç', 'ÄŸ': 'ğ', 'Äž': 'Ğ',
+    'ÅŸ': 'ş', 'Åž': 'Ş', 'Ä±': 'ı', 'Ä°': 'İ',
+    'Ã¢': 'a', 'Ã¢': 'a', 'Ã®': 'i', 'Ã»': 'u',
+    'â€˜': "'", 'â€™': "'", 'â€œ': '"', 'â€�': '"',
+    'â€”': '-', 'â€“': '-', 'Â': ''
+  };
+  let out = s;
+  for (const k of Object.keys(map)) {
+    out = out.split(k).join(map[k]);
+  }
+  out = out.replace(/[âîûÂÎÛ]/g, (m) => ({ 'â': 'a', 'î': 'i', 'û': 'u', 'Â': 'A', 'Î': 'I', 'Û': 'U' }[m]));
+  return out;
+}
+
 function getCharHarmony(lower, pos) {
   let bestDist = Infinity;
   let bestHarmony = 'back';
@@ -214,7 +237,7 @@ function cevirKelime(kelime) {
 }
 
 function gokturkMonogram(kart) {
-  const raw = (kart.ses || '').replace(/[^A-Za-zÇĞİÖŞÜçğıöşü\s]/g, '').trim();
+  const raw = temizYazi(kart.ses || '').replace(/[^A-Za-zÇĞİÖŞÜçğıöşü\s]/g, '').trim();
   if (!raw) return '#';
   const kelime = raw.split(/\s+/)[0];
   const tamga = cevirKelime(kelime);
@@ -225,11 +248,11 @@ function display(kart) {
   const isMit = kart.kategori === 'mitoloji';
   const isHay = kart.kategori === 'hayvan';
   if (kart.displayMode === 'latin' && !isMit && !isHay) {
-    return { isGokt: false, main: kart.ses.split(' ')[0], sub: kart.fonetik, isMit: false, isHay: false, isLatin: true, isOzel: false };
+    return { isGokt: false, main: temizYazi(kart.ses).split(' ')[0], sub: temizYazi(kart.fonetik), isMit: false, isHay: false, isLatin: true, isOzel: false };
   }
-  if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: kart.ses, isMit: false, isHay: false, isLatin: false, isOzel: false };
+  if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: temizYazi(kart.ses), isMit: false, isHay: false, isLatin: false, isOzel: false };
   const mono = gokturkMonogram(kart);
-  return { isGokt: false, main: mono, sub: kart.ses, isMit, isHay, isLatin: false, isOzel: true };
+  return { isGokt: false, main: mono, sub: temizYazi(kart.ses), isMit, isHay, isLatin: false, isOzel: true };
 }
 
 function TasIcerik({ kart, buyuk = false, tepsi = false }) {
@@ -250,12 +273,11 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
 
 export default function EslestirmeScreen() {
   const { state, dispatch } = useGame();
-  const { playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio } = useAudio();
-  const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 0; // 0-based index
-  const seviyeNo = aktifSeviye + 1; // 1-based for layout
+  const { playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, playBgm, stopBgm } = useAudio();
+  const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 0;
   const bolum = Math.min(state.eslestirmeBolum || 1, TOPLAM_BOLUM);
-  const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, seviyeNo, bolum));
-  const boardDims = getBoardDims(getLayout(seviyeNo));
+  const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, bolum));
+  const boardDims = getBoardDims(getLayout(bolum));
   const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
   const [carpisma, setCarpisma] = useState(null);
   const [sure, setSure] = useState(OYUN_SURESI);
@@ -266,9 +288,14 @@ export default function EslestirmeScreen() {
   const blocked = useRef(false);
 
   useEffect(() => {
-    // Start BGM after the user enters the game (level click is a gesture)
     unlockAudio();
-  }, [unlockAudio]);
+    playBgm();
+    return () => stopBgm();
+  }, [unlockAudio, playBgm, stopBgm]);
+
+  useEffect(() => {
+    if (bitti) stopBgm();
+  }, [bitti, stopBgm]);
 
   useEffect(() => {
     if (bitti) return;
@@ -399,15 +426,14 @@ export default function EslestirmeScreen() {
           </div>
           {kazandi ? (
             <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => {
-              const bolge = BOLGELER.find(b => b.id === (state.seciliBolge || 'orhun'));
-              if (bolge && aktifSeviye < bolge.seviyeSayisi - 1) {
-                dispatch({ type: 'SEFER_BASLAT', bolgeId: bolge.id, seviye: aktifSeviye + 1 });
-              } else {
+              const sonraki = Math.min(bolum + 1, TOPLAM_BOLUM);
+              if (bolum >= TOPLAM_BOLUM) {
                 dispatch({ type: 'NAVIGATE', ekran: 'map' });
+                return;
               }
+              dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum: sonraki });
             }}>
-              {(BOLGELER.find(b => b.id === (state.seciliBolge || 'orhun'))?.seviyeSayisi - 1 > aktifSeviye)
-                ? 'Sonraki Bolum' : 'Bolge Tamamlandi!'}
+              {bolum < TOPLAM_BOLUM ? 'Sonraki Bölüm' : 'Tamamlandı!'}
             </button>
           ) : (
             <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => window.location.reload()}>Tekrar Oyna</button>

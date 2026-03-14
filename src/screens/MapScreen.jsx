@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { BOLGELER, getBolgeTamgalari, HAYVANLAR, MITOLOJI, YADA_TASI, findKartById, NADIRLIK } from '../data/tamgalar';
 
@@ -37,6 +37,12 @@ function SeviyeButon({ bolgeId, seviye, ilerleme, kilit, onClick }) {
 
 export default function MapScreen() {
   const { state, dispatch } = useGame();
+  const aktifBolum = state.eslestirmeBolum || 1;
+  const [bolumSayfa, setBolumSayfa] = useState(Math.floor((aktifBolum - 1) / 5));
+
+  useEffect(() => {
+    setBolumSayfa(Math.floor((aktifBolum - 1) / 5));
+  }, [aktifBolum]);
 
   function seviyeTikla(bolgeId, seviye) {
     dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null });
@@ -78,6 +84,17 @@ export default function MapScreen() {
     dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum });
   }
 
+  function bolumAciklama(bolum) {
+    const etiketler = ['Göktürk Harfleri'];
+    if (bolum >= 5) etiketler.push('Mitolojik Karakterler');
+    if (bolum >= 11) etiketler.push('12 Hayvan');
+    if (bolum >= 15) {
+      const adim = Math.floor((bolum - 15) / 5) + 1;
+      etiketler.push(`Latin +${adim * 5} Harf`);
+    }
+    return etiketler.join(' • ');
+  }
+
   return (
     <div className="screen map-screen">
       <div className="map-header">
@@ -101,26 +118,49 @@ export default function MapScreen() {
         </div>
       </div>
 
-      <div className="bolum-50-kutu">
-        <div className="bolum-50-baslik">
-          <span>Eşleştirme Bölümleri</span>
-          <span>B{state.eslestirmeBolum || 1}/50</span>
+      <div className="bolum-mini-kart">
+        <div className="bolum-mini-ust">
+          <div className="bolum-mini-ikon">{'\u{10C1A}'}</div>
+          <div className="bolum-mini-icerik">
+            <div className="bolum-mini-baslik">
+              <span>{aktifBolum}. Bölüm</span>
+              <span>B{aktifBolum}/50</span>
+            </div>
+            <div className="bolum-mini-alt">{bolumAciklama(aktifBolum)}</div>
+          </div>
         </div>
-        <div className="bolum-50-grid">
-          {Array.from({ length: 50 }, (_, i) => {
-            const no = i + 1;
-            const aktif = no <= (state.eslestirmeBolum || 1);
-            return (
-              <button
-                key={no}
-                className={`bolum-50-btn ${aktif ? 'bolum-50-aktif' : 'bolum-50-kilit'}`}
-                disabled={!aktif}
-                onClick={aktif ? () => eslestirmeBolumSec(no) : undefined}
-              >
-                {no}
-              </button>
-            );
-          })}
+        <div className="bolum-mini-nav">
+          <button
+            className="bolum-mini-nav-btn"
+            onClick={() => setBolumSayfa(p => Math.max(0, p - 1))}
+            disabled={bolumSayfa === 0}
+          >
+            &#8249;
+          </button>
+          <div className="bolum-mini-grid">
+            {Array.from({ length: 5 }, (_, i) => {
+              const no = bolumSayfa * 5 + i + 1;
+              if (no > 50) return <span key={i} className="bolum-mini-bos" />;
+              const aktif = no <= aktifBolum;
+              return (
+                <button
+                  key={no}
+                  className={`bolum-mini-btn ${aktif ? 'bolum-mini-aktif' : 'bolum-mini-kilit'}`}
+                  disabled={!aktif}
+                  onClick={aktif ? () => eslestirmeBolumSec(no) : undefined}
+                >
+                  {no}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            className="bolum-mini-nav-btn"
+            onClick={() => setBolumSayfa(p => Math.min(9, p + 1))}
+            disabled={bolumSayfa === 9}
+          >
+            &#8250;
+          </button>
         </div>
       </div>
 

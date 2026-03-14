@@ -50,16 +50,21 @@ export function AudioProvider({ children }) {
 
     const unlockAudio = useCallback(() => {
         if (unlocked) return;
-
-        // Play a silent buffer to unlock audio on mobile/modern browsers
         const silent = new Audio();
         silent.play().catch(() => { });
-
-        if (bgmRef.current && !isMuted) {
-            bgmRef.current.play().catch(e => console.log("Audio unlock failed:", e));
-        }
         setUnlocked(true);
-    }, [unlocked, isMuted]);
+    }, [unlocked]);
+
+    const playBgm = useCallback(() => {
+        if (isMuted || !bgmRef.current) return;
+        bgmRef.current.play().catch(() => { });
+    }, [isMuted]);
+
+    const stopBgm = useCallback(() => {
+        if (!bgmRef.current) return;
+        bgmRef.current.pause();
+        bgmRef.current.currentTime = 0;
+    }, []);
 
     const toggleMute = useCallback(() => {
         setIsMuted(prev => {
@@ -122,7 +127,7 @@ export function AudioProvider({ children }) {
     return (
         <AudioContext.Provider value={{
             playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, unlocked,
-            bgmVolume, setBgmVolume: setVolume
+            bgmVolume, setBgmVolume: setVolume, playBgm, stopBgm
         }}>
             {children}
         </AudioContext.Provider>

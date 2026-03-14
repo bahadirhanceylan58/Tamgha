@@ -407,30 +407,78 @@ body {
   padding: 0.5rem 1rem;
 }
 
-.bolum-50-kutu {
+.bolum-mini-kart {
   margin: 0.5rem 1rem 0.75rem;
-  padding: 0.75rem;
-  border: 1px solid rgba(212, 160, 23, 0.25);
+  border: 1px solid rgba(212, 160, 23, 0.22);
   border-radius: 14px;
-  background: rgba(20, 12, 4, 0.6);
+  background: linear-gradient(135deg, rgba(40, 22, 6, 0.9), rgba(20, 12, 4, 0.8));
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
 
-.bolum-50-baslik {
+.bolum-mini-ust {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.8rem;
+}
+
+.bolum-mini-ikon {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 1.6rem;
+  color: var(--altin-acik);
+  text-shadow: 0 0 10px rgba(212, 160, 23, 0.4);
+}
+
+.bolum-mini-icerik {
+  flex: 1;
+}
+
+.bolum-mini-baslik {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
-  color: var(--metin-soluk);
-  margin-bottom: 0.5rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: var(--krem);
 }
 
-.bolum-50-grid {
+.bolum-mini-alt {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  color: var(--metin-soluk);
+}
+
+.bolum-mini-nav {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4rem 0.6rem 0.6rem;
+  border-top: 1px solid rgba(212, 160, 23, 0.2);
+}
+
+.bolum-mini-nav-btn {
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 160, 23, 0.35);
+  background: rgba(30, 18, 6, 0.6);
+  color: var(--krem);
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+}
+
+.bolum-mini-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.bolum-mini-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
-.bolum-50-btn {
+.bolum-mini-btn {
   border: 1px solid rgba(212, 160, 23, 0.35);
   border-radius: 10px;
   padding: 0.35rem 0;
@@ -440,14 +488,18 @@ body {
   color: var(--metin-soluk);
 }
 
-.bolum-50-aktif {
+.bolum-mini-aktif {
   background: linear-gradient(135deg, rgba(212, 160, 23, 0.25), rgba(120, 70, 10, 0.4));
   color: var(--krem);
   box-shadow: 0 0 8px rgba(212, 160, 23, 0.25);
 }
 
-.bolum-50-kilit {
+.bolum-mini-kilit {
   opacity: 0.45;
+}
+
+.bolum-mini-bos {
+  display: block;
 }
 
 .bolge-kart {
@@ -4283,22 +4335,30 @@ body {
 }
 
 /* Hayvan â€” parchment tile, amber border */
+/* Hayvan — Göktürk taş oyması: koyu taş, kazınmış görünüm */
 .mj-tas-hay {
-  background: linear-gradient(135deg, #fdf5e0 0%, #f5e8c0 50%, #e0cc98 100%);
-  border-color: #9a7020;
+  background: linear-gradient(145deg, #3c2810 0%, #2a1c09 55%, #1c1005 100%);
+  border-color: #6a4820;
+  border-bottom-color: #1c1005;
+  border-right-color: #1c1005;
   box-shadow:
-    1px 1px 0px 0px #7a5010,
-    2px 2px 0px 0px #6a4008,
-    3px 3px 0px 0px #5a3205,
-    4px 4px 0px 0px #4a2803,
-    5px 5px 0px 0px #3a2002,
-    7px 7px 4px rgba(0, 0, 0, 0.5),
-    inset 0 2px 4px rgba(255, 255, 255, 0.9);
+    1px 1px 0px 0px #7a5828,
+    2px 2px 0px 0px #5a3c18,
+    3px 3px 0px 0px #3a2808,
+    4px 4px 0px 0px #2a1c05,
+    5px 5px 3px rgba(0, 0, 0, 0.65),
+    inset 0 1px 3px rgba(200, 160, 80, 0.15);
 }
 
 .mj-tas-hay .mj-ana-ozel {
-  color: #3b3a25;
-  text-shadow: 0 0 6px rgba(120, 90, 30, 0.35);
+  color: #d4a850;
+  font-size: 1.55rem;
+  text-shadow: 0 0 4px rgba(180, 120, 30, 0.45), 0 1px 2px rgba(0,0,0,0.6);
+}
+
+.mj-tas-hay .mj-ses {
+  color: #c8a060;
+  opacity: 0.85;
 }
 
 /* â”€â”€ Tile content â”€â”€ */
