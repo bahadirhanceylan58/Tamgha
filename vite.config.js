@@ -29,6 +29,8 @@ export default defineConfig({
         lang: 'tr',
         dir: 'ltr',
         categories: ['education', 'games'],
+        related_applications: [],
+        prefer_related_applications: false,
         icons: [
           {
             src: 'pwa-64x64.png',
