@@ -35,9 +35,9 @@ function DogumYiliModal({ onKapat, onKaydet }) {
         <button className="detay-kapat" onClick={onKapat}>&#10005;</button>
 
         <div className="dogum-baslik-bolum">
-          <div className=”dogum-ust-ikon”>{'\u{1F4C5}'}</div>
-          <h3 className=”dogum-baslik”>Takvim Ruhunu Bul</h3>
-          <p className=”dogum-alt”>12 Hayvanlı Türk Takvimine göre doğum ruhunu keşfet</p>
+          <div className="dogum-ust-ikon">{'\u{1F4C5}'}</div>
+          <h3 className="dogum-baslik">Takvim Ruhunu Bul</h3>
+          <p className="dogum-alt">12 Hayvanlı Türk Takvimine göre doğum ruhunu keşfet</p>
         </div>
 
         <div className="dogum-giris-bolum">
