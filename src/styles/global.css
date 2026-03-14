@@ -371,135 +371,162 @@ body {
   font-family: 'Cinzel', serif;
 }
 
-.ilerleme-bar-wrapper {
-  padding: 0.75rem 1rem;
+/* İlerleme Paneli */
+.ilerleme-panel {
+  margin: 0.5rem 1rem 0.6rem;
+  border: 1px solid rgba(212, 160, 23, 0.28);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(40, 22, 6, 0.95), rgba(18, 10, 3, 0.9));
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 160, 23, 0.1);
+  overflow: hidden;
 }
 
-.ilerleme-etiket {
+.ilerleme-panel-ust {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: var(--metin-soluk);
-  margin-bottom: 0.4rem;
-  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
 }
 
-.ilerleme-bar {
+.ilerleme-bolum-kutu {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  background: rgba(212, 160, 23, 0.12);
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  border-radius: 10px;
+  padding: 0.3rem 0.55rem;
+  min-width: 52px;
+  justify-content: center;
+}
+
+.ilerleme-bolum-b {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  color: var(--altin);
+  opacity: 0.8;
+}
+
+.ilerleme-bolum-sayi {
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--altin);
+  line-height: 1;
+}
+
+.ilerleme-bolum-kalan {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  color: var(--metin-soluk);
+}
+
+.ilerleme-panel-sag {
+  flex: 1;
+  min-width: 0;
+}
+
+.ilerleme-panel-baslik {
+  font-size: 0.75rem;
+  color: var(--krem);
+  font-family: 'Cinzel', serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.35rem;
+}
+
+.ilerleme-bar-ince {
   height: 5px;
   background: rgba(255, 255, 255, 0.07);
   border-radius: 3px;
   overflow: hidden;
   border: 1px solid rgba(212, 160, 23, 0.15);
+  margin-bottom: 0.3rem;
 }
 
-.ilerleme-dolgu {
+.ilerleme-bar-dolgu {
   height: 100%;
-  background: linear-gradient(90deg, #a06010, var(--altin), #f0d060);
+  background: linear-gradient(90deg, #8a5010, var(--altin), #f0d060);
   border-radius: 3px;
   transition: width 0.6s ease;
-  box-shadow: 0 0 6px rgba(212, 160, 23, 0.4);
+  box-shadow: 0 0 5px rgba(212, 160, 23, 0.5);
+}
+
+.ilerleme-panel-alt {
+  font-size: 0.68rem;
+  color: var(--metin-soluk);
+}
+
+.ilerleme-bolum-nav {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  align-items: center;
+  gap: 5px;
+  padding: 0.35rem 0.55rem 0.55rem;
+  border-top: 1px solid rgba(212, 160, 23, 0.15);
+}
+
+.ilerleme-nav-btn {
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid rgba(212, 160, 23, 0.3);
+  background: rgba(30, 18, 6, 0.5);
+  color: var(--krem);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background var(--gecis);
+}
+.ilerleme-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.ilerleme-nav-btn:not(:disabled):hover { background: rgba(212, 160, 23, 0.15); }
+
+.ilerleme-bolum-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.3rem;
+}
+
+.ilerleme-bolum-btn {
+  border-radius: 8px;
+  padding: 0.3rem 0;
+  font-size: 0.75rem;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: all var(--gecis);
+  border: 1px solid rgba(212, 160, 23, 0.2);
+  background: rgba(20, 12, 4, 0.6);
+  color: var(--metin-soluk);
+}
+
+.ilerleme-bolum-btn.aktif {
+  background: rgba(212, 160, 23, 0.15);
+  color: var(--krem);
+  border-color: rgba(212, 160, 23, 0.35);
+}
+
+.ilerleme-bolum-btn.aktif:hover {
+  background: rgba(212, 160, 23, 0.25);
+  border-color: var(--altin);
+}
+
+.ilerleme-bolum-btn.simdiki {
+  background: linear-gradient(135deg, rgba(212, 160, 23, 0.35), rgba(150, 80, 10, 0.5));
+  color: var(--altin);
+  border-color: var(--altin);
+  font-weight: 700;
+  box-shadow: 0 0 8px rgba(212, 160, 23, 0.3);
+}
+
+.ilerleme-bolum-btn.kilit {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .bolgeler-listesi {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-}
-
-.bolum-mini-kart {
-  margin: 0.5rem 1rem 0.75rem;
-  border: 1px solid rgba(212, 160, 23, 0.22);
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(40, 22, 6, 0.9), rgba(20, 12, 4, 0.8));
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-}
-
-.bolum-mini-ust {
-  display: flex;
-  align-items: center;
   gap: 0.65rem;
-  padding: 0.6rem 0.8rem;
-}
-
-.bolum-mini-ikon {
-  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
-  font-size: 1.6rem;
-  color: var(--altin-acik);
-  text-shadow: 0 0 10px rgba(212, 160, 23, 0.4);
-}
-
-.bolum-mini-icerik {
-  flex: 1;
-}
-
-.bolum-mini-baslik {
-  display: flex;
-  justify-content: space-between;
-  font-family: 'Cinzel', serif;
-  font-size: 0.9rem;
-  color: var(--krem);
-}
-
-.bolum-mini-alt {
-  margin-top: 0.15rem;
-  font-size: 0.7rem;
-  color: var(--metin-soluk);
-}
-
-.bolum-mini-nav {
-  display: grid;
-  grid-template-columns: 32px 1fr 32px;
-  align-items: center;
-  gap: 6px;
-  padding: 0.4rem 0.6rem 0.6rem;
-  border-top: 1px solid rgba(212, 160, 23, 0.2);
-}
-
-.bolum-mini-nav-btn {
-  height: 28px;
-  border-radius: 8px;
-  border: 1px solid rgba(212, 160, 23, 0.35);
-  background: rgba(30, 18, 6, 0.6);
-  color: var(--krem);
-  font-family: 'Cinzel', serif;
-  cursor: pointer;
-}
-
-.bolum-mini-nav-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.bolum-mini-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.35rem;
-}
-
-.bolum-mini-btn {
-  border: 1px solid rgba(212, 160, 23, 0.35);
-  border-radius: 10px;
-  padding: 0.35rem 0;
-  font-size: 0.78rem;
-  font-family: 'Cinzel', serif;
-  background: rgba(30, 18, 6, 0.5);
-  color: var(--metin-soluk);
-}
-
-.bolum-mini-aktif {
-  background: linear-gradient(135deg, rgba(212, 160, 23, 0.25), rgba(120, 70, 10, 0.4));
-  color: var(--krem);
-  box-shadow: 0 0 8px rgba(212, 160, 23, 0.25);
-}
-
-.bolum-mini-kilit {
-  opacity: 0.45;
-}
-
-.bolum-mini-bos {
-  display: block;
+  padding: 0 1rem 0.5rem;
 }
 
 .bolge-kart {
@@ -520,57 +547,87 @@ body {
 .bolge-kart-ust {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem;
 }
 
 .bolge-simge {
   font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
-  font-size: 2.5rem;
-  min-width: 3rem;
+  font-size: 2.2rem;
+  min-width: 2.6rem;
   text-align: center;
   text-shadow: 0 0 20px rgba(212, 160, 23, 0.6);
 }
 
 .bolge-info {
   flex: 1;
+  min-width: 0;
 }
 
 .bolge-adi {
   font-family: 'Cinzel', serif;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--krem);
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.1rem;
 }
 
 .bolge-altyazi {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
   font-style: italic;
 }
 
 .bolge-tamga-sayisi,
 .bolge-kilit-mesaj {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.5);
-  margin-top: 0.2rem;
+  margin-top: 0.15rem;
 }
 
-.yildiz-row {
+.bolge-yildiz-ozet {
   display: flex;
-  gap: 0.1rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 38px;
 }
 
-.yildiz {
-  font-size: 1.1rem;
-}
-
-.yildiz-dolu {
+.bolge-yildiz-oran {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
   color: var(--altin);
+  white-space: nowrap;
 }
 
-.yildiz-bos {
-  color: rgba(255, 255, 255, 0.15);
+.bolge-yildiz-max {
+  font-size: 0.7rem;
+  color: var(--metin-soluk);
+}
+
+.bolge-tam-rozet {
+  font-size: 0.75rem;
+  color: #4a9e6a;
+  background: rgba(74, 158, 106, 0.15);
+  border: 1px solid rgba(74, 158, 106, 0.4);
+  border-radius: 10px;
+  padding: 0.05rem 0.35rem;
+  font-weight: 700;
+}
+
+.bolge-kilit-ikon {
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+.bolge-tamamlandi-serit {
+  background: linear-gradient(90deg, rgba(74, 158, 106, 0.08), rgba(74, 158, 106, 0.15), rgba(74, 158, 106, 0.08));
+  border-top: 1px solid rgba(74, 158, 106, 0.25);
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+  color: #4a9e6a;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.05em;
 }
 
 .bolge-seviyeler {
@@ -635,7 +692,34 @@ body {
 }
 
 .map-alt-nav {
-  padding: 0.75rem 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem 0.75rem;
+}
+
+.map-alt-btn {
+  padding: 0.65rem 0.4rem;
+  font-size: 0.82rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.map-alt-btn span {
+  font-size: 1.15rem;
+}
+
+.map-oyna-btn {
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(200, 100, 30, 0.5);
+  border: 2px solid #ff9944 !important;
+}
+
+.map-oyna-btn span {
+  font-size: 1.25rem;
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1644,13 +1728,6 @@ body {
   50% {
     text-shadow: 0 0 40px rgba(255, 107, 0, 1), 0 0 80px rgba(255, 107, 0, 0.5);
   }
-}
-
-.map-alt-nav {
-  padding: 0.75rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .btn-arena {

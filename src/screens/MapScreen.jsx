@@ -1,23 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
-import { BOLGELER, getBolgeTamgalari, HAYVANLAR, MITOLOJI, YADA_TASI, findKartById, NADIRLIK } from '../data/tamgalar';
+import { BOLGELER, getBolgeTamgalari } from '../data/tamgalar';
 
-function YildizRow({ yildizlar }) {
-  return (
-    <div className="yildiz-row">
-      {[0, 1, 2].map((i) => (
-        <span key={i} className={`yildiz ${yildizlar[i] > 0 ? 'yildiz-dolu' : 'yildiz-bos'}`}>
-          &#9733;
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function SeviyeButon({ bolgeId, seviye, ilerleme, kilit, onClick }) {
+function SeviyeButon({ seviye, ilerleme, kilit, onClick }) {
   const yildiz = ilerleme?.yildizlar?.[seviye] || 0;
   const tamamlandi = yildiz > 0;
-
   return (
     <button
       className={`seviye-btn ${tamamlandi ? 'seviye-tamamlandi' : ''} ${kilit ? 'seviye-kapali' : ''}`}
@@ -34,7 +21,6 @@ function SeviyeButon({ bolgeId, seviye, ilerleme, kilit, onClick }) {
   );
 }
 
-
 export default function MapScreen() {
   const { state, dispatch } = useGame();
   const aktifBolum = state.eslestirmeBolum || 1;
@@ -48,7 +34,6 @@ export default function MapScreen() {
     dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null });
   }
 
-  // eslestirmeBolum milestonlarına göre bölge kilidini hesapla (state'teki kilit bayrağından bağımsız)
   function bolgeKilidiHesapla(bolgeId) {
     if (bolgeId === 'orhun') return false;
     if (bolgeId === 'selenga') return aktifBolum < 10;
@@ -58,29 +43,7 @@ export default function MapScreen() {
   }
 
   function baslatSonrakiBolum() {
-    let hedefBolge = BOLGELER[0].id;
-    let hedefSeviye = 0;
-
-    for (const b of BOLGELER) {
-      const ilerleme = state.bolgeIlerlemesi[b.id];
-      if (!ilerleme || ilerleme.kilit) continue;
-
-      const bolge2 = BOLGELER.find(x => x.id === b.id);
-      const yildizlar = ilerleme.yildizlar || Array(bolge2?.seviyeSayisi || 5).fill(0);
-      const eksikIndex = yildizlar.findIndex(y => y < 3);
-
-      // Eger bu bolgede eksik bir yildiz varsa ve oynanabilirse burayi sec
-      if (eksikIndex !== -1) {
-        if (eksikIndex === 0 || yildizlar[eksikIndex - 1] > 0) {
-          hedefBolge = b.id;
-          hedefSeviye = eksikIndex;
-          break;
-        }
-      }
-      // Bolge ful ama son bolge degilse donguye devam et
-    }
-
-    dispatch({ type: 'SEFER_BASLAT', bolgeId: hedefBolge, seviye: hedefSeviye, guc: null });
+    dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum: aktifBolum });
   }
 
   function eslestirmeBolumSec(bolum) {
@@ -88,15 +51,16 @@ export default function MapScreen() {
   }
 
   function bolumAciklama(bolum) {
-    const etiketler = ['Göktürk Harfleri'];
-    if (bolum >= 5) etiketler.push('Mitolojik Karakterler');
-    if (bolum >= 11) etiketler.push('12 Hayvan');
     if (bolum >= 15) {
       const adim = Math.floor((bolum - 15) / 5) + 1;
-      etiketler.push(`Latin +${adim * 5} Harf`);
+      return `Göktürk + Mitoloji + 12 Hayvan + Latin (${adim * 5})`;
     }
-    return etiketler.join(' • ');
+    if (bolum >= 11) return 'Göktürk + Mitoloji + 12 Hayvan';
+    if (bolum >= 5) return 'Göktürk Harfleri + Mitoloji';
+    return 'Göktürk Harfleri';
   }
+
+  const pctIlerleme = Math.min((aktifBolum / 50) * 100, 100);
 
   return (
     <div className="screen map-screen">
@@ -104,51 +68,43 @@ export default function MapScreen() {
         <button className="geri-btn" onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'home' })}>
           &#8592; Ana Menü
         </button>
-        <h2 className="map-baslik">Bozkir Haritasi</h2>
-        <div className="puan-badge">{state.toplamPuan} puan</div>
+        <h2 className="map-baslik">Bozkır Haritası</h2>
+        <div className="puan-badge">{state.toplamPuan.toLocaleString()} puan</div>
       </div>
 
-      <div className="ilerleme-bar-wrapper">
-        <div className="ilerleme-etiket">
-          <span>Tamga Ilerlemesi</span>
-          <span>B{aktifBolum} / 50</span>
-        </div>
-        <div className="ilerleme-bar">
-          <div
-            className="ilerleme-dolgu"
-            style={{ width: `${(aktifBolum / 50) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      <div className="bolum-mini-kart">
-        <div className="bolum-mini-ust">
-          <div className="bolum-mini-ikon">{'\u{10C1A}'}</div>
-          <div className="bolum-mini-icerik">
-            <div className="bolum-mini-baslik">
-              <span>{aktifBolum}. Bölüm</span>
-              <span>B{aktifBolum}/50</span>
+      {/* Birleşik İlerleme Paneli */}
+      <div className="ilerleme-panel">
+        <div className="ilerleme-panel-ust">
+          <div className="ilerleme-bolum-kutu">
+            <span className="ilerleme-bolum-b">B</span>
+            <span className="ilerleme-bolum-sayi">{aktifBolum}</span>
+            <span className="ilerleme-bolum-kalan">/50</span>
+          </div>
+          <div className="ilerleme-panel-sag">
+            <div className="ilerleme-panel-baslik">{bolumAciklama(aktifBolum)}</div>
+            <div className="ilerleme-bar-ince">
+              <div className="ilerleme-bar-dolgu" style={{ width: `${pctIlerleme}%` }} />
             </div>
-            <div className="bolum-mini-alt">{bolumAciklama(aktifBolum)}</div>
+            <div className="ilerleme-panel-alt">{aktifBolum}. Bölüm &bull; %{Math.round(pctIlerleme)} tamamlandı</div>
           </div>
         </div>
-        <div className="bolum-mini-nav">
+
+        <div className="ilerleme-bolum-nav">
           <button
-            className="bolum-mini-nav-btn"
+            className="ilerleme-nav-btn"
             onClick={() => setBolumSayfa(p => Math.max(0, p - 1))}
             disabled={bolumSayfa === 0}
-          >
-            &#8249;
-          </button>
-          <div className="bolum-mini-grid">
+          >&#8249;</button>
+          <div className="ilerleme-bolum-grid">
             {Array.from({ length: 5 }, (_, i) => {
               const no = bolumSayfa * 5 + i + 1;
-              if (no > 50) return <span key={i} className="bolum-mini-bos" />;
+              if (no > 50) return <span key={i} />;
               const aktif = no <= aktifBolum;
+              const simdiki = no === aktifBolum;
               return (
                 <button
                   key={no}
-                  className={`bolum-mini-btn ${aktif ? 'bolum-mini-aktif' : 'bolum-mini-kilit'}`}
+                  className={`ilerleme-bolum-btn${aktif ? ' aktif' : ' kilit'}${simdiki ? ' simdiki' : ''}`}
                   disabled={!aktif}
                   onClick={aktif ? () => eslestirmeBolumSec(no) : undefined}
                 >
@@ -158,16 +114,14 @@ export default function MapScreen() {
             })}
           </div>
           <button
-            className="bolum-mini-nav-btn"
+            className="ilerleme-nav-btn"
             onClick={() => setBolumSayfa(p => Math.min(9, p + 1))}
             disabled={bolumSayfa === 9}
-          >
-            &#8250;
-          </button>
+          >&#8250;</button>
         </div>
       </div>
 
-
+      {/* Bölgeler */}
       <div className="bolgeler-listesi">
         {BOLGELER.map((bolge) => {
           const ilerleme = state.bolgeIlerlemesi[bolge.id];
@@ -177,6 +131,10 @@ export default function MapScreen() {
           );
           const toplamBolgeTamga = getBolgeTamgalari(bolge.id).length;
           const isTengri = bolge.id === 'tengri_yurdu';
+          const yildizlar = ilerleme?.yildizlar || Array(bolge.seviyeSayisi).fill(0);
+          const toplamYildiz = yildizlar.reduce((a, b) => a + b, 0);
+          const maxYildiz = bolge.seviyeSayisi * 3;
+          const tumTamamlandi = !kilit && toplamYildiz >= maxYildiz;
 
           return (
             <div
@@ -191,7 +149,9 @@ export default function MapScreen() {
                   <p className="bolge-altyazi">{bolge.altyazi}</p>
                   {kilit ? (
                     <p className="bolge-kilit-mesaj">
-                      &#128274; {bolge.id === 'selenga' ? 'Bölüm 10\'da açılır' : bolge.id === 'altay' ? 'Bölüm 20\'de açılır' : 'Bölüm 30\'da açılır'}
+                      &#128274;{' '}
+                      {bolge.id === 'selenga' ? "Bölüm 10'da açılır" :
+                       bolge.id === 'altay' ? "Bölüm 20'de açılır" : "Bölüm 30'da açılır"}
                     </p>
                   ) : (
                     <p className="bolge-tamga-sayisi">
@@ -199,15 +159,23 @@ export default function MapScreen() {
                     </p>
                   )}
                 </div>
-                <YildizRow yildizlar={ilerleme?.yildizlar || [0, 0, 0]} />
+                <div className="bolge-yildiz-ozet">
+                  {!kilit ? (
+                    <>
+                      <div className="bolge-yildiz-oran">{toplamYildiz}<span className="bolge-yildiz-max">/{maxYildiz}</span> &#9733;</div>
+                      {tumTamamlandi && <div className="bolge-tam-rozet">✓</div>}
+                    </>
+                  ) : (
+                    <div className="bolge-kilit-ikon">&#128274;</div>
+                  )}
+                </div>
               </div>
 
-              {!kilit && (
+              {!kilit && !tumTamamlandi && (
                 <div className="bolge-seviyeler">
                   {Array.from({ length: bolge.seviyeSayisi }, (_, i) => i).map((seviye) => (
                     <SeviyeButon
                       key={seviye}
-                      bolgeId={bolge.id}
                       seviye={seviye}
                       ilerleme={ilerleme}
                       kilit={seviye > 0 && (ilerleme?.yildizlar?.[seviye - 1] || 0) === 0}
@@ -216,39 +184,40 @@ export default function MapScreen() {
                   ))}
                 </div>
               )}
+
+              {!kilit && tumTamamlandi && (
+                <div className="bolge-tamamlandi-serit">
+                  <span>&#9733;</span> Tüm Görevler Tamamlandı <span>&#9733;</span>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      <div className="map-alt-nav" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.6rem', padding: '0.5rem 1rem' }}>
+      <div className="map-alt-nav">
         <button
-          className="btn btn-altin"
-          style={{ padding: '0.7rem 0.4rem', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}
+          className="btn btn-altin map-alt-btn"
           onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'koleksiyon' })}
         >
-          <span style={{ fontSize: '1.2rem' }}>{'\u{10C09}'}</span>
+          <span>{'\u{10C09}'}</span>
           Koleksiyon
         </button>
         <button
-          className="btn btn-birincil"
-          style={{ padding: '0.7rem 0.4rem', fontSize: '1rem', fontWeight: '700', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem', boxShadow: '0 0 12px rgba(200,100,30,0.6)', border: '2px solid #ff9944' }}
+          className="btn btn-birincil map-alt-btn map-oyna-btn"
           onClick={baslatSonrakiBolum}
         >
-          <span style={{ fontSize: '1.3rem' }}>{'\u{10C1A}'}</span>
+          <span>{'\u{10C1A}'}</span>
           Oyna
         </button>
         <button
-          className="btn btn-altin"
-          style={{ padding: '0.7rem 0.4rem', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}
+          className="btn btn-altin map-alt-btn"
           onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'rehber' })}
         >
-          <span style={{ fontSize: '1.2rem' }}>📖</span>
+          <span>📖</span>
           Nasıl Oynanır
         </button>
       </div>
-
-
     </div>
   );
 }
