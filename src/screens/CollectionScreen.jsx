@@ -16,7 +16,15 @@ function TamgaDetay({ tamga, onKapat }) {
       >
         <button className="detay-kapat" onClick={onKapat}>&#10005;</button>
         <div className="detay-nadirlik">{nadirlik.adi}</div>
-        <div className={`detay-tamga ${isOzel ? 'detay-tamga-emoji' : ''}`}>{tamga.tamga}</div>
+
+        {tamga.gorsel ? (
+          <div className="detay-gorsel-cerceve">
+            <img src={tamga.gorsel} alt={tamga.ses} className="detay-gorsel" />
+          </div>
+        ) : (
+          <div className={`detay-tamga ${isOzel ? 'detay-tamga-emoji' : ''}`}>{tamga.tamga}</div>
+        )}
+
         <div className="detay-ses">{tamga.ses}</div>
         <div className="detay-fonetik">[{tamga.fonetik}]</div>
         {isOzel && tamga.guc && (
@@ -150,7 +158,11 @@ export default function CollectionScreen() {
             >
               {kazanildi ? (
                 <>
-                  <div className={`mini-tamga ${isOzel ? 'mini-tamga-emoji' : ''}`}>{tamga.tamga}</div>
+                  {tamga.gorsel ? (
+                    <img src={tamga.gorsel} alt={tamga.ses} className="mini-gorsel" />
+                  ) : (
+                    <div className={`mini-tamga ${isOzel ? 'mini-tamga-emoji' : ''}`}>{tamga.tamga}</div>
+                  )}
                   <div className="mini-ses">{tamga.ses}</div>
                   {isOzel && tamga.guc && (
                     <div className="mini-guc-ikon">{tamga.guc.ikon}</div>
