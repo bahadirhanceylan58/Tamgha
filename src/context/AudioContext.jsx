@@ -13,6 +13,7 @@ const SOUNDS = {
 export function AudioProvider({ children }) {
     const [isMuted, setIsMuted] = useState(false);
     const [unlocked, setUnlocked] = useState(false);
+    const [bgmVolume, setBgmVolume] = useState(0.22);
 
     const bgmRef = useRef(null);
     const clickRef = useRef(null);
@@ -22,7 +23,7 @@ export function AudioProvider({ children }) {
     useEffect(() => {
         bgmRef.current = new Audio(SOUNDS.bgm);
         bgmRef.current.loop = true;
-        bgmRef.current.volume = 0.22;
+        bgmRef.current.volume = bgmVolume;
 
         clickRef.current = new Audio(SOUNDS.click);
         clickRef.current.volume = 0.6;
@@ -40,6 +41,12 @@ export function AudioProvider({ children }) {
             }
         };
     }, []);
+
+    useEffect(() => {
+        if (bgmRef.current) {
+            bgmRef.current.volume = bgmVolume;
+        }
+    }, [bgmVolume]);
 
     const unlockAudio = useCallback(() => {
         if (unlocked) return;
@@ -60,6 +67,11 @@ export function AudioProvider({ children }) {
             if (bgmRef.current) bgmRef.current.muted = next;
             return next;
         });
+    }, []);
+
+    const setVolume = useCallback((v) => {
+        const safe = Math.max(0, Math.min(1, v));
+        setBgmVolume(safe);
     }, []);
 
     const playTas = useCallback(() => {
@@ -109,7 +121,8 @@ export function AudioProvider({ children }) {
 
     return (
         <AudioContext.Provider value={{
-            playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, unlocked
+            playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, unlocked,
+            bgmVolume, setBgmVolume: setVolume
         }}>
             {children}
         </AudioContext.Provider>

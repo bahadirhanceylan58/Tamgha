@@ -74,6 +74,10 @@ export default function MapScreen() {
     dispatch({ type: 'SEFER_BASLAT', bolgeId: hedefBolge, seviye: hedefSeviye, guc: null });
   }
 
+  function eslestirmeBolumSec(bolum) {
+    dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum });
+  }
+
   return (
     <div className="screen map-screen">
       <div className="map-header">
@@ -94,6 +98,29 @@ export default function MapScreen() {
             className="ilerleme-dolgu"
             style={{ width: `${(toplamYildiz / maxYildiz) * 100}%` }}
           />
+        </div>
+      </div>
+
+      <div className="bolum-50-kutu">
+        <div className="bolum-50-baslik">
+          <span>Eşleştirme Bölümleri</span>
+          <span>B{state.eslestirmeBolum || 1}/50</span>
+        </div>
+        <div className="bolum-50-grid">
+          {Array.from({ length: 50 }, (_, i) => {
+            const no = i + 1;
+            const aktif = no <= (state.eslestirmeBolum || 1);
+            return (
+              <button
+                key={no}
+                className={`bolum-50-btn ${aktif ? 'bolum-50-aktif' : 'bolum-50-kilit'}`}
+                disabled={!aktif}
+                onClick={aktif ? () => eslestirmeBolumSec(no) : undefined}
+              >
+                {no}
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -88,6 +88,7 @@ function reducer(state, action) {
         seciliBolge: action.bolgeId,
         seciliSeviye: action.seviye,
         aktifGuc: action.guc || null,
+        ...(action.bolum ? { eslestirmeBolum: action.bolum } : {}),
       };
 
     case 'SEFER_ILERLE': {

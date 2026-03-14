@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { TAMGALAR, HAYVANLAR, findKartById, NADIRLIK } from '../data/tamgalar';
 import { getT } from '../i18n/translations';
@@ -6,7 +6,7 @@ import { useAudio } from '../hooks/useAudio';
 
 const YUZUCU_TAMGALAR = ['\u{10C00}', '\u{10C09}', '\u{10C1A}', '\u{10C43}', '\u{10C23}', '\u{10C3A}', '\u{10C03}', '\u{10C2D}'];
 
-// 2020 = Sıçgan (index 0), döngü HAYVANLAR sıralamasıyla eşleşiyor
+// 2020 = SÄ±Ã§gan (index 0), dÃ¶ngÃ¼ HAYVANLAR sÄ±ralamasÄ±yla eÅŸleÅŸiyor
 function yildenHayvan(yil) {
   const index = ((yil - 2020) % 12 + 12) % 12;
   return HAYVANLAR[index];
@@ -35,23 +35,23 @@ function DogumYiliModal({ onKapat, onKaydet }) {
         <button className="detay-kapat" onClick={onKapat}>&#10005;</button>
 
         <div className="dogum-baslik-bolum">
-          <div className="dogum-ust-ikon">🗓</div>
+          <div className="dogum-ust-ikon">ğŸ—“</div>
           <h3 className="dogum-baslik">Takvim Ruhunu Bul</h3>
-          <p className="dogum-alt">12 Hayvanlı Türk Takvimine göre doğum ruhunu keşfet</p>
+          <p className="dogum-alt">12 HayvanlÄ± TÃ¼rk Takvimine gÃ¶re doÄŸum ruhunu keÅŸfet</p>
         </div>
 
         <div className="dogum-giris-bolum">
           <input
             className="dogum-input"
             type="number"
-            placeholder="Doğum yılın (örn: 1998)"
+            placeholder="DoÄŸum yÄ±lÄ±n (Ã¶rn: 1998)"
             value={yil}
             onChange={(e) => { setYil(e.target.value); setSonuc(null); }}
             min="1900"
             max="2100"
           />
           <button className="btn btn-birincil dogum-hesapla-btn" onClick={hesapla}>
-            Ruhunu Keşfet
+            Ruhunu KeÅŸfet
           </button>
         </div>
 
@@ -63,14 +63,14 @@ function DogumYiliModal({ onKapat, onKaydet }) {
             <div className="dogum-sonuc-parcaciklar">
               {[...Array(8)].map((_, i) => (
                 <span key={i} className="dogum-parcacik" style={{ animationDelay: `${i * 0.1}s` }}>
-                  ✦
+                  âœ¦
                 </span>
               ))}
             </div>
 
             <div className="dogum-sonuc-hayvan">{sonuc.tamga}</div>
             <div className="dogum-sonuc-adi" style={{ color: nadirlik.renk }}>{sonuc.ses}</div>
-            <div className="dogum-sonuc-yil">{yil} • {sonuc.sira}. Hayvan</div>
+            <div className="dogum-sonuc-yil">{yil} â€¢ {sonuc.sira}. Hayvan</div>
 
             <div className="dogum-guc-karti" style={{ borderColor: nadirlik.renk }}>
               <span className="dogum-guc-ikon">{sonuc.guc.ikon}</span>
@@ -98,13 +98,13 @@ function DogumYiliModal({ onKapat, onKaydet }) {
 
 export default function HomeScreen() {
   const { state, dispatch } = useGame();
-  const { unlockAudio, unlocked, isMuted, toggleMute } = useAudio();
+  const { unlockAudio, unlocked, isMuted, toggleMute, bgmVolume, setBgmVolume } = useAudio();
   const t = getT(state.dil || 'tr');
   const [dogumModalAcik, setDogumModalAcik] = useState(false);
   const bugun = new Date().toDateString();
   const gunlukAlindi = state.gunlukKartTalep === bugun;
 
-  // Doğum hayvanı verisi
+  // DoÄŸum hayvanÄ± verisi
   const dogumHayvani = state.dogumHayvaniId ? findKartById(state.dogumHayvaniId) : null;
   const dogumNadirlik = dogumHayvani ? (NADIRLIK[dogumHayvani.nadirlik] || NADIRLIK.demir) : null;
 
@@ -155,14 +155,24 @@ export default function HomeScreen() {
           <span className="home-profil-avatar">{state.avatar || '\u{10C00}'}</span>
           <span className="home-profil-ad">{state.kullaniciAdi || t('profilBtn')}</span>
         </button>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="home-ses-btn" onClick={!unlocked ? unlockAudio : toggleMute}>
-            {!unlocked || isMuted ? '🔇' : '🔊'}
-          </button>
-          <div className="home-dil-rozet">
-            {state.dil === 'en' ? '🇬🇧' : state.dil === 'ru' ? '🇷🇺' : '🇹🇷'}
-          </div>
-        </div>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+  <button className="home-ses-btn" onClick={!unlocked ? unlockAudio : toggleMute}>
+    {!unlocked || isMuted ? '\u{1F507}' : '\u{1F50A}'}
+  </button>
+  <input
+    className="home-ses-slider"
+    type="range"
+    min="0"
+    max="1"
+    step="0.01"
+    value={bgmVolume}
+    onChange={(e) => setBgmVolume(parseFloat(e.target.value))}
+    aria-label="Müzik Sesi"
+  />
+  <div className="home-dil-rozet">
+    {state.dil === 'en' ? '\u{1F1EC}\u{1F1E7}' : state.dil === 'ru' ? '\u{1F1F7}\u{1F1FA}' : '\u{1F1F9}\u{1F1F7}'}
+  </div>
+</div>
       </div>
 
       {/* Logo */}
@@ -227,7 +237,7 @@ export default function HomeScreen() {
             onClick={gunlukAlindi ? null : gunlukKartAl}
             disabled={gunlukAlindi}
           >
-            <span className="btn-simge">★</span>
+            <span className="btn-simge">â˜…</span>
             {gunlukAlindi ? t('gunlukAlindi') : t('gunlukKartBtn')}
           </button>
         </div>
@@ -238,7 +248,7 @@ export default function HomeScreen() {
           onClick={() => setDogumModalAcik(true)}
           style={dogumHayvani ? { '--nadirlik-renk': dogumNadirlik.renk } : {}}
         >
-          <span>🗓</span>
+          <span>ğŸ—“</span>
           {dogumHayvani ? `${dogumHayvani.tamga} Takvim Ruhum` : t('takvimRuhu')}
         </button>
 
@@ -247,14 +257,14 @@ export default function HomeScreen() {
             className="btn btn-takvim home-alt-btn"
             onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'isim_carki' })}
           >
-            <span>🎡</span>
+            <span>ğŸ¡</span>
             {t('isimCarki')}
           </button>
           <button
             className="btn btn-takvim home-alt-btn"
             onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'sozluk' })}
           >
-            <span>📖</span>
+            <span>ğŸ“–</span>
             {t('sozlukBtn')}
           </button>
           <button
@@ -269,7 +279,7 @@ export default function HomeScreen() {
 
       {/* Alt bilgi */}
       <div className="home-alt">
-        <p>Göktürk Alfabesi • MS 6-8. Yüzyıl</p>
+        <p>GÃ¶ktÃ¼rk Alfabesi â€¢ MS 6-8. YÃ¼zyÄ±l</p>
       </div>
 
       {dogumModalAcik && (
@@ -281,3 +291,4 @@ export default function HomeScreen() {
     </div>
   );
 }
+
