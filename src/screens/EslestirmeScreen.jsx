@@ -276,6 +276,8 @@ export default function EslestirmeScreen() {
   const { playTas, playClick, playMatch, playCombo, toggleMute, isMuted, unlockAudio, playBgm, stopBgm } = useAudio();
   const aktifSeviye = state.sefer?.aktif ? state.sefer.seviye : 0;
   const bolum = Math.min(state.eslestirmeBolum || 1, TOPLAM_BOLUM);
+  // startBolum: mount anındaki bölüm — ESLESTIRME_TAMAMLA sonrası bolum değişse bile doğru sonraki bölümü hesaplar
+  const [startBolum] = useState(bolum);
   const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, bolum));
   const boardDims = getBoardDims(getLayout(bolum));
   const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
@@ -426,14 +428,14 @@ export default function EslestirmeScreen() {
           </div>
           {kazandi ? (
             <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => {
-              const sonraki = Math.min(bolum + 1, TOPLAM_BOLUM);
-              if (bolum >= TOPLAM_BOLUM) {
+              if (startBolum >= TOPLAM_BOLUM) {
                 dispatch({ type: 'NAVIGATE', ekran: 'map' });
                 return;
               }
+              const sonraki = Math.min(startBolum + 1, TOPLAM_BOLUM);
               dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum: sonraki });
             }}>
-              {bolum < TOPLAM_BOLUM ? 'Sonraki Bölüm' : 'Tamamlandı!'}
+              {startBolum < TOPLAM_BOLUM ? 'Sonraki Bölüm' : 'Tamamlandı!'}
             </button>
           ) : (
             <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => window.location.reload()}>Tekrar Oyna</button>
