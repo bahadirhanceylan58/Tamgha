@@ -447,10 +447,11 @@ body {
 
 .ilerleme-bar-dolgu {
   height: 100%;
-  background: linear-gradient(90deg, #8a5010, var(--altin), #f0d060);
+  background: linear-gradient(90deg, #c89020, var(--altin), #f0d060);
   border-radius: 3px;
   transition: width 0.6s ease;
   box-shadow: 0 0 5px rgba(212, 160, 23, 0.5);
+  min-width: 5px;
 }
 
 .ilerleme-panel-alt {
