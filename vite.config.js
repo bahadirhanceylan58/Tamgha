@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.svg', 'icon-512.svg', 'apple-touch-icon.svg'],
+      includeAssets: ['icon.png'],
       manifest: {
         name: 'TAMGHA - Bozkır Yazıcısı',
         short_name: 'TAMGHA',
@@ -22,22 +22,22 @@ export default defineConfig({
         categories: ['education', 'games'],
         icons: [
           {
-            src: 'icon-192.svg',
+            src: 'icon.png',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any'
           },
           {
-            src: 'icon-512.svg',
+            src: 'icon.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any maskable'
           }
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
-        globIgnores: ['**/*.docx', '**/*.png', '**/umay.png'],
+        globPatterns: ['**/*.{js,css,html,png,woff2}'],
+        globIgnores: ['**/*.docx', '**/umay.png', '**/*.svg'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
