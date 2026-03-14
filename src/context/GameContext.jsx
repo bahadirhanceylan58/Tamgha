@@ -143,22 +143,33 @@ function reducer(state, action) {
       const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];
       const yeniYildizlar = [...oncekiYildizlar];
 
-      // Yıldız güncelle (seviye yalnızca 0-4 aralığındaysa geçerli)
       if (seviye >= 0 && seviye < yeniYildizlar.length) {
         const yildiz = action.kazandi ? 3 : 0;
         yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
+      }
+
+      const yeniBolum = action.kazandi ? Math.min((state.eslestirmeBolum || 1) + 1, 50) : (state.eslestirmeBolum || 1);
+
+      // eslestirmeBolum milestonlarına göre bölge kilitleri aç
+      const bolgeKilidiAc = {};
+      if (yeniBolum >= 10 && state.bolgeIlerlemesi.selenga?.kilit) {
+        bolgeKilidiAc.selenga = { ...state.bolgeIlerlemesi.selenga, kilit: false };
+      }
+      if (yeniBolum >= 20 && state.bolgeIlerlemesi.altay?.kilit) {
+        bolgeKilidiAc.altay = { ...state.bolgeIlerlemesi.altay, kilit: false };
+      }
+      if (yeniBolum >= 30 && state.bolgeIlerlemesi.tengri_yurdu?.kilit) {
+        bolgeKilidiAc.tengri_yurdu = { ...state.bolgeIlerlemesi.tengri_yurdu, kilit: false };
       }
 
       return {
         ...state,
         bolgeIlerlemesi: {
           ...state.bolgeIlerlemesi,
-          [bolgeId]: {
-            ...state.bolgeIlerlemesi[bolgeId],
-            yildizlar: yeniYildizlar,
-          }
+          [bolgeId]: { ...state.bolgeIlerlemesi[bolgeId], yildizlar: yeniYildizlar },
+          ...bolgeKilidiAc,
         },
-        eslestirmeBolum: action.kazandi ? Math.min((state.eslestirmeBolum || 1) + 1, 50) : state.eslestirmeBolum,
+        eslestirmeBolum: yeniBolum,
         toplamPuan: state.toplamPuan + puan,
       };
     }

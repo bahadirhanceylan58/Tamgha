@@ -48,11 +48,14 @@ export default function MapScreen() {
     dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null });
   }
 
-  const toplamYildiz = Object.values(state.bolgeIlerlemesi).reduce(
-    (acc, b) => acc + b.yildizlar.reduce((a, y) => a + y, 0),
-    0
-  );
-  const maxYildiz = BOLGELER.reduce((acc, b) => acc + b.seviyeSayisi * 3, 0);
+  // eslestirmeBolum milestonlarına göre bölge kilidini hesapla (state'teki kilit bayrağından bağımsız)
+  function bolgeKilidiHesapla(bolgeId) {
+    if (bolgeId === 'orhun') return false;
+    if (bolgeId === 'selenga') return aktifBolum < 10;
+    if (bolgeId === 'altay') return aktifBolum < 20;
+    if (bolgeId === 'tengri_yurdu') return aktifBolum < 30;
+    return true;
+  }
 
   function baslatSonrakiBolum() {
     let hedefBolge = BOLGELER[0].id;
@@ -108,12 +111,12 @@ export default function MapScreen() {
       <div className="ilerleme-bar-wrapper">
         <div className="ilerleme-etiket">
           <span>Tamga Ilerlemesi</span>
-          <span>{toplamYildiz}/{maxYildiz} &#9733;</span>
+          <span>B{aktifBolum} / 50</span>
         </div>
         <div className="ilerleme-bar">
           <div
             className="ilerleme-dolgu"
-            style={{ width: `${(toplamYildiz / maxYildiz) * 100}%` }}
+            style={{ width: `${(aktifBolum / 50) * 100}%` }}
           />
         </div>
       </div>
@@ -168,7 +171,7 @@ export default function MapScreen() {
       <div className="bolgeler-listesi">
         {BOLGELER.map((bolge) => {
           const ilerleme = state.bolgeIlerlemesi[bolge.id];
-          const kilit = ilerleme?.kilit ?? true;
+          const kilit = bolgeKilidiHesapla(bolge.id);
           const kazanilanTamgalar = getBolgeTamgalari(bolge.id).filter((t) =>
             state.kazanilanKartlar.includes(t.id)
           );
@@ -187,7 +190,9 @@ export default function MapScreen() {
                   <h3 className="bolge-adi">{bolge.adi}</h3>
                   <p className="bolge-altyazi">{bolge.altyazi}</p>
                   {kilit ? (
-                    <p className="bolge-kilit-mesaj">&#128274; Onceki bolgeyi tamamla</p>
+                    <p className="bolge-kilit-mesaj">
+                      &#128274; {bolge.id === 'selenga' ? 'Bölüm 10\'da açılır' : bolge.id === 'altay' ? 'Bölüm 20\'de açılır' : 'Bölüm 30\'da açılır'}
+                    </p>
                   ) : (
                     <p className="bolge-tamga-sayisi">
                       {kazanilanTamgalar.length}/{toplamBolgeTamga} kart
