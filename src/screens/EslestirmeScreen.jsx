@@ -13,35 +13,35 @@ const OYUN_SURESI = 300;
 const ESLESTI_MS = 520;
 const TOPLAM_BOLUM = 50;
 
-// Piramit dÃ¼zenleri: seviye 1'de az taÅŸ, seviye arttÄ±kÃ§a bÃ¼yÃ¼r
+// Piramit düzenleri: seviye 1'de az taş, seviye arttıkça büyür
 const PIRAMIT_DUZENLER = [
-  // Seviye 1: 8 taÅŸ (4 Ã§ift) â€” mini piramit
+  // Seviye 1: 8 taş (4 çift) â€” mini piramit
   [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:3,c:2,l:0}],
-  // Seviye 2: 12 taÅŸ (6 Ã§ift) â€” orta piramit
+  // Seviye 2: 12 taş (6 çift) â€” orta piramit
   [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
    {r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0}],
-  // Seviye 3: 16 taÅŸ (8 Ã§ift) â€” piramit + 1 Ã¼st katman
+  // Seviye 3: 16 taş (8 çift) â€” piramit + 1 üst katman
   [{r:0,c:2,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
    {r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:4,c:2,l:0},
    {r:1,c:2,l:1},{r:2,c:2,l:1},{r:3,c:2,l:1}],
-  // Seviye 4: 20 taÅŸ (10 Ã§ift) â€” geniÅŸ piramit
+  // Seviye 4: 20 taş (10 çift) â€” geniş piramit
   [{r:0,c:3,l:0},{r:0,c:4,l:0},
    {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},
    {r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
    {r:4,c:3,l:0},{r:4,c:4,l:0},
    {r:1,c:3,l:1},{r:2,c:3,l:1}],
-  // Seviye 5: 24 taÅŸ (12 Ã§ift) â€” tam piramit 2 katman
+  // Seviye 5: 24 taş (12 çift) â€” tam piramit 2 katman
   [{r:0,c:3,l:0},{r:0,c:4,l:0},
    {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},
    {r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
    {r:4,c:3,l:0},{r:4,c:4,l:0},
    {r:1,c:3,l:1},{r:1,c:4,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1}],
-  // Seviye 6+: 28 taÅŸ (14 Ã§ift) â€” dev piramit
+  // Seviye 6+: 28 taş (14 çift) â€” dev piramit
   [{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},{r:0,c:6,l:0},
    {r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},{r:1,c:6,l:0},
    {r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},{r:2,c:6,l:0},{r:2,c:7,l:0},
@@ -115,7 +115,7 @@ function createBoard(bolgeId, bolum = 1) {
 
 function createYada() {
   return {
-    id: 'yada_tasi', tamga: 'ğŸ’', ses: 'YADA', fonetik: 'jada',
+    id: 'yada_tasi', tamga: '💎', ses: 'YADA', fonetik: 'jada',
     kategori: 'mitoloji', nadirlik: 'yada', bolge: 'tengri',
   };
 }
@@ -350,7 +350,7 @@ export default function EslestirmeScreen() {
     const yeniTepsi = [...tepsi, yeniEleman];
     setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
 
-    // Tepside Ã§ift ara (yeni eklenenle eÅŸleÅŸen)
+    // Tepside çift ara (yeni eklenenle eÅŸleÅŸen)
     let pairIdx = -1;
     for (let i = 0; i < yeniTepsi.length - 1; i++) {
       if (yeniTepsi[i].kart.tamga === yeniTepsi[yeniTepsi.length - 1].kart.tamga) {
@@ -408,7 +408,7 @@ export default function EslestirmeScreen() {
   const surePct = Math.max(0, (sure / OYUN_SURESI) * 100);
   const sureRenk = sure > 60 ? '#4a9e6a' : sure > 20 ? '#c8820a' : '#c02020';
 
-  // â”€â”€ BÄ°TTÄ° â”€â”€
+  // â”€â”€ BİTTİ â”€â”€
   if (bitti) {
     const kazandi = tiles.every(t => t.removed);
     const finalSkor = skor + (kazandi ? sure * 5 : 0);
@@ -466,7 +466,7 @@ export default function EslestirmeScreen() {
         </div>
       </div>
 
-      {/* Tepsi â€” Ã¼st alan */}
+      {/* Tepsi â€” üst alan */}
       <div className="mj-tepsi-alan">
         <div className="mj-tepsi">
           {Array.from({ length: MAX_TEPSI }, (_, i) => {
