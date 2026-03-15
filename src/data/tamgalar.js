@@ -509,7 +509,7 @@ export const BOLGELER = [
     renk: '#8b4513',
     gradyan: 'linear-gradient(135deg, #3d1a06, #8b4513)',
     kilit: false,
-    seviyeSayisi: 5,
+    seviyeSayisi: 15,
     simge: '\u{10C00}',
   },
   {
@@ -520,7 +520,7 @@ export const BOLGELER = [
     renk: '#1a4a6e',
     gradyan: 'linear-gradient(135deg, #0a2a45, #1a4a6e)',
     kilit: true,
-    seviyeSayisi: 5,
+    seviyeSayisi: 15,
     simge: '\u{10C03}',
   },
   {
@@ -531,7 +531,7 @@ export const BOLGELER = [
     renk: '#4a1a6e',
     gradyan: 'linear-gradient(135deg, #2a0a45, #4a1a6e)',
     kilit: true,
-    seviyeSayisi: 5,
+    seviyeSayisi: 15,
     simge: '\u{10C2D}',
   },
   {
@@ -542,7 +542,7 @@ export const BOLGELER = [
     renk: '#ff6b00',
     gradyan: 'linear-gradient(135deg, #0a0020, #1a0050, #2d006e)',
     kilit: true,
-    seviyeSayisi: 5,
+    seviyeSayisi: 15,
     simge: '☀',
   },
 ];

@@ -10,10 +10,10 @@ const INITIAL_STATE = {
   seciliSeviye: null,
   kazanilanKartlar: [],
   bolgeIlerlemesi: {
-    orhun: { yildizlar: [0, 0, 0, 0, 0], kilit: false },
-    selenga: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
-    altay: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
-    tengri_yurdu: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
+    orhun: { yildizlar: Array(15).fill(0), kilit: false },
+    selenga: { yildizlar: Array(15).fill(0), kilit: true },
+    altay: { yildizlar: Array(15).fill(0), kilit: true },
+    tengri_yurdu: { yildizlar: Array(15).fill(0), kilit: true },
   },
   toplamPuan: 0,
   gunlukKartTalep: null,
@@ -33,6 +33,7 @@ const INITIAL_STATE = {
     seviye: null,
     guc: null,
     asama: 0, // 0: Eşleştirme, 1: Arena, 2: Quiz
+    ozelSeviye: false,
   },
 
   // Taş eşleştirme global bölüm ilerlemesi (1-50)
@@ -48,23 +49,23 @@ function yukleKayit() {
       const parsed = JSON.parse(kayit);
       // tengri_yurdu yoksa ekle (eski kayitlar icin)
       const bolgeIlerlemesi = {
-        orhun: { yildizlar: [0, 0, 0, 0, 0], kilit: false },
-        selenga: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
-        altay: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
-        tengri_yurdu: { yildizlar: [0, 0, 0, 0, 0], kilit: true },
+        orhun: { yildizlar: Array(15).fill(0), kilit: false },
+        selenga: { yildizlar: Array(15).fill(0), kilit: true },
+        altay: { yildizlar: Array(15).fill(0), kilit: true },
+        tengri_yurdu: { yildizlar: Array(15).fill(0), kilit: true },
         ...(parsed.bolgeIlerlemesi || {}),
       };
       if (!bolgeIlerlemesi.tengri_yurdu) {
-        bolgeIlerlemesi.tengri_yurdu = { yildizlar: [0, 0, 0, 0, 0], kilit: true };
+        bolgeIlerlemesi.tengri_yurdu = { yildizlar: Array(15).fill(0), kilit: true };
       }
-      // Eski kayıt: 3 elemanlı yıldız dizilerini 5'e genişlet
+      // Eski kayıt: yıldız dizilerini 15'e genişlet
       for (const k of Object.keys(bolgeIlerlemesi)) {
         const y = bolgeIlerlemesi[k].yildizlar;
-        if (y.length < 5) {
-          bolgeIlerlemesi[k] = { ...bolgeIlerlemesi[k], yildizlar: [...y, ...Array(5 - y.length).fill(0)] };
+        if (y.length < 15) {
+          bolgeIlerlemesi[k] = { ...bolgeIlerlemesi[k], yildizlar: [...y, ...Array(15 - y.length).fill(0)] };
         }
       }
-      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 }, eslestirmeBolum: parsed.eslestirmeBolum ?? 1 };
+      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false }, eslestirmeBolum: parsed.eslestirmeBolum ?? 1 };
     }
   } catch (e) {
     // ignore
@@ -79,13 +80,13 @@ function reducer(state, action) {
         ...state,
         ekran: action.ekran,
         seciliBolge: action.bolge ?? state.seciliBolge,
-        sefer: action.ekran === 'home' || action.ekran === 'map' ? { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 } : state.sefer
+        sefer: action.ekran === 'home' || action.ekran === 'map' ? { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false } : state.sefer
       };
 
     case 'SEFER_BASLAT':
       return {
         ...state,
-        sefer: { aktif: true, bolgeId: action.bolgeId, seviye: action.seviye, guc: action.guc, asama: 0 },
+        sefer: { aktif: true, bolgeId: action.bolgeId, seviye: action.seviye, guc: action.guc, asama: 0, ozelSeviye: !!action.ozelSeviye },
         ekran: 'eslestirme',
         seciliBolge: action.bolgeId,
         seciliSeviye: action.seviye,
@@ -110,7 +111,7 @@ function reducer(state, action) {
     case 'SEFER_BITIR':
       return {
         ...state,
-        sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 }
+        sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false }
       };
 
     case 'QUIZ_BASLAT':
@@ -143,7 +144,7 @@ function reducer(state, action) {
 
     case 'ESLESTIRME_TAMAMLA': {
       const { bolgeId, seviye, puan } = action;
-      const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];
+      const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || Array(15).fill(0);
       const yeniYildizlar = [...oncekiYildizlar];
 
       if (seviye >= 0 && seviye < yeniYildizlar.length) {
@@ -179,20 +180,20 @@ function reducer(state, action) {
 
     case 'QUIZ_TAMAMLA': {
       const { bolgeId, seviye, yildiz, kazanilanIds } = action;
-      const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || [0, 0, 0, 0, 0];
+      const oncekiYildizlar = state.bolgeIlerlemesi[bolgeId]?.yildizlar || Array(15).fill(0);
       const yeniYildizlar = [...oncekiYildizlar];
       yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
 
       const toplamYildiz = yeniYildizlar.reduce((a, b) => a + b, 0);
       const bolgeKilidiAc = {};
 
-      if (bolgeId === 'orhun' && toplamYildiz >= 5) {
+      if (bolgeId === 'orhun' && toplamYildiz >= 15) {
         bolgeKilidiAc.selenga = { ...state.bolgeIlerlemesi.selenga, kilit: false };
       }
-      if (bolgeId === 'selenga' && toplamYildiz >= 5) {
+      if (bolgeId === 'selenga' && toplamYildiz >= 15) {
         bolgeKilidiAc.altay = { ...state.bolgeIlerlemesi.altay, kilit: false };
       }
-      if (bolgeId === 'altay' && toplamYildiz >= 5) {
+      if (bolgeId === 'altay' && toplamYildiz >= 15) {
         bolgeKilidiAc.tengri_yurdu = { ...state.bolgeIlerlemesi.tengri_yurdu, kilit: false };
       }
 
@@ -231,7 +232,7 @@ function reducer(state, action) {
     }
 
     case 'HARITAYA_DON':
-      return { ...state, ekran: 'map', yeniKazanilanKartlar: [], sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0 } };
+      return { ...state, ekran: 'map', yeniKazanilanKartlar: [], sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false } };
 
     case 'DOGUM_YILI_KAYDET': {
       const { yil, hayvanId } = action;

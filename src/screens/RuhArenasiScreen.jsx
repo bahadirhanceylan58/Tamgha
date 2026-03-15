@@ -11,7 +11,7 @@ function shuffle(arr) {
 }
 
 export default function RuhArenasiScreen() {
-  const { dispatch } = useGame();
+  const { state, dispatch } = useGame();
 
   const [seciliHayvanlar] = useState(() => shuffle(TUM_KARTLAR).slice(0, ESLESME_SAYISI));
   const [karisikGucler] = useState(() => shuffle([...Array(ESLESME_SAYISI).keys()]));
@@ -24,6 +24,7 @@ export default function RuhArenasiScreen() {
   const [sure, setSure] = useState(ARENA_SURE);
   const [bitti, setBitti] = useState(false);
   const [comboGoster, setComboGoster] = useState(null);
+  const [sonEslesen, setSonEslesen] = useState(null); // mitoloji/hayvan reveal
 
   useEffect(() => {
     if (bitti) return;
@@ -62,7 +63,9 @@ export default function RuhArenasiScreen() {
       setTamamlananlar((prev) => new Set([...prev, secilenSol]));
       setSecilenSol(null);
       setComboGoster({ puan: kazanilanPuan, combo: yeniCombo });
+      setSonEslesen(seciliHayvanlar[secilenSol]);
       setTimeout(() => setComboGoster(null), 800);
+      setTimeout(() => setSonEslesen(null), 2000);
     } else {
       // YANLIS
       setYanlisCift({ sol: secilenSol, sag: gucIdx });
@@ -167,6 +170,26 @@ export default function RuhArenasiScreen() {
         <div className="combo-efekt">
           +{comboGoster.puan}
           {comboGoster.combo > 1 && <span className="combo-x"> {comboGoster.combo}x COMBO!</span>}
+        </div>
+      )}
+
+      {/* Bozkurt combo bar */}
+      {combo > 0 && (
+        <div className="arena-bozkurt-bar">
+          {Array.from({ length: Math.min(combo, 6) }).map((_, i) => (
+            <span key={i} className="arena-bozkurt-ikon">🐺</span>
+          ))}
+          {combo > 6 && <span className="arena-bozkurt-fazla">+{combo - 6}</span>}
+        </div>
+      )}
+
+      {/* Mitoloji/Hayvan reveal */}
+      {sonEslesen && (
+        <div className="arena-ruh-reveal">
+          <span className="arena-ruh-tamga">{sonEslesen.tamga}</span>
+          <span className="arena-ruh-guc-ikon">{sonEslesen.guc?.ikon}</span>
+          <span className="arena-ruh-guc-adi">{sonEslesen.guc?.adi}</span>
+          <span className="arena-ruh-aciklama">{sonEslesen.guc?.aciklama}</span>
         </div>
       )}
 

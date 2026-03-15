@@ -145,6 +145,9 @@ export default function QuizScreen() {
     return q;
   });
 
+  // Seviyeye göre süre: 0→28s, 1→24s, 2→20s, 3→16s, 4→12s
+  const soruSuresi = Math.max(12, 28 - (seviye ?? 0) * 4);
+
   const [mevcutSoru, setMevcutSoru] = useState(0);
   const [secilen, setSecilen] = useState(null);
   const [cevapDurumu, setCevapDurumu] = useState(null);
@@ -154,6 +157,8 @@ export default function QuizScreen() {
   const [affedilenKullanildi, setAffedilenKullanildi] = useState(false);
   const [ipucuKullanildi, setIpucuKullanildi] = useState(false);
   const [ilkBilUygulanmis, setIlkBilUygulanmis] = useState(false);
+  const [soruSure, setSoruSure] = useState(soruSuresi);
+  const [hizMesaj, setHizMesaj] = useState(null);
 
   // ilk_bil: ilk soruyu otomatik dogru say
   useEffect(() => {
@@ -175,11 +180,44 @@ export default function QuizScreen() {
     }
   }, []);
 
+  // Yeni soruya geçince sayacı sıfırla
+  useEffect(() => {
+    setSoruSure(soruSuresi);
+    setHizMesaj(null);
+  }, [mevcutSoru]);
+
+  // Geri sayım — süre bitince yanlış say
+  useEffect(() => {
+    if (bitti || secilen !== null) return;
+    if (soruSure <= 0) {
+      setCevapDurumu('yanlis');
+      setYanlisSayisi(y => y + 1);
+      setSecilen('__sure__');
+      setTimeout(() => {
+        if (mevcutSoru < sorular.length - 1) {
+          setMevcutSoru(m => m + 1);
+          setSecilen(null);
+          setCevapDurumu(null);
+        } else {
+          setBitti(true);
+        }
+      }, 1200);
+      return;
+    }
+    const t = setTimeout(() => setSoruSure(s => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [soruSure, bitti, secilen]);
+
   const soru = sorular[mevcutSoru];
 
   function cevapSec(secim) {
     if (secilen !== null) return;
     setSecilen(secim.id);
+
+    // Hız bonusu mesajı
+    if (soruSure >= soruSuresi - 4) setHizMesaj('⚡ Çok Hızlı!');
+    else if (soruSure >= soruSuresi - 8) setHizMesaj('🔥 Hızlı!');
+    else setHizMesaj(null);
 
     const dogru = secim.id === soru.correct.id;
 
@@ -350,6 +388,21 @@ export default function QuizScreen() {
           <span className="quiz-ilerleme-yazi">{mevcutSoru + 1}/{SORU_SAYISI}</span>
         </div>
         <div className="quiz-puan-badge">{puan} &#9733;</div>
+        <div className="quiz-sure-sayac" style={{ color: soruSure <= soruSuresi * 0.25 ? '#c02020' : soruSure <= soruSuresi * 0.5 ? '#c8820a' : '#aaa' }}>
+          {soruSure}s
+        </div>
+      </div>
+
+      {/* Soru süresi barı */}
+      <div className="quiz-soru-sure-cap">
+        <div
+          className="quiz-soru-sure-ic"
+          style={{
+            width: `${(soruSure / soruSuresi) * 100}%`,
+            background: soruSure > soruSuresi * 0.5 ? '#4a9e6a' : soruSure > soruSuresi * 0.25 ? '#c8820a' : '#c02020',
+            transition: 'width 1s linear, background 0.3s',
+          }}
+        />
       </div>
 
       {/* Aktif guc rozeti */}
@@ -414,10 +467,16 @@ export default function QuizScreen() {
         </button>
       )}
 
+      {cevapDurumu === 'dogru' && hizMesaj && (
+        <div className="quiz-hiz-mesaj">{hizMesaj}</div>
+      )}
+
       {cevapDurumu && (
         <div className={`quiz-geri-bildirim ${cevapDurumu}`}>
           {cevapDurumu === 'dogru' ? (
             <span>&#10003; Dogru! {soru.correct.aciklama}</span>
+          ) : secilen === '__sure__' ? (
+            <span>&#9201; Sure doldu! Dogru: <strong>{soru.correct.ses}</strong> — {soru.correct.tamga}</span>
           ) : (
             <span>&#10007; Yanlis. Dogru cevap: <strong>{soru.correct.ses}</strong> - {soru.correct.tamga}</span>
           )}

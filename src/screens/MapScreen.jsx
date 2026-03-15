@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { BOLGELER, getBolgeTamgalari } from '../data/tamgalar';
 
@@ -24,9 +25,20 @@ function SeviyeButon({ seviye, ilerleme, kilit, onClick }) {
 export default function MapScreen() {
   const { state, dispatch } = useGame();
   const aktifBolum = state.eslestirmeBolum || 1;
+  const [acikBolgeler, setAcikBolgeler] = useState({});
+
+  function tamamlandiTikla(bolgeId) {
+    setAcikBolgeler(prev => ({ ...prev, [bolgeId]: !prev[bolgeId] }));
+  }
+
+  function oyunuSifirla() {
+    if (!window.confirm('Tüm ilerleme sıfırlanacak. Emin misin?')) return;
+    localStorage.removeItem('tamgha_kayit');
+    window.location.reload();
+  }
 
   function seviyeTikla(bolgeId, seviye) {
-    dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null });
+    dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null, ozelSeviye: true });
   }
 
   function bolgeKilidiHesapla(bolgeId) {
@@ -48,7 +60,15 @@ export default function MapScreen() {
           &#8592; Ana Menü
         </button>
         <h2 className="map-baslik">Bozkır Haritası</h2>
-        <div className="puan-badge">{state.toplamPuan.toLocaleString()} puan</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="puan-badge">{state.toplamPuan.toLocaleString()} puan</div>
+          <button
+            onClick={oyunuSifirla}
+            style={{ fontSize: '0.65rem', opacity: 0.5, background: 'none', border: '1px solid #666', borderRadius: '6px', color: '#aaa', padding: '2px 6px', cursor: 'pointer' }}
+          >
+            Sıfırla
+          </button>
+        </div>
       </div>
 
       {/* Bölgeler */}
@@ -116,9 +136,31 @@ export default function MapScreen() {
               )}
 
               {!kilit && tumTamamlandi && (
-                <div className="bolge-tamamlandi-serit">
-                  <span>&#9733;</span> Tüm Görevler Tamamlandı <span>&#9733;</span>
-                </div>
+                <>
+                  <button
+                    className="bolge-tamamlandi-serit"
+                    onClick={() => tamamlandiTikla(bolge.id)}
+                    style={{ width: '100%', cursor: 'pointer' }}
+                  >
+                    <span>&#9733;</span> Tüm Görevler Tamamlandı <span>&#9733;</span>
+                    <span style={{ marginLeft: '6px', fontSize: '0.7rem', opacity: 0.7 }}>
+                      {acikBolgeler[bolge.id] ? '▲' : '▼'}
+                    </span>
+                  </button>
+                  {acikBolgeler[bolge.id] && (
+                    <div className="bolge-seviyeler" style={{ paddingBottom: '0.5rem' }}>
+                      {Array.from({ length: bolge.seviyeSayisi }, (_, i) => i).map((seviye) => (
+                        <SeviyeButon
+                          key={seviye}
+                          seviye={seviye}
+                          ilerleme={ilerleme}
+                          kilit={false}
+                          onClick={() => seviyeTikla(bolge.id, seviye)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           );

@@ -642,10 +642,17 @@ body {
   padding: 0.75rem 1rem;
   background: rgba(0, 0, 0, 0.3);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.bolge-seviyeler::-webkit-scrollbar { display: none; }
 
 .seviye-btn {
-  flex: 1;
+  flex: 0 0 64px;
+  min-width: 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4344,6 +4351,7 @@ body {
   overflow: auto;
   padding: 0.5rem 0.3rem;
   min-height: 0;
+  position: relative;
 }
 
 .mj-tahta {
@@ -4354,9 +4362,9 @@ body {
 /* â”€â”€ Tile base â”€â”€ */
 .mj-tas {
   position: absolute;
-  width: 44px;
-  height: 55px;
-  border-radius: 8px;
+  width: 56px;
+  height: 70px;
+  border-radius: 9px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4496,7 +4504,7 @@ body {
 
 /* GÃ¶ktÃ¼rk Unicode char */
 .mj-ana-gokt {
-  font-size: 1.65rem;
+  font-size: 2.0rem;
   color: #2a1508;
 }
 
@@ -4526,7 +4534,7 @@ body {
 
 /* Small ses / name label */
 .mj-ses {
-  font-size: 0.42rem;
+  font-size: 0.52rem;
   letter-spacing: 0.06em;
   color: #503010;
   text-transform: uppercase;
@@ -5449,3 +5457,429 @@ body {
   opacity: 0.7;
 }
 
+
+/* ══════════════════════════════════════════════════════
+   BOZKURT CAN SİSTEMİ — EslestirmeScreen
+   ══════════════════════════════════════════════════════ */
+.mj-can-alan {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.mj-can-ikon {
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: opacity 0.4s, transform 0.3s;
+}
+.mj-can-dolu {
+  opacity: 1;
+  filter: drop-shadow(0 0 4px #ff9900aa);
+}
+.mj-can-bos {
+  opacity: 0.2;
+  filter: grayscale(1);
+}
+
+/* Carpışma overlay — mitoloji/hayvan güç açıklaması */
+.cp-ruh-aciklama {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 0.5rem;
+  background: rgba(0,0,0,0.55);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255,200,80,0.3);
+  animation: fadeInUp 0.3s ease;
+}
+.cp-ruh-guc-ikon { font-size: 1.4rem; }
+.cp-ruh-aciklama span:nth-child(2) {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffd700;
+}
+.cp-ruh-aciklama-metin {
+  font-size: 0.7rem;
+  opacity: 0.85;
+  text-align: center;
+  color: #eee;
+}
+
+/* ══════════════════════════════════════════════════════
+   QUIZ SORU SÜRESİ BARI
+   ══════════════════════════════════════════════════════ */
+.quiz-soru-sure-cap {
+  width: 100%;
+  height: 5px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+.quiz-soru-sure-ic {
+  height: 100%;
+  border-radius: 3px;
+  min-width: 2px;
+}
+.quiz-sure-sayac {
+  font-size: 0.72rem;
+  font-weight: 700;
+  min-width: 2.4rem;
+  text-align: right;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+.quiz-hiz-mesaj {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 0.06em;
+  animation: fadeInUp 0.2s ease;
+  margin-bottom: 0.2rem;
+}
+
+/* ══════════════════════════════════════════════════════
+   ARENA — BOZKURT COMBO BAR & RUH REVEAL
+   ══════════════════════════════════════════════════════ */
+.arena-bozkurt-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 1.8rem;
+  animation: fadeInUp 0.3s ease;
+}
+.arena-bozkurt-ikon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 5px #ff990088);
+  animation: pulse 0.5s ease;
+}
+.arena-bozkurt-fazla {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ff9900;
+  margin-left: 4px;
+}
+.arena-ruh-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: linear-gradient(135deg, rgba(40,20,80,0.9), rgba(20,40,80,0.9));
+  border: 1px solid rgba(180,120,255,0.4);
+  border-radius: 12px;
+  padding: 0.5rem 1.2rem;
+  margin: 0 1rem;
+  animation: fadeInUp 0.3s ease;
+}
+.arena-ruh-tamga  { font-size: 1.6rem; line-height: 1; }
+.arena-ruh-guc-ikon { font-size: 1.1rem; }
+.arena-ruh-guc-adi  { font-size: 0.78rem; font-weight: 700; color: #c8a0ff; }
+.arena-ruh-aciklama {
+  font-size: 0.65rem;
+  opacity: 0.8;
+  text-align: center;
+  color: #ddd;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* ══════════════════════════════════════════════════════
+   RUH TAŞLARI — Mitoloji & Hayvan özel tile tasarımı
+   ══════════════════════════════════════════════════════ */
+
+/* Mitoloji taşı — koyu, mistik, altın parıltılı */
+.mj-tas-mit {
+  background: linear-gradient(145deg, #1a0a2e 0%, #2d1155 50%, #1a0a2e 100%) !important;
+  border: 1.5px solid #8040c0 !important;
+  box-shadow:
+    1px 1px 0px #5020a0,
+    2px 2px 0px #3a1080,
+    3px 3px 0px #280860,
+    4px 4px 0px #1a0440,
+    5px 5px 3px rgba(0,0,0,0.7),
+    0 0 8px rgba(160,80,255,0.25),
+    inset 0 1px 3px rgba(200,150,255,0.2) !important;
+}
+
+/* Hayvan taşı — doğal taş, amber/toprak tonları */
+.mj-tas-hay {
+  background: linear-gradient(145deg, #2a1c08 0%, #3d2a10 50%, #2a1c08 100%) !important;
+  border: 1.5px solid #7a5020 !important;
+  box-shadow:
+    1px 1px 0px #6a4018,
+    2px 2px 0px #503010,
+    3px 3px 0px #3a2008,
+    4px 4px 0px #281404,
+    5px 5px 3px rgba(0,0,0,0.7),
+    0 0 6px rgba(180,100,30,0.2),
+    inset 0 1px 3px rgba(255,180,80,0.15) !important;
+}
+
+/* Ruh emoji — büyük, merkezi */
+.mj-ruh-emoji {
+  font-size: 2.0rem;
+  line-height: 1;
+  display: block;
+  text-align: center;
+  filter: drop-shadow(0 0 4px rgba(255,220,100,0.5));
+}
+.mj-ruh-mit {
+  filter: drop-shadow(0 0 6px rgba(180,100,255,0.7));
+}
+.mj-ruh-hay {
+  filter: drop-shadow(0 0 5px rgba(200,140,40,0.6));
+}
+
+/* İsim etiketi */
+.mj-ruh-isim {
+  font-size: 0.45rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255,220,120,0.9);
+  line-height: 1;
+}
+.mj-tas-hay .mj-ruh-isim {
+  color: rgba(220,160,60,0.9);
+}
+
+/* Alt bant çizgisi */
+.mj-ruh-bant-mit {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 0 0 9px 9px;
+  background: linear-gradient(90deg, #6010c0, #c060ff, #6010c0);
+}
+.mj-ruh-bant-hay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 0 0 9px 9px;
+  background: linear-gradient(90deg, #804010, #e08030, #804010);
+}
+
+/* Tepsi'deki ruh emoji */
+.mj-tepsi-ruh-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* ── Mitoloji Monogramı ──────────────────────────────── */
+/* Taş üzerinde: büyük Göktürk harfleri */
+.mj-mit-mono {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 1.85rem;
+  line-height: 1;
+  display: block;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+/* Tepsi monogramı */
+.mj-tepsi-mit-mono {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: block;
+  text-align: center;
+}
+
+/* Carpisma sahnesi buyuk monogram */
+.cp-mit-mono {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 3.2rem;
+  line-height: 1;
+  display: block;
+  text-align: center;
+  margin-bottom: 0.2rem;
+}
+
+/* Per-deity renk + parıltı */
+.mj-mit-mit_tengri  { color: #ffc840; text-shadow: 0 0 8px rgba(255,200,0,0.9), 0 0 18px rgba(255,150,0,0.5); }
+.mj-mit-mit_umay    { color: #b8d4ff; text-shadow: 0 0 8px rgba(100,150,255,0.8), 0 0 16px rgba(60,100,220,0.4); }
+.mj-mit-mit_erlik   { color: #ff3838; text-shadow: 0 0 8px rgba(255,40,40,0.9), 0 0 16px rgba(180,0,0,0.5); }
+.mj-mit-mit_ulgen   { color: #50e8ff; text-shadow: 0 0 8px rgba(40,200,255,0.9), 0 0 16px rgba(0,150,220,0.5); }
+.mj-mit-mit_ak_ana  { color: #e0e8ff; text-shadow: 0 0 10px rgba(200,210,255,1.0), 0 0 20px rgba(120,150,255,0.6); }
+.mj-mit-mit_kayra   { color: #b060ff; text-shadow: 0 0 8px rgba(150,60,255,0.9), 0 0 16px rgba(90,20,200,0.5); }
+.mj-mit-mit_mergen  { color: #50ff90; text-shadow: 0 0 8px rgba(40,220,100,0.8), 0 0 14px rgba(0,160,60,0.4); }
+
+/* Per-deity alt bant renkleri */
+.mj-tas-mit_tengri .mj-ruh-bant-mit  { background: linear-gradient(90deg, #806000, #ffc840, #806000); }
+.mj-tas-mit_umay .mj-ruh-bant-mit    { background: linear-gradient(90deg, #203060, #5070c0, #203060); }
+.mj-tas-mit_erlik .mj-ruh-bant-mit   { background: linear-gradient(90deg, #600010, #c01828, #600010); }
+.mj-tas-mit_ulgen .mj-ruh-bant-mit   { background: linear-gradient(90deg, #003050, #0098c8, #003050); }
+.mj-tas-mit_ak_ana .mj-ruh-bant-mit  { background: linear-gradient(90deg, #505080, #b0b8e0, #505080); }
+.mj-tas-mit_kayra .mj-ruh-bant-mit   { background: linear-gradient(90deg, #380080, #7828c0, #380080); }
+.mj-tas-mit_mergen .mj-ruh-bant-mit  { background: linear-gradient(90deg, #005820, #28a060, #005820); }
+
+/* Serbest mitoloji taşı hover */
+.mj-tas-serbest.mj-tas-mit:hover {
+  box-shadow:
+    1px 1px 0px #5020a0,
+    2px 2px 0px #3a1080,
+    3px 3px 0px #280860,
+    4px 5px 0px #1a0440,
+    6px 7px 4px rgba(0,0,0,0.6),
+    0 0 16px rgba(180,80,255,0.5),
+    inset 0 1px 3px rgba(200,150,255,0.3) !important;
+  transform: translateY(-4px) translateX(-1px);
+}
+.mj-tas-serbest.mj-tas-hay:hover {
+  box-shadow:
+    1px 1px 0px #6a4018,
+    2px 2px 0px #503010,
+    3px 3px 0px #3a2008,
+    4px 5px 0px #281404,
+    6px 7px 4px rgba(0,0,0,0.6),
+    0 0 14px rgba(200,130,40,0.5),
+    inset 0 1px 3px rgba(255,180,80,0.2) !important;
+  transform: translateY(-4px) translateX(-1px);
+}
+
+/* ══════════════════════════════════════════════
+   GÖKTÜRK ARKA PLAN ANİMASYONU (sadece oyun tahtası)
+══════════════════════════════════════════════ */
+.mj-gokt-arka {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.mj-gokt-arka-harf {
+  position: absolute;
+  bottom: -2rem;
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  color: #c8900a;
+  animation: gokt-yuksel linear infinite;
+  user-select: none;
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+}
+
+@keyframes gokt-yuksel {
+  0% {
+    transform: translateY(0) rotate(-8deg) scale(0.85);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-110vh) rotate(12deg) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* ── Bomba Taşı ── */
+.mj-tas-bomba {
+  border-color: #e03030 !important;
+  box-shadow:
+    1px 1px 0px #801010,
+    2px 2px 0px #601010,
+    3px 3px 0px #400808,
+    4px 5px 4px rgba(0,0,0,0.6),
+    0 0 10px rgba(220,40,40,0.5) !important;
+  animation: bomba-titreme 1.2s ease-in-out infinite;
+}
+
+.mj-tas-bomba-kritik {
+  animation: bomba-titreme-kritik 0.35s ease-in-out infinite !important;
+  border-color: #ff1010 !important;
+  box-shadow: 0 0 18px rgba(255,30,30,0.9) !important;
+}
+
+.mj-bomba-sayac {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #ff4040;
+  background: rgba(0,0,0,0.7);
+  border-radius: 4px;
+  padding: 1px 3px;
+  line-height: 1;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes bomba-titreme {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+@keyframes bomba-titreme-kritik {
+  0%, 100% { transform: translateX(0) scale(1.02); }
+  50% { transform: translateX(-2px) scale(0.99); }
+}
+
+/* ── Donmuş Taş ── */
+.mj-tas-donmus {
+  filter: brightness(0.6) saturate(0.3) hue-rotate(180deg) !important;
+  cursor: not-allowed !important;
+  border-color: #60a8e0 !important;
+  box-shadow:
+    1px 1px 0px #2060a0,
+    2px 2px 0px #104080,
+    3px 3px 0px #083060,
+    4px 5px 4px rgba(0,0,0,0.6),
+    0 0 12px rgba(80,160,240,0.5) !important;
+}
+
+.mj-tas-donmus.mj-tas-serbest:hover {
+  transform: none !important;
+  box-shadow:
+    1px 1px 0px #2060a0,
+    2px 2px 0px #104080,
+    3px 3px 0px #083060,
+    4px 5px 4px rgba(0,0,0,0.6),
+    0 0 12px rgba(80,160,240,0.5) !important;
+}
+
+.mj-donmus-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 2;
+  text-shadow: 0 0 8px rgba(120,200,255,0.9);
+}
+
+/* ── Karıştır Butonu ── */
+.mj-karistir-btn {
+  background: linear-gradient(135deg, #0a3050, #0a5080) !important;
+  border-color: #1080c0 !important;
+  color: #60c8ff !important;
+}
+
+.mj-karistir-btn:disabled {
+  opacity: 0.35 !important;
+}
