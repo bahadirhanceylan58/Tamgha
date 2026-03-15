@@ -40,6 +40,8 @@ const INITIAL_STATE = {
   eslestirmeBolum: 1,
   // Her SEFER_BASLAT'ta artar — EslestirmeScreen remount için key olarak kullanılır
   seferSayaci: 0,
+  // Günlük haklar (karıştır vb.)
+  gunlukHaklar: { tarih: null, karistirKalan: 3 },
 };
 
 function yukleKayit() {
@@ -65,7 +67,7 @@ function yukleKayit() {
           bolgeIlerlemesi[k] = { ...bolgeIlerlemesi[k], yildizlar: [...y, ...Array(15 - y.length).fill(0)] };
         }
       }
-      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false }, eslestirmeBolum: parsed.eslestirmeBolum ?? 1 };
+      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false }, eslestirmeBolum: parsed.eslestirmeBolum ?? 1, gunlukHaklar: parsed.gunlukHaklar ?? { tarih: null, karistirKalan: 3 } };
     }
   } catch (e) {
     // ignore
@@ -271,6 +273,18 @@ function reducer(state, action) {
       };
     }
 
+    case 'GUNLUK_HAKLAR_YENILE':
+      return { ...state, gunlukHaklar: { tarih: action.tarih, karistirKalan: 3 } };
+
+    case 'KARISTIR_HAKKI_KULLAN':
+      return {
+        ...state,
+        gunlukHaklar: {
+          ...state.gunlukHaklar,
+          karistirKalan: Math.max(0, (state.gunlukHaklar?.karistirKalan ?? 0) - 1),
+        },
+      };
+
     default:
       return state;
   }
@@ -291,9 +305,10 @@ export function GameProvider({ children }) {
       avatar: state.avatar,
       dil: state.dil,
       eslestirmeBolum: state.eslestirmeBolum,
+      gunlukHaklar: state.gunlukHaklar,
     };
     localStorage.setItem('tamgha_kayit', JSON.stringify(kayit));
-  }, [state.kazanilanKartlar, state.bolgeIlerlemesi, state.toplamPuan, state.gunlukKartTalep, state.dogumYili, state.dogumHayvaniId, state.kullaniciAdi, state.avatar, state.dil, state.eslestirmeBolum]);
+  }, [state.kazanilanKartlar, state.bolgeIlerlemesi, state.toplamPuan, state.gunlukKartTalep, state.dogumYili, state.dogumHayvaniId, state.kullaniciAdi, state.avatar, state.dil, state.eslestirmeBolum, state.gunlukHaklar]);
 
   return <GameContext.Provider value={{ state, dispatch }}>{children}</GameContext.Provider>;
 }

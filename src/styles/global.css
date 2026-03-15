@@ -3522,6 +3522,58 @@ body {
   color: var(--altin);
 }
 
+/* ── Profil — Doğum Hayvanı ──────────────────────── */
+.profil-dogum-hayvan {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0.3rem 0 0.1rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+.profil-dogum-emoji { font-size: 1.3rem; }
+.profil-dogum-yazi  { font-size: 0.72rem; color: var(--altin); opacity: 0.85; }
+
+/* ── Profil — Günlük Haklar ─────────────────────── */
+.profil-gunluk-haklar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.profil-hak-kart {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.profil-hak-ikon  { font-size: 1.4rem; flex-shrink: 0; }
+.profil-hak-bilgi { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.profil-hak-ad    { font-size: 0.82rem; font-weight: 600; color: var(--metin); }
+.profil-hak-aciklama { font-size: 0.68rem; opacity: 0.55; }
+.profil-hak-sayac {
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.profil-hak-sayac.hak-dolu {
+  background: rgba(60,180,80,0.2);
+  color: #60d878;
+  border: 1px solid rgba(60,180,80,0.3);
+}
+.profil-hak-sayac.hak-bos {
+  background: rgba(180,60,60,0.15);
+  color: #c06060;
+  border: 1px solid rgba(180,60,60,0.25);
+}
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Ä°SÄ°M Ã‡ARKI
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -5682,21 +5734,23 @@ body {
   line-height: 1;
 }
 
-/* ── Mitoloji Monogramı ──────────────────────────────── */
-/* Taş üzerinde: büyük Göktürk harfleri */
+/* ── Mitoloji Monogramı (Latin kısa ad) ─────────────── */
 .mj-mit-mono {
-  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
-  font-size: 1.85rem;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   line-height: 1;
   display: block;
   text-align: center;
-  letter-spacing: 0.03em;
 }
 
 /* Tepsi monogramı */
 .mj-tepsi-mit-mono {
-  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
-  font-size: 1.2rem;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   line-height: 1;
   display: block;
   text-align: center;
@@ -5704,8 +5758,10 @@ body {
 
 /* Carpisma sahnesi buyuk monogram */
 .cp-mit-mono {
-  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
-  font-size: 3.2rem;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   line-height: 1;
   display: block;
   text-align: center;

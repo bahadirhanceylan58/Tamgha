@@ -1,10 +1,10 @@
 ﻿import { useState, useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
-import { TAMGALAR, MITOLOJI, HAYVANLAR, BOLGELER } from '../data/tamgalar';
+import { TAMGALAR, MITOLOJI, HAYVANLAR, BOLGELER, YADA_TASI } from '../data/tamgalar';
 import { useAudio } from '../hooks/useAudio';
 
-const TW = 56;   // genişletildi
-const TH = 70;   // genişletildi
+const TW = 50;
+const TH = 63;
 const GAP = 3;
 const LOX = 5;
 const LOY = 7;
@@ -216,10 +216,23 @@ function aktifHarfIdleri(bolum) {
   return new Set(TAMGALAR.slice(0, sayi).map((t) => t.id));
 }
 
+// Mitoloji taşları için Latin kısa ad (Göktürk değil)
+const MIT_MONO = {
+  mit_tengri:  'TGR',
+  mit_umay:    'UMY',
+  mit_erlik:   'ERL',
+  mit_ulgen:   'ÜLG',
+  mit_ak_ana:  'ANA',
+  mit_kayra:   'KHN',
+  mit_mergen:  'MRG',
+  yada_tasi:   'YDA',
+};
+
 function kartHavuzu(bolum) {
   const havuz = [...TAMGALAR];
   if (bolum >= 5) havuz.push(...MITOLOJI);
   if (bolum >= 11) havuz.push(...HAYVANLAR);
+  if (bolum >= 30) havuz.push(YADA_TASI); // nadir — yüksek bölümlerde çıkar
   return havuz;
 }
 
@@ -433,11 +446,12 @@ function display(kart) {
 function TasIcerik({ kart, buyuk = false, tepsi = false }) {
   const d = display(kart);
 
-  // Mitoloji — Göktürk monogramı (emoji değil)
+  // Mitoloji — Latin kısa ad (emoji/Göktürk değil)
   if (d.isMit && !tepsi && !buyuk) {
+    const mono = MIT_MONO[kart.id] || kart.ses.slice(0, 3).toUpperCase();
     return (
       <>
-        <span className={`mj-mit-mono mj-mit-${kart.id}`}>{gokturkMonogram(kart)}</span>
+        <span className={`mj-mit-mono mj-mit-${kart.id}`}>{mono}</span>
         <span className="mj-ruh-isim">{d.sub}</span>
         <span className="mj-ruh-bant-mit" />
       </>
@@ -446,9 +460,10 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
 
   // Mitoloji buyuk (carpisma sahnesi)
   if (d.isMit && buyuk) {
+    const mono = MIT_MONO[kart.id] || kart.ses.slice(0, 3).toUpperCase();
     return (
       <>
-        <span className={`cp-mit-mono mj-mit-${kart.id}`}>{gokturkMonogram(kart)}</span>
+        <span className={`cp-mit-mono mj-mit-${kart.id}`}>{mono}</span>
         <span className="cp-ses">{d.sub}</span>
       </>
     );
@@ -470,7 +485,7 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
     return (
       <>
         {d.isMit
-          ? <span className={`mj-tepsi-mit-mono mj-mit-${kart.id}`}>{gokturkMonogram(kart)}</span>
+          ? <span className={`mj-tepsi-mit-mono mj-mit-${kart.id}`}>{MIT_MONO[kart.id] || kart.ses.slice(0, 3).toUpperCase()}</span>
           : <span className="mj-tepsi-ruh-emoji">{d.main}</span>
         }
         <span className="mj-tepsi-ses">{d.sub}</span>
@@ -532,8 +547,13 @@ export default function EslestirmeScreen() {
   useEffect(() => {
     unlockAudio();
     playBgm();
+    // Günlük hakları yenile
+    const bugun = new Date().toDateString();
+    if (state.gunlukHaklar?.tarih !== bugun) {
+      dispatch({ type: 'GUNLUK_HAKLAR_YENILE', tarih: bugun });
+    }
     return () => stopBgm();
-  }, [unlockAudio, playBgm, stopBgm]);
+  }, []);
 
   useEffect(() => {
     if (bitti) stopBgm();
@@ -797,9 +817,15 @@ export default function EslestirmeScreen() {
 
   function karistir() {
     if (bitti || blocked.current || !!carpisma) return;
-    if (sure <= 30) { showMsg('⚠️ Yeterli süre yok!', 1200); return; }
-    setSure(s => s - 30);
-    showMsg('🌀 Taşlar Karıştırıldı! -30s', 1500);
+    const hakKalan = state.gunlukHaklar?.karistirKalan ?? 0;
+    if (hakKalan > 0) {
+      dispatch({ type: 'KARISTIR_HAKKI_KULLAN' });
+      showMsg(`🌀 Karıştırıldı! (${hakKalan - 1} ücretsiz hak kaldı)`, 1800);
+    } else {
+      if (sure <= 30) { showMsg('⚠️ Yeterli süre yok!', 1200); return; }
+      setSure(s => s - 30);
+      showMsg('🌀 Taşlar Karıştırıldı! -30s', 1500);
+    }
     setTiles(prev => {
       const alive = prev.filter(t => !t.removed && !t.inTray);
       const kartlar = shuffle(alive.map(t => t.kart));
@@ -832,9 +858,16 @@ export default function EslestirmeScreen() {
           </div>
           {kazandi ? (
             ozelSeviye ? (
-              <button className="btn btn-birincil" style={{ width: '100%' }}
-                onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'map' })}>
-                Haritaya Dön ⭐
+              <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => {
+                const bolgeId = state.sefer?.bolgeId || state.seciliBolge || 'orhun';
+                const sonrakiSeviye = aktifSeviye + 1;
+                if (sonrakiSeviye >= 15) {
+                  dispatch({ type: 'NAVIGATE', ekran: 'map' });
+                } else {
+                  dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye: sonrakiSeviye, guc: null, ozelSeviye: true });
+                }
+              }}>
+                {aktifSeviye >= 14 ? 'Bölgeyi Tamamladın! ⭐' : 'Sonraki Seviye →'}
               </button>
             ) : (
               <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => {
@@ -988,10 +1021,14 @@ export default function EslestirmeScreen() {
         <button
           className="mj-guc-btn mj-karistir-btn"
           onClick={karistir}
-          disabled={bitti || !!carpisma || sure <= 30}
+          disabled={bitti || !!carpisma || ((state.gunlukHaklar?.karistirKalan ?? 0) <= 0 && sure <= 30)}
         >
           <span className="mj-guc-ikon">🌀</span>
-          <span className="mj-guc-yazi">Karıştır -30s</span>
+          <span className="mj-guc-yazi">
+            {(state.gunlukHaklar?.karistirKalan ?? 0) > 0
+              ? `Karıştır ✦${state.gunlukHaklar.karistirKalan}`
+              : 'Karıştır -30s'}
+          </span>
         </button>
       </div>
     </div>
