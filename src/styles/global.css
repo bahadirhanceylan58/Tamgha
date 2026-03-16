@@ -65,19 +65,25 @@ body {
 
 .oyun-sarici {
   width: 100%;
-  max-width: 480px;
+  max-width: 100%;
   height: 100vh;
   height: 100dvh;
   position: relative;
   overflow: hidden;
   background: var(--bg);
-  /* Desktop shadow frames */
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 160, 23, 0.1);
-  /* GÃ¼venli alan - Ã§entikli telefonlar */
+  /* Güvenli alan - çentikli telefonlar */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+}
+
+/* Masaüstü: telefon çerçevesi görünümü */
+@media (min-width: 900px) {
+  .oyun-sarici {
+    max-width: 480px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 160, 23, 0.1);
+  }
 }
 
 /* â”€â”€ Genel Ekran â”€â”€ */
@@ -4426,8 +4432,8 @@ body {
 /* â”€â”€ Tile base â”€â”€ */
 .mj-tas {
   position: absolute;
-  width: 56px;
-  height: 70px;
+  width: 50px;
+  height: 62px;
   border-radius: 9px;
   display: flex;
   flex-direction: column;
@@ -4568,14 +4574,14 @@ body {
 
 /* GÃ¶ktÃ¼rk Unicode char */
 .mj-ana-gokt {
-  font-size: 2.0rem;
+  font-size: 1.75rem;
   color: #2a1508;
 }
 
 /* Özel (mitoloji/hayvan) - Göktürk stili */
 .mj-ana-ozel {
   font-family: 'Noto Serif Old Turkic', 'Segoe UI Historic', serif;
-  font-size: 1.55rem;
+  font-size: 1.35rem;
   letter-spacing: 0.04em;
   color: #2b1a0d;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.25);
@@ -4584,7 +4590,7 @@ body {
 /* Latin (Hard Mode) - ASMR Feel */
 .mj-ana-latin {
   font-family: 'Cinzel', serif;
-  font-size: 1.65rem;
+  font-size: 1.45rem;
   font-weight: 700;
   color: #1a150f;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
@@ -5757,12 +5763,44 @@ body {
   text-align: center;
 }
 
+/* ── Mitoloji Sembol ─────────────── */
+.mj-mit-sembol {
+  font-size: 1.5rem;
+  line-height: 1;
+  display: block;
+  text-align: center;
+  margin-bottom: 1px;
+}
+
+/* ── Mitoloji Tam İsim ─────────────── */
+.mj-mit-isim {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.38rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255, 220, 120, 0.95);
+  line-height: 1.2;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 46px;
+  margin-bottom: 4px;
+}
+
 /* Tepsi monogramı */
 .mj-tepsi-mit-mono {
   font-family: 'Cinzel', Georgia, serif;
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.06em;
+  line-height: 1;
+  display: block;
+  text-align: center;
+}
+
+.mj-tepsi-mit-sembol {
+  font-size: 1.2rem;
   line-height: 1;
   display: block;
   text-align: center;
@@ -5842,6 +5880,66 @@ body {
   user-select: none;
   will-change: transform, opacity;
   mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* ── Kilit Tamga Overlay (taş üstüne konur) ── */
+.mj-kilit-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 5, 0, 0.72);
+  border: 2px solid rgba(255, 200, 40, 0.9);
+  box-shadow:
+    0 0 10px rgba(255, 180, 0, 0.8),
+    0 0 22px rgba(255, 100, 0, 0.5),
+    inset 0 0 8px rgba(255, 220, 80, 0.15);
+  cursor: pointer;
+  z-index: 2;
+  animation: kilit-cikis 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.4) both,
+             kilit-nabiz 0.5s ease-in-out 0.25s infinite alternate;
+}
+
+.mj-kilit-harf {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 1.7rem;
+  line-height: 1;
+  color: #ffe060;
+  text-shadow:
+    0 0 6px rgba(255, 220, 0, 1),
+    0 0 16px rgba(255, 140, 0, 0.8);
+}
+
+@keyframes kilit-cikis {
+  from { transform: scale(0) rotate(-15deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+@keyframes kilit-nabiz {
+  from { box-shadow: 0 0 10px rgba(255,180,0,0.8), 0 0 22px rgba(255,100,0,0.5); }
+  to   { box-shadow: 0 0 18px rgba(255,220,0,1),   0 0 38px rgba(255,140,0,0.8); }
+}
+
+.mj-gokt-arka-harf-altin {
+  color: #ffe040 !important;
+  text-shadow:
+    0 0 8px rgba(255, 220, 0, 1),
+    0 0 20px rgba(255, 160, 0, 0.8),
+    0 0 40px rgba(255, 100, 0, 0.5);
+  animation: gokt-yuksel linear infinite, mj-altin-nabiz 0.45s ease-in-out infinite alternate !important;
+  pointer-events: auto !important;
+  cursor: pointer;
+  z-index: 5;
+  font-size: 2.2rem !important;
+  mix-blend-mode: normal !important;
+  filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.9));
+}
+
+@keyframes mj-altin-nabiz {
+  from { transform: translateY(0) scale(1);   filter: brightness(1);   }
+  to   { transform: translateY(-4px) scale(1.25); filter: brightness(1.6); }
 }
 
 @keyframes gokt-yuksel {
@@ -5951,3 +6049,594 @@ body {
 .mj-karistir-btn:disabled {
   opacity: 0.35 !important;
 }
+
+/* ════════════════════════════════════════════════
+   SÖZMACA EKRANI
+   ════════════════════════════════════════════════ */
+.sm-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(ellipse at 50% 20%, #1a1200 0%, #0a0800 100%);
+  overflow: hidden;
+}
+
+/* Header */
+.sm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid rgba(212,160,23,0.2);
+  flex-shrink: 0;
+}
+.sm-geri {
+  font-size: 1.2rem;
+  color: rgba(212,160,23,0.8);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+}
+.sm-baslik-kap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.sm-baslik-latin {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: rgba(212,160,23,0.6);
+}
+.sm-baslik-gokt {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 1.1rem;
+  color: var(--altin);
+  text-shadow: 0 0 8px rgba(212,160,23,0.5);
+}
+.sm-ilerleme {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--altin);
+}
+.sm-ilerleme span { font-size: 0.7rem; color: rgba(212,160,23,0.5); }
+
+/* Puan bar */
+.sm-puan-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 1rem;
+  flex-shrink: 0;
+}
+.sm-puan-sayi {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--altin);
+}
+.sm-hatalar { display: flex; gap: 5px; }
+.sm-hata-nokta {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,80,80,0.3);
+  transition: all 0.2s;
+}
+.sm-hata-dolu {
+  background: #e03030;
+  border-color: #ff5050;
+  box-shadow: 0 0 6px rgba(255,50,50,0.6);
+}
+
+/* İpucu */
+.sm-ipucu {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0.6rem 1rem 0.3rem;
+}
+.sm-ipucu-latin {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 20px rgba(212,160,23,0.4);
+}
+.sm-ipucu-anlam {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.85rem;
+  color: rgba(212,160,23,0.7);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* Slotlar */
+.sm-slotlar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.8rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.sm-slot {
+  width: 48px;
+  height: 58px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid;
+  transition: all 0.3s;
+}
+.sm-slot-gizli {
+  background: rgba(30,20,5,0.8);
+  border-color: rgba(212,160,23,0.25);
+}
+.sm-slot-gizli .sm-slot-harf {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: rgba(212,160,23,0.3);
+}
+.sm-slot-acik {
+  background: linear-gradient(145deg, #2a1a00, #1a1000);
+  border-color: rgba(212,160,23,0.7);
+  box-shadow: 0 0 8px rgba(212,160,23,0.3);
+}
+.sm-slot-acik .sm-slot-harf {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 1.6rem;
+  color: #ffe080;
+  text-shadow: 0 0 10px rgba(255,200,0,0.6);
+}
+.sm-slot-parlak {
+  animation: sm-parlak 0.4s ease-out;
+}
+@keyframes sm-parlak {
+  0%   { box-shadow: 0 0 0 rgba(255,220,0,0); transform: scale(1); }
+  50%  { box-shadow: 0 0 20px rgba(255,220,0,0.8); transform: scale(1.12); }
+  100% { box-shadow: 0 0 8px rgba(212,160,23,0.3); transform: scale(1); }
+}
+.sm-slot-tamamlandi {
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 12px rgba(255,215,0,0.5) !important;
+}
+
+/* Görev çizgisi */
+.sm-gorev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding: 0.1rem 0;
+}
+.sm-gorev-ok { color: rgba(212,160,23,0.4); font-size: 0.75rem; }
+.sm-gorev-yazi {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: rgba(212,160,23,0.5);
+  text-transform: uppercase;
+}
+
+/* Taşlar */
+.sm-taslar-alan {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+}
+.sm-tas {
+  width: 52px;
+  height: 64px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid #c8ab78;
+  background: linear-gradient(135deg, #ffffff 0%, #fef8eb 40%, #eedbba 80%, #d8c298 100%);
+  box-shadow:
+    1px 1px 0 #ab8d5c, 2px 2px 0 #8b6e3c, 3px 3px 0 #705527,
+    4px 4px 0 #5c431d, 5px 5px 4px rgba(0,0,0,0.5),
+    inset 0 2px 4px rgba(255,255,255,0.9);
+  transition: transform 0.12s, box-shadow 0.12s, opacity 0.2s;
+}
+.sm-tas:hover:not(:disabled) {
+  transform: translateY(-3px) translateX(-1px);
+}
+.sm-tas:active:not(:disabled) {
+  transform: translateY(2px) translateX(1px);
+  box-shadow: 1px 1px 0 #ab8d5c, 2px 2px 0 #8b6e3c, 1px 1px 3px rgba(0,0,0,0.6),
+              inset 0 1px 2px rgba(255,255,255,0.7);
+}
+.sm-tas-harf {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: #2a1508;
+  pointer-events: none;
+}
+.sm-tas-dogru {
+  opacity: 0.3;
+  background: linear-gradient(135deg, #d0c898, #b0a878) !important;
+  pointer-events: none;
+  transform: scale(0.9);
+}
+.sm-tas-salla {
+  animation: sm-salla 0.4s ease-in-out;
+  border-color: #e05050 !important;
+  box-shadow: 0 0 10px rgba(220,50,50,0.6), 1px 1px 0 #ab8d5c !important;
+}
+@keyframes sm-salla {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px) rotate(-4deg); }
+  40%      { transform: translateX(6px) rotate(4deg); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+/* Sıracı noktaları */
+.sm-siraci {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.4rem 0 0.6rem;
+  flex-shrink: 0;
+}
+.sm-siraci-nokta {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(212,160,23,0.2);
+  border: 1px solid rgba(212,160,23,0.3);
+  transition: all 0.2s;
+}
+.sm-siraci-aktif {
+  background: var(--altin);
+  box-shadow: 0 0 6px rgba(212,160,23,0.7);
+  transform: scale(1.3);
+}
+.sm-siraci-tamam {
+  background: rgba(212,160,23,0.5);
+}
+
+/* Bitiş ekranı */
+.sm-bitis-ekran {
+  justify-content: center;
+  align-items: center;
+}
+.sm-bitis-ic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2rem;
+  text-align: center;
+}
+.sm-bitis-gokt {
+  font-family: 'Segoe UI Historic', 'Noto Serif Old Turkic', serif;
+  font-size: 3rem;
+  color: var(--altin);
+  text-shadow: 0 0 20px rgba(212,160,23,0.7);
+  animation: sm-parlak 1.5s ease infinite alternate;
+}
+.sm-bitis-baslik {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  color: rgba(212,160,23,0.8);
+}
+.sm-bitis-puan {
+  font-family: 'Cinzel', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #fff;
+}
+.sm-bitis-etiket {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: rgba(212,160,23,0.5);
+}
+.sm-bitis-bilgi {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 0.5rem;
+}
+.sm-bitis-btn { width: 100%; max-width: 240px; }
+
+/* ── Gizli Kelimeler Paneli (EslestirmeScreen) ──────────────────────────── */
+.mj-kelime-panel {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 4px 12px 5px;
+}
+.mj-kelime-grup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.mj-kelime-slotlar {
+  display: flex;
+  gap: 3px;
+}
+.mj-kelime-slot {
+  width: 26px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  transition: background 0.35s, border-color 0.35s, box-shadow 0.35s;
+}
+.mj-kelime-slot-buz {
+  background: rgba(130,190,255,0.07);
+  border: 1.5px solid rgba(130,190,255,0.25);
+}
+.mj-kelime-slot-buz .mj-kelime-harf {
+  font-family: 'Segoe UI Historic','Noto Serif Old Turkic',serif;
+  font-size: 0.95rem;
+  color: rgba(140,200,255,0.18);
+  filter: blur(1.5px);
+}
+.mj-kelime-slot-acik {
+  background: rgba(212,160,23,0.16);
+  border: 1.5px solid rgba(212,160,23,0.6);
+  box-shadow: 0 0 6px rgba(212,160,23,0.3);
+  animation: mj-kelime-ac 0.45s ease-out;
+}
+.mj-kelime-slot-acik .mj-kelime-harf {
+  font-family: 'Segoe UI Historic','Noto Serif Old Turkic',serif;
+  font-size: 0.95rem;
+  color: #f5d98e;
+  filter: none;
+  text-shadow: 0 0 5px rgba(212,160,23,0.7);
+}
+@keyframes mj-kelime-ac {
+  0%   { transform: scale(1.35); background: rgba(212,160,23,0.5); }
+  60%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.mj-kelime-latin {
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Crimson Text', serif;
+}
+.mj-kelime-avci {
+  font-size: 1.1rem;
+  align-self: center;
+  animation: mj-parlak-altin 1s ease infinite alternate;
+}
+@keyframes mj-parlak-altin {
+  from { filter: drop-shadow(0 0 3px #d4a017); }
+  to   { filter: drop-shadow(0 0 8px #f5d98e); }
+}
+
+/* ── Ceviri sekme çubuğu ────────────────────────────────────────────────── */
+.ceviri-sekmeler {
+  display: flex;
+  gap: 8px;
+  padding: 0 1rem 0.75rem;
+  border-bottom: 1px solid rgba(212,160,23,0.15);
+}
+.ceviri-sekme {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1.5px solid rgba(212,160,23,0.25);
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.85rem;
+  font-family: 'Crimson Text', serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ceviri-sekme span {
+  font-family: 'Segoe UI Historic','Noto Serif Old Turkic',serif;
+  font-size: 1rem;
+}
+.ceviri-sekme-aktif {
+  border-color: rgba(212,160,23,0.7);
+  background: rgba(212,160,23,0.1);
+  color: #d4a017;
+}
+
+/* ── Tamga Çöz oyunu (tc-*) ─────────────────────────────────────────────── */
+.tc-kap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5rem;
+}
+.tc-oyun {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+.tc-ilerleme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 0.25rem;
+}
+.tc-ilerleme-sayi {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Crimson Text', serif;
+}
+.tc-ilerleme-sayi span { color: rgba(255,255,255,0.3); }
+.tc-hatalar { display: flex; gap: 6px; }
+.tc-hata {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(200,60,60,0.4);
+  background: transparent;
+}
+.tc-hata-dolu { background: #c43c3c; border-color: #c43c3c; }
+.tc-puan-mini {
+  font-size: 0.8rem;
+  color: #d4a017;
+  font-family: 'Crimson Text', serif;
+}
+.tc-ipucu {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  background: rgba(212,160,23,0.07);
+  border: 1px solid rgba(212,160,23,0.2);
+  border-radius: 14px;
+  width: 100%;
+}
+.tc-latin {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #d4a017;
+  font-family: 'Crimson Text', serif;
+}
+.tc-anlam {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  font-family: 'Crimson Text', serif;
+}
+.tc-slotlar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.tc-slot {
+  width: 52px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  font-family: 'Segoe UI Historic','Noto Serif Old Turkic',serif;
+  font-size: 1.6rem;
+  transition: all 0.25s;
+}
+.tc-slot-gizli {
+  background: rgba(255,255,255,0.06);
+  border: 2px dashed rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.2);
+  font-family: sans-serif;
+  font-size: 1.2rem;
+}
+.tc-slot-acik {
+  background: rgba(212,160,23,0.15);
+  border: 2px solid rgba(212,160,23,0.5);
+  color: #f5d98e;
+}
+.tc-slot-parlak {
+  animation: tc-parlak 0.4s ease-out;
+}
+@keyframes tc-parlak {
+  0% { transform: scale(1.25); box-shadow: 0 0 16px rgba(212,160,23,0.8); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+.tc-slot-harf { pointer-events: none; }
+.tc-siraci {
+  display: flex; gap: 8px;
+}
+.tc-siraci-nokta {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: all 0.2s;
+}
+.tc-s-aktif { background: #d4a017; box-shadow: 0 0 6px #d4a01788; }
+.tc-s-tamam { background: rgba(212,160,23,0.4); }
+.tc-taslar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+.tc-tas {
+  width: 58px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  border: 2px solid rgba(212,160,23,0.35);
+  background: rgba(30,20,10,0.6);
+  font-family: 'Segoe UI Historic','Noto Serif Old Turkic',serif;
+  font-size: 1.7rem;
+  color: #f5d98e;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tc-tas:hover:not(:disabled) {
+  border-color: rgba(212,160,23,0.7);
+  background: rgba(212,160,23,0.12);
+  transform: translateY(-2px);
+}
+.tc-tas:active:not(:disabled) { transform: scale(0.93); }
+.tc-tas-dogru {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+.tc-tas-salla {
+  animation: tc-salla 0.4s ease-in-out;
+  border-color: rgba(200,60,60,0.7);
+}
+@keyframes tc-salla {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  70% { transform: translateX(-4px); }
+}
+.tc-bitis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+.tc-bitis-gokt {
+  font-family: 'Segoe UI Historic','Noto Serif Old Turkic',serif;
+  font-size: 2rem;
+  color: #d4a017;
+  letter-spacing: 4px;
+  animation: tc-parlak 1.5s ease infinite alternate;
+}
+.tc-bitis-baslik {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Crimson Text', serif;
+}
+.tc-bitis-puan {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #d4a017;
+  font-family: 'Crimson Text', serif;
+}
+.tc-bitis-etiket {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.4);
+}
+.tc-btn { width: 100%; max-width: 240px; }

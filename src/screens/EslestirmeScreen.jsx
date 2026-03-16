@@ -3,8 +3,8 @@ import { useGame } from '../context/GameContext';
 import { TAMGALAR, MITOLOJI, HAYVANLAR, BOLGELER, YADA_TASI } from '../data/tamgalar';
 import { useAudio } from '../hooks/useAudio';
 
-const TW = 50;
-const TH = 63;
+const TW = 44;
+const TH = 55;
 const GAP = 3;
 const LOX = 5;
 const LOY = 7;
@@ -28,88 +28,36 @@ const SAMAN_SOZLERI = {
   mit_mergen: '🎯 MERGEN! Çift otomatik eşleşti!',
 };
 
+// Gizli kelime havuzu (Göktürk harfleri)
+const GK_KELIMELER = [
+  { latin: 'AT',  harfler: ['\u{10C00}', '\u{10C43}'] },
+  { latin: 'ER',  harfler: ['\u{10C00}', '\u{10C3C}'] },
+  { latin: 'EL',  harfler: ['\u{10C00}', '\u{10C20}'] },
+  { latin: 'SU',  harfler: ['\u{10C3D}', '\u{10C06}'] },
+  { latin: 'KÜN', harfler: ['\u{10C1A}', '\u{10C07}', '\u{10C24}'] },
+  { latin: 'KUT', harfler: ['\u{10C34}', '\u{10C06}', '\u{10C43}'] },
+  { latin: 'BEG', harfler: ['\u{10C0B}', '\u{10C0F}'] },
+  { latin: 'ÖD',  harfler: ['\u{10C07}', '\u{10C13}'] },
+  { latin: 'YER', harfler: ['\u{10C18}', '\u{10C3C}'] },
+];
+
 // Bölüm 1-5: 90sn | 6-10: 110sn | 11-20: 130sn | 21-30: 120sn | 31-40: 105sn | 41-50: 90sn
 // 12taş→95s | 16taş→110s | 22taş→130s | 26taş→140s | 30taş→150s | 36taş→150s
 function bolumSuresi(bolum) {
-  if (bolum <= 3)  return 95;
-  if (bolum <= 7)  return 110;
-  if (bolum <= 12) return 130;
-  if (bolum <= 20) return 140;
-  if (bolum <= 35) return 150;
-  return 150;
+  if (bolum <= 3)  return 120;  // 20 taş
+  if (bolum <= 7)  return 150;  // 28 taş
+  if (bolum <= 12) return 180;  // 36 taş
+  if (bolum <= 20) return 210;  // 44 taş
+  if (bolum <= 35) return 240;  // 52 taş
+  return 270;                   // 60 taş
 }
-const OYUN_SURESI = 240; // fallback (sure barı için)
+const OYUN_SURESI = 270; // fallback (sure barı için)
 const TOPLAM_BOLUM = 50;
 
-// Katmanlı düzenler — daha çok kapalı taş, Vita tarzı derinlik
-// Her layout'ta l=0 taban, l=1 orta, l=2 tepe katmanları var
+// Katmanlı düzenler — artan taş sayısı, Vita tarzı derinlik
+// Her layout'ta l=0 taban, l=1 orta, l=2+ tepe katmanları var
 const PIRAMIT_DUZENLER = [
-  // 0: bolum 1-3 → 12 taş (6 çift), 2 katman
-  [
-    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},
-    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
-    {r:0,c:1,l:1},{r:0,c:2,l:1},
-    {r:1,c:1,l:1},{r:1,c:2,l:1},
-  ],
-  // 1: bolum 4-7 → 16 taş (8 çift), 3 katman
-  [
-    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
-    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
-    {r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},{r:1,c:2,l:1},
-    {r:0,c:2,l:2},{r:1,c:2,l:2},
-  ],
-  // 2: bolum 8-12 → 22 taş (11 çift), 3 katman
-  [
-    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
-    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
-    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},
-    {r:0,c:2,l:1},{r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},
-    {r:2,c:1,l:1},{r:2,c:2,l:1},
-    {r:1,c:2,l:2},{r:2,c:2,l:2},
-  ],
-  // 3: bolum 13-20 → 26 taş (13 çift), 3 katman
-  [
-    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
-    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
-    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
-    {r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},
-    {r:0,c:2,l:1},{r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},
-    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},
-    {r:1,c:2,l:2},
-  ],
-  // 4: bolum 21-35 → 30 taş (15 çift), 3 katman
-  [
-    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
-    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
-    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
-    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},
-    {r:0,c:2,l:1},{r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},
-    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},{r:3,c:2,l:1},
-    {r:1,c:2,l:2},{r:2,c:2,l:2},
-  ],
-  // 5: bolum 36-50 → 36 taş (18 çift), 4 katman
-  [
-    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
-    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
-    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
-    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},
-    {r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},
-    {r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},
-    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},
-    {r:3,c:2,l:1},
-    {r:1,c:2,l:2},{r:2,c:1,l:2},{r:2,c:2,l:2},{r:2,c:3,l:2},
-    {r:1,c:2,l:3},{r:2,c:2,l:3},
-  ],
-];
-
-// Bölge-seviye bazlı düzenler (10 layout, artan zorluk)
-// Orhun: 0-4, Selenga: 2-6, Altay: 5-9, Tengri: 6-9
-const BOLGE_DUZENLER = [
-  // 0: 12 taş (Orhun Lv1-3)
-  PIRAMIT_DUZENLER[0],
-  // 1: 16 taş (Orhun Lv4-6)
-  PIRAMIT_DUZENLER[1],
-  // 2: 20 taş (Orhun Lv7-9 / Selenga Lv1-3)
+  // 0: bolum 1-3 → 20 taş (10 çift), 2 katman
   [
     {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},
     {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},
@@ -118,35 +66,18 @@ const BOLGE_DUZENLER = [
     {r:1,c:1,l:1},{r:1,c:2,l:1},
     {r:2,c:1,l:1},{r:2,c:2,l:1},
   ],
-  // 3: 22 taş (Orhun Lv10-12 / Selenga Lv4-6)
-  PIRAMIT_DUZENLER[2],
-  // 4: 24 taş (Orhun Lv13-15 / Selenga Lv7-9)
+  // 1: bolum 4-7 → 28 taş (14 çift), 3 katman
   [
     {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
     {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
     {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
     {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},
-    {r:1,c:2,l:1},{r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},
+    {r:0,c:2,l:1},{r:0,c:3,l:1},
+    {r:1,c:2,l:1},{r:1,c:3,l:1},
+    {r:2,c:2,l:1},{r:2,c:3,l:1},
+    {r:3,c:2,l:1},{r:3,c:3,l:1},
   ],
-  // 5: 26 taş (Selenga Lv10-12 / Altay Lv1-3)
-  PIRAMIT_DUZENLER[3],
-  // 6: 30 taş (Selenga Lv13-15 / Altay Lv4-6 / Tengri Lv1-3)
-  PIRAMIT_DUZENLER[4],
-  // 7: 32 taş (Altay Lv7-9 / Tengri Lv4-6)
-  [
-    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
-    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
-    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},
-    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},
-    {r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},
-    {r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},
-    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},
-    {r:3,c:2,l:1},
-    {r:1,c:2,l:2},{r:2,c:2,l:2},
-  ],
-  // 8: 36 taş (Altay Lv10-12 / Tengri Lv7-9)
-  PIRAMIT_DUZENLER[5],
-  // 9: 40 taş (Altay Lv13-15 / Tengri Lv10-15)
+  // 2: bolum 8-12 → 36 taş (18 çift), 3 katman
   [
     {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},
     {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},
@@ -156,8 +87,103 @@ const BOLGE_DUZENLER = [
     {r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},
     {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},
     {r:3,c:1,l:1},{r:3,c:2,l:1},{r:3,c:3,l:1},
-    {r:0,c:2,l:2},{r:1,c:1,l:2},{r:1,c:2,l:2},{r:1,c:3,l:2},
-    {r:2,c:1,l:2},{r:2,c:2,l:2},{r:2,c:3,l:2},{r:3,c:2,l:2},
+    {r:1,c:2,l:2},{r:1,c:3,l:2},
+    {r:2,c:2,l:2},{r:2,c:3,l:2},
+  ],
+  // 3: bolum 13-20 → 44 taş (22 çift), 3 katman
+  [
+    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},
+    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
+    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},
+    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
+    {r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},{r:0,c:4,l:1},
+    {r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},{r:1,c:4,l:1},
+    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},
+    {r:3,c:1,l:1},{r:3,c:2,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1},
+    {r:1,c:2,l:2},{r:1,c:3,l:2},
+    {r:2,c:2,l:2},{r:2,c:3,l:2},
+  ],
+  // 4: bolum 21-35 → 52 taş (26 çift), 3 katman
+  [
+    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},
+    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
+    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},
+    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
+    {r:4,c:0,l:0},{r:4,c:1,l:0},{r:4,c:2,l:0},{r:4,c:3,l:0},{r:4,c:4,l:0},{r:4,c:5,l:0},
+    {r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},{r:0,c:4,l:1},
+    {r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},{r:1,c:4,l:1},
+    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},
+    {r:3,c:1,l:1},{r:3,c:2,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1},
+    {r:1,c:2,l:2},{r:1,c:3,l:2},
+    {r:2,c:2,l:2},{r:2,c:3,l:2},
+    {r:3,c:2,l:2},{r:3,c:3,l:2},
+  ],
+  // 5: bolum 36-50 → 60 taş (30 çift), 3 katman
+  [
+    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},
+    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
+    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},
+    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
+    {r:4,c:0,l:0},{r:4,c:1,l:0},{r:4,c:2,l:0},{r:4,c:3,l:0},{r:4,c:4,l:0},{r:4,c:5,l:0},
+    {r:0,c:0,l:1},{r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},{r:0,c:4,l:1},{r:0,c:5,l:1},
+    {r:1,c:0,l:1},{r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},{r:1,c:4,l:1},{r:1,c:5,l:1},
+    {r:2,c:0,l:1},{r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},{r:2,c:5,l:1},
+    {r:3,c:0,l:1},{r:3,c:1,l:1},{r:3,c:2,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1},{r:3,c:5,l:1},
+    {r:1,c:2,l:2},{r:1,c:3,l:2},
+    {r:2,c:2,l:2},{r:2,c:3,l:2},
+    {r:3,c:2,l:2},{r:3,c:3,l:2},
+  ],
+];
+
+// Bölge-seviye bazlı düzenler (10 layout, artan zorluk)
+// Orhun: 0-4, Selenga: 2-6, Altay: 5-9, Tengri: 6-9
+const BOLGE_DUZENLER = [
+  // 0: 20 taş (Orhun Lv1-3)
+  PIRAMIT_DUZENLER[0],
+  // 1: 28 taş (Orhun Lv4-6)
+  PIRAMIT_DUZENLER[1],
+  // 2: 28 taş (Orhun Lv7-9 / Selenga Lv1-3)
+  PIRAMIT_DUZENLER[1],
+  // 3: 36 taş (Orhun Lv10-12 / Selenga Lv4-6)
+  PIRAMIT_DUZENLER[2],
+  // 4: 36 taş (Orhun Lv13-15 / Selenga Lv7-9)
+  PIRAMIT_DUZENLER[2],
+  // 5: 44 taş (Selenga Lv10-12 / Altay Lv1-3)
+  PIRAMIT_DUZENLER[3],
+  // 6: 52 taş (Selenga Lv13-15 / Altay Lv4-6 / Tengri Lv1-3)
+  PIRAMIT_DUZENLER[4],
+  // 7: 48 taş (Altay Lv7-9 / Tengri Lv4-6)
+  [
+    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},
+    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
+    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},
+    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
+    {r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},{r:0,c:4,l:1},
+    {r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},{r:1,c:4,l:1},
+    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},
+    {r:3,c:1,l:1},{r:3,c:2,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1},
+    {r:1,c:2,l:2},{r:1,c:3,l:2},
+    {r:2,c:2,l:2},{r:2,c:3,l:2},
+    {r:3,c:2,l:2},{r:3,c:3,l:2},
+    {r:0,c:2,l:2},{r:0,c:3,l:2},
+  ],
+  // 8: 60 taş (Altay Lv10-12 / Tengri Lv7-9)
+  PIRAMIT_DUZENLER[5],
+  // 9: 56 taş (Altay Lv13-15 / Tengri Lv10-15)
+  [
+    {r:0,c:0,l:0},{r:0,c:1,l:0},{r:0,c:2,l:0},{r:0,c:3,l:0},{r:0,c:4,l:0},{r:0,c:5,l:0},
+    {r:1,c:0,l:0},{r:1,c:1,l:0},{r:1,c:2,l:0},{r:1,c:3,l:0},{r:1,c:4,l:0},{r:1,c:5,l:0},
+    {r:2,c:0,l:0},{r:2,c:1,l:0},{r:2,c:2,l:0},{r:2,c:3,l:0},{r:2,c:4,l:0},{r:2,c:5,l:0},
+    {r:3,c:0,l:0},{r:3,c:1,l:0},{r:3,c:2,l:0},{r:3,c:3,l:0},{r:3,c:4,l:0},{r:3,c:5,l:0},
+    {r:4,c:0,l:0},{r:4,c:1,l:0},{r:4,c:2,l:0},{r:4,c:3,l:0},{r:4,c:4,l:0},{r:4,c:5,l:0},
+    {r:0,c:1,l:1},{r:0,c:2,l:1},{r:0,c:3,l:1},{r:0,c:4,l:1},
+    {r:1,c:1,l:1},{r:1,c:2,l:1},{r:1,c:3,l:1},{r:1,c:4,l:1},
+    {r:2,c:1,l:1},{r:2,c:2,l:1},{r:2,c:3,l:1},{r:2,c:4,l:1},
+    {r:3,c:1,l:1},{r:3,c:2,l:1},{r:3,c:3,l:1},{r:3,c:4,l:1},
+    {r:4,c:1,l:1},{r:4,c:2,l:1},{r:4,c:3,l:1},{r:4,c:4,l:1},
+    {r:1,c:2,l:2},{r:1,c:3,l:2},
+    {r:2,c:2,l:2},{r:2,c:3,l:2},
+    {r:3,c:2,l:2},{r:3,c:3,l:2},
   ],
 ];
 
@@ -173,22 +199,22 @@ function getSureBolgeSeviye(bolgeId, seviye) {
   const base = BOLGE_LAYOUT_OFFSET[bolgeId] ?? 0;
   const step = Math.min(4, Math.floor((seviye * 5) / 15));
   const idx = Math.min(BOLGE_DUZENLER.length - 1, base + step);
-  const tileCounts = [12, 16, 20, 22, 24, 26, 30, 32, 36, 40];
-  const tc = tileCounts[idx] || 12;
-  if (tc <= 16) return 90;
-  if (tc <= 22) return 110;
-  if (tc <= 26) return 130;
-  if (tc <= 32) return 145;
-  return 160;
+  const tileCounts = [20, 28, 28, 36, 36, 44, 52, 48, 60, 56];
+  const tc = tileCounts[idx] || 20;
+  if (tc <= 28) return 150;
+  if (tc <= 36) return 180;
+  if (tc <= 44) return 210;
+  if (tc <= 52) return 240;
+  return 270;
 }
 
 function getLayout(bolum) {
-  if (bolum <= 3)  return PIRAMIT_DUZENLER[0]; // 12 taş
-  if (bolum <= 7)  return PIRAMIT_DUZENLER[1]; // 16 taş
-  if (bolum <= 12) return PIRAMIT_DUZENLER[2]; // 22 taş
-  if (bolum <= 20) return PIRAMIT_DUZENLER[3]; // 26 taş
-  if (bolum <= 35) return PIRAMIT_DUZENLER[4]; // 30 taş
-  return PIRAMIT_DUZENLER[5];                  // 36 taş
+  if (bolum <= 3)  return PIRAMIT_DUZENLER[0]; // 20 taş
+  if (bolum <= 7)  return PIRAMIT_DUZENLER[1]; // 28 taş
+  if (bolum <= 12) return PIRAMIT_DUZENLER[2]; // 36 taş
+  if (bolum <= 20) return PIRAMIT_DUZENLER[3]; // 44 taş
+  if (bolum <= 35) return PIRAMIT_DUZENLER[4]; // 52 taş
+  return PIRAMIT_DUZENLER[5];                  // 60 taş
 }
 
 function getBoardDims(layout) {
@@ -226,6 +252,18 @@ const MIT_MONO = {
   mit_kayra:   'KHN',
   mit_mergen:  'MRG',
   yada_tasi:   'YDA',
+};
+
+// Mitoloji taşları için benzersiz semboller
+const MIT_SEMBOL = {
+  mit_tengri:  '⚡',
+  mit_umay:    '✦',
+  mit_erlik:   '☠',
+  mit_ulgen:   '☀',
+  mit_ak_ana:  '✿',
+  mit_kayra:   '✤',
+  mit_mergen:  '➤',
+  yada_tasi:   '◈',
 };
 
 function kartHavuzu(bolum) {
@@ -446,13 +484,13 @@ function display(kart) {
 function TasIcerik({ kart, buyuk = false, tepsi = false }) {
   const d = display(kart);
 
-  // Mitoloji — Latin kısa ad (emoji/Göktürk değil)
+  // Mitoloji — sembol + tam isim
   if (d.isMit && !tepsi && !buyuk) {
-    const mono = MIT_MONO[kart.id] || kart.ses.slice(0, 3).toUpperCase();
+    const sembol = MIT_SEMBOL[kart.id] || '✦';
     return (
       <>
-        <span className={`mj-mit-mono mj-mit-${kart.id}`}>{mono}</span>
-        <span className="mj-ruh-isim">{d.sub}</span>
+        <span className={`mj-mit-sembol mj-mit-${kart.id}`}>{sembol}</span>
+        <span className="mj-mit-isim">{d.sub}</span>
         <span className="mj-ruh-bant-mit" />
       </>
     );
@@ -485,7 +523,7 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
     return (
       <>
         {d.isMit
-          ? <span className={`mj-tepsi-mit-mono mj-mit-${kart.id}`}>{MIT_MONO[kart.id] || kart.ses.slice(0, 3).toUpperCase()}</span>
+          ? <span className={`mj-tepsi-mit-sembol mj-mit-${kart.id}`}>{MIT_SEMBOL[kart.id] || MIT_MONO[kart.id] || '✦'}</span>
           : <span className="mj-tepsi-ruh-emoji">{d.main}</span>
         }
         <span className="mj-tepsi-ses">{d.sub}</span>
@@ -541,7 +579,15 @@ export default function EslestirmeScreen() {
   const [bitti, setBitti] = useState(false);
   const [efektMesaj, setEfektMesaj] = useState(null);
   const [bozkurtCan, setBozkurtCan] = useState(MAX_CAN);
+  const [bonusTamga, setBonusTamga] = useState(null); // { harf, x, y }
+  const bonusRef = useRef(false);
   const blocked = useRef(false);
+
+  // Gizli kelimeler
+  const gizliKelimeler = useMemo(() => shuffle([...GK_KELIMELER]).slice(0, 3), []);
+  const [acikHarfler, setAcikHarfler] = useState(new Set());
+  const kelimeAvciRef = useRef(false);
+  const [kelimeAvciGoster, setKelimeAvciGoster] = useState(false);
   const bombPatladiRef = useRef(0);
 
   useEffect(() => {
@@ -603,6 +649,50 @@ export default function EslestirmeScreen() {
       });
     }
   }, [tiles, bitti]);
+
+  // Kilit tamga: null iken sonraki aktivasyonu planla
+  useEffect(() => {
+    if (bitti || bonusTamga !== null) return;
+    const delay = bonusRef.current ? (12000 + Math.random() * 6000) : 9000;
+    const t = setTimeout(() => {
+      bonusRef.current = true;
+      const freeTiles = tiles.filter(tile => !tile.removed && !tile.inTray && isFree(tile, tiles));
+      if (freeTiles.length < 3) return;
+      const target = freeTiles[Math.floor(Math.random() * freeTiles.length)];
+      setBonusTamga({ tileId: target.id, harf: MJ_GOKT_HARFLER[Math.floor(Math.random() * MJ_GOKT_HARFLER.length)] });
+    }, delay);
+    return () => clearTimeout(t);
+  }, [bitti, bonusTamga]);
+
+  // Kilit tamga: 4s sonra kaybolur, ceza -8 saniye
+  useEffect(() => {
+    if (!bonusTamga) return;
+    const t = setTimeout(() => {
+      setBonusTamga(null);
+      setSure(s => Math.max(0, s - 8));
+      showMsg('💀 KİLİT KAÇTI! -8 SANİYE', 1600);
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [bonusTamga]);
+
+  // Kelime avcısı: tüm gizli kelimeler açılınca bonus
+  useEffect(() => {
+    if (kelimeAvciRef.current || bitti || acikHarfler.size === 0) return;
+    if (gizliKelimeler.every(k => k.harfler.every(h => acikHarfler.has(h)))) {
+      kelimeAvciRef.current = true;
+      setKelimeAvciGoster(true);
+      setSkor(s => s + 300);
+      setSure(s => Math.min(s + 15, maxSure + 60));
+      showMsg('🔑 KELİME AVCISI! +300 +15s', 2500);
+    }
+  }, [acikHarfler, bitti]);
+
+  function handleBonusTamga() {
+    if (!bonusTamga) return;
+    setBonusTamga(null);
+    setSkor(s => s + 150);
+    showMsg('🔓 KİLİT KIRDI! +150', 1200);
+  }
 
   function showMsg(msg, dur = 1500) {
     setEfektMesaj(msg);
@@ -752,6 +842,12 @@ export default function EslestirmeScreen() {
         else showMsg('MUKEMMEL ESLEME!');
       } else { playMatch(); }
       setSkor(s => s + puan);
+
+      // Kelime avcısı — eşleşen tamgayı kaydet
+      const matchedTamga = tile.kart.tamga;
+      if (matchedTamga) {
+        setAcikHarfler(prev => prev.has(matchedTamga) ? prev : new Set([...prev, matchedTamga]));
+      }
 
       // Esleseni parlat
       setTepsi(yeniTepsi.map((t) =>
@@ -945,6 +1041,26 @@ export default function EslestirmeScreen() {
         <span>{hamle} hamle</span>
       </div>
 
+      {/* Gizli Kelimeler */}
+      <div className="mj-kelime-panel">
+        {gizliKelimeler.map((kelime, ki) => (
+          <div key={ki} className="mj-kelime-grup">
+            <div className="mj-kelime-slotlar">
+              {kelime.harfler.map((harf, hi) => {
+                const acik = acikHarfler.has(harf);
+                return (
+                  <div key={hi} className={`mj-kelime-slot ${acik ? 'mj-kelime-slot-acik' : 'mj-kelime-slot-buz'}`}>
+                    <span className="mj-kelime-harf">{harf}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <span className="mj-kelime-latin">{kelime.latin}</span>
+          </div>
+        ))}
+        {kelimeAvciGoster && <span className="mj-kelime-avci">🔑</span>}
+      </div>
+
       {efektMesaj && <div className="mj-efekt-mesaj">{efektMesaj}</div>}
 
       {/* Carpışma sahnesi */}
@@ -983,12 +1099,13 @@ export default function EslestirmeScreen() {
             const free = isFree(tile, tiles);
             const d = display(tile.kart);
             const pos = tilePos(tile.col, tile.row, tile.layer, boardDims.maxL * LOY);
+            const isKilitli = bonusTamga?.tileId === tile.id;
             return (
               <div
                 key={tile.id}
                 className={[
                   'mj-tas',
-                  free ? 'mj-tas-serbest' : 'mj-tas-kapali',
+                  free && !isKilitli ? 'mj-tas-serbest' : 'mj-tas-kapali',
                   d.isMit ? 'mj-tas-mit' : '',
                   d.isMit ? `mj-tas-${tile.kart.id}` : '',
                   d.isHay ? 'mj-tas-hay' : '',
@@ -996,12 +1113,17 @@ export default function EslestirmeScreen() {
                   tile.isFrozen ? 'mj-tas-donmus' : '',
                   tile.isBomb && tile.bombSure <= 3 ? 'mj-tas-bomba-kritik' : '',
                 ].filter(Boolean).join(' ')}
-                style={{ left: pos.left, top: pos.top, zIndex: pos.zIndex }}
-                onClick={() => tasTikla(tile.id)}
+                style={{ left: pos.left, top: pos.top, zIndex: isKilitli ? pos.zIndex + 10 : pos.zIndex }}
+                onClick={() => isKilitli ? handleBonusTamga() : tasTikla(tile.id)}
               >
                 <TasIcerik kart={tile.kart} />
                 {tile.isBomb && <span className="mj-bomba-sayac">{tile.bombSure}</span>}
                 {tile.isFrozen && <span className="mj-donmus-overlay">❄</span>}
+                {isKilitli && (
+                  <div className="mj-kilit-overlay">
+                    <span className="mj-kilit-harf">{bonusTamga.harf}</span>
+                  </div>
+                )}
               </div>
             );
           })}
