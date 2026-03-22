@@ -50,6 +50,35 @@ function getCharHarmony(lower, pos) {
   return bestHarmony;
 }
 
+// Tarihi yazıtlardaki birebir orjinal yazılışlar (İstisnai kelimeler)
+const OZEL_KELIMELER = {
+  'türk': '\u{10C45}\u{10C07}\u{10C3C}\u{10C1C}', // T-Ü-R-ÜK
+  'türük': '\u{10C45}\u{10C07}\u{10C3C}\u{10C1C}',
+  'tengri': '\u{10C45}\u{10C2D}\u{10C3C}\u{10C03}', // T-NG-R-İ
+  'tanrı': '\u{10C45}\u{10C2D}\u{10C3C}\u{10C03}',
+  'ötüken': '\u{10C07}\u{10C45}\u{10C1C}\u{10C24}', // Ö-T-ÖK-N
+  'bilge': '\u{10C0B}\u{10C03}\u{10C20}\u{10C0F}\u{10C00}', // B-İ-L-G-E
+  'kağan': '\u{10C34}\u{10C0D}\u{10C23}', // K-Ğ-N
+  'kagan': '\u{10C34}\u{10C0D}\u{10C23}',
+  'han': '\u{10C34}\u{10C23}', // H-N
+  'bodun': '\u{10C09}\u{10C06}\u{10C11}\u{10C06}\u{10C23}', // B-O-D-U-N
+  'kut': '\u{10C34}\u{10C06}\u{10C43}' // K-U-T
+};
+
+// Göktürklerde özel rakam sembolü yoktur, sayılar kelime olarak yazılır
+const RAKAMLAR = {
+  '0': '\u{10C3D}\u{10C03}\u{10C2F}\u{10C03}\u{10C3A}', // S-I-F-I-R
+  '1': '\u{10C0B}\u{10C03}\u{10C3C}', // B-İ-R
+  '2': '\u{10C03}\u{10C1A}\u{10C03}', // İ-K-İ
+  '3': '\u{10C07}\u{10C32}', // Ü-Ç
+  '4': '\u{10C45}\u{10C07}\u{10C3C}\u{10C45}', // T-Ö-R-T
+  '5': '\u{10C0B}\u{10C03}\u{10C41}', // B-İ-Ş
+  '6': '\u{10C00}\u{10C20}\u{10C43}\u{10C03}', // A-L-T-I
+  '7': '\u{10C18}\u{10C03}\u{10C45}\u{10C03}', // Y-İ-T-İ
+  '8': '\u{10C3E}\u{10C03}\u{10C1A}\u{10C03}\u{10C14}', // S-E-K-İ-Z
+  '9': '\u{10C43}\u{10C06}\u{10C34}\u{10C06}\u{10C14}', // T-O-K-U-Z
+};
+
 function cevirKelime(kelime) {
   const harfler = []; let i = 0;
   const lower = kelime.toLowerCase(), son = lower.length - 1;
@@ -60,7 +89,9 @@ function cevirKelime(kelime) {
       if (lig) { harfler.push({ latin: kelime.slice(i, i + 2), tamga: lig.t }); i += 2; continue; }
     }
     const ch = lower[i], ses = SESLER[ch];
-    if (ses) {
+    if (RAKAMLAR[ch]) {
+      harfler.push({ latin: kelime[i], tamga: RAKAMLAR[ch] });
+    } else if (ses) {
       if (DUZ_UNLU.has(ch) && i > 0 && i < son) { i++; continue; }
       harfler.push({ latin: kelime[i], tamga: ses[getCharHarmony(lower, i)] });
     } else if (ch !== "'") {
@@ -71,10 +102,29 @@ function cevirKelime(kelime) {
   return harfler;
 }
 
-function cevirMetin(metin) {
+function cevirMetin(metin, ayiriciKullan = false) {
   if (!metin.trim()) return [];
-  return metin.split(/(\s+|\n)/).filter(Boolean).map(parca => {
-    if (/^[\s\n]+$/.test(parca)) return { tip: 'bosluk', latin: parca, tamga: parca, harfler: [] };
+  // Noktalama işaretlerini, boşlukları ve satır sonlarını ayrı yakala
+  const parcalar = metin.split(/([ \t]+|\n|[,.!?\-])/).filter(Boolean);
+  
+  return parcalar.map(parca => {
+    if (/^[ \t]+$/.test(parca)) {
+      return { tip: 'bosluk', latin: parca, tamga: ayiriciKullan ? ':' : ' ', harfler: [] };
+    }
+    if (/^\n+$/.test(parca)) {
+      return { tip: 'bosluk', latin: parca, tamga: parca, harfler: [] };
+    }
+    if (/^[,.!?\-]$/.test(parca)) return { tip: 'noktalama', latin: parca, tamga: parca, harfler: [{ latin: parca, tamga: parca }] };
+    
+    // Özel tarihi kelime kontrolü
+    const temizKelime = parca.toLowerCase().replace(/['’]/g, '');
+    if (OZEL_KELIMELER[temizKelime]) {
+      const ozelTamga = OZEL_KELIMELER[temizKelime];
+      // Harf eşleştirmesini görsel olarak göstermek için yapay bir harf dizeli oluştur
+      const harfler = [{ latin: parca, tamga: ozelTamga }];
+      return { tip: 'kelime', latin: parca, tamga: ozelTamga, harfler };
+    }
+
     const harfler = cevirKelime(parca);
     return { tip: 'kelime', latin: parca, tamga: harfler.map(h => h.tamga).join(''), harfler };
   });
@@ -231,8 +281,9 @@ export default function CeviriScreen() {
   const [sekme, setSekme] = useState('ceviri');
   const [metin, setMetin] = useState('');
   const [kopyalandi, setKopyalandi] = useState(false);
+  const [ayiriciKullan, setAyiriciKullan] = useState(false);
 
-  const parcalar = cevirMetin(metin);
+  const parcalar = cevirMetin(metin, ayiriciKullan);
   const tamgaCikti = parcalar.map(p => p.tamga).join('');
 
   function kopyala() {
@@ -282,11 +333,25 @@ export default function CeviriScreen() {
               placeholder={t('ceviriPlaceholder')}
               value={metin}
               onChange={e => setMetin(e.target.value)}
-              maxLength={200}
-              rows={3}
+              maxLength={5000}
+              rows={4}
             />
-            <div className="ceviri-karakter-sayac">{metin.length}/200</div>
+            <div className="ceviri-karakter-sayac">{metin.length}/5000</div>
           </div>
+
+          <div className="ceviri-opsiyonlar" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px', color: '#daaa64' }}>
+            <input 
+              type="checkbox" 
+              id="ayiriciToggle" 
+              checked={ayiriciKullan} 
+              onChange={e => setAyiriciKullan(e.target.checked)} 
+              style={{ accentColor: '#c87020', cursor: 'pointer', width: '16px', height: '16px' }}
+            />
+            <label htmlFor="ayiriciToggle" style={{ cursor: 'pointer', fontSize: '14px', userSelect: 'none' }}>
+              Göktürkçe kelime ayırıcı ( : ) kullan
+            </label>
+          </div>
+
           <div className="ceviri-ornekler">
             {ornekler.map(o => (
               <button key={o} className="ceviri-ornek-btn" onClick={() => setMetin(o)}>{o}</button>

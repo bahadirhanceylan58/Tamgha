@@ -354,7 +354,7 @@ export const TAMGALAR = [
   },
   {
     id: 'sh',
-    tamga: '\u{10C3E}',
+    tamga: '\u{10C41}',
     ses: 'Ş',
     fonetik: 'ş',
     kategori: 'ünsüz',

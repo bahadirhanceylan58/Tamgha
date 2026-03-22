@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { TAMGALAR, MITOLOJI, HAYVANLAR, BOLGELER, YADA_TASI } from '../data/tamgalar';
 import { useAudio } from '../hooks/useAudio';
@@ -230,17 +230,7 @@ function getBoardDims(layout) {
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-// Latin harfler: 15. bÃ¶lÃ¼mden sonra her 5 bÃ¶lÃ¼mde +5 harf
-function latinHarfSayisi(bolum) {
-  if (bolum < 15) return 0;
-  const adim = Math.floor((bolum - 15) / 5) + 1;
-  return Math.min(TAMGALAR.length, adim * 5);
-}
-
-function aktifHarfIdleri(bolum) {
-  const sayi = latinHarfSayisi(bolum);
-  return new Set(TAMGALAR.slice(0, sayi).map((t) => t.id));
-}
+// Latin display kaldırıldı — tüm taşlar Göktürkçe
 
 // Mitoloji taşları için Latin kısa ad (Göktürk değil)
 const MIT_MONO = {
@@ -279,23 +269,57 @@ function createBoard(bolgeId, bolum = 1, layoutOverride = null) {
   const pairCount = Math.floor(layout.length / 2);
   const pool = shuffle(kartHavuzu(bolum));
   let selectedPool = [];
-  for (let i = 0; i < pairCount; i++) {
-    selectedPool.push(pool[i % pool.length]);
+  
+  // Kelime Avcısı için en az 3 kelimenin harflerini garantilemeye çalış
+  const hedefKelimeler = shuffle([...GK_KELIMELER]).slice(0, 3);
+  const garantiHarfler = new Set();
+  hedefKelimeler.forEach(gk => gk.harfler.forEach(h => garantiHarfler.add(h)));
+  
+  const garantiKartlar = [];
+  garantiHarfler.forEach(h => {
+    const kart = pool.find(k => k.tamga === h);
+    if (kart) garantiKartlar.push(kart);
+  });
+  
+  selectedPool.push(...garantiKartlar.slice(0, Math.max(0, pairCount - 2))); // Birkaç tanesini rastgeleliğe bırak
+  
+  // Kalan slotları rastgele doldur
+  for (const aday of pool) {
+    if (selectedPool.length >= pairCount) break;
+    if (!selectedPool.some(k => k.id === aday.id)) {
+      selectedPool.push(aday);
+    }
   }
-  const latinSet = aktifHarfIdleri(bolum);
-  const latinAcik = bolum >= 15;
   const doubled = shuffle([
     ...selectedPool.map(k => ({ ...k, displayMode: 'tamga' })),
-    ...selectedPool.map(k => ({
-      ...k,
-      displayMode: (latinAcik && k.kategori !== 'mitoloji' && k.kategori !== 'hayvan' && latinSet.has(k.id)) ? 'latin' : 'tamga'
-    }))
+    ...selectedPool.map(k => ({ ...k, displayMode: 'tamga' }))
   ]);
   const tiles = shuffle([...layout]).map((pos, i) => ({
     id: i, row: pos.r, col: pos.c, layer: pos.l,
     kart: doubled[i], removed: false, inTray: false,
     isBomb: false, bombSure: 0, isFrozen: false,
   }));
+
+  // Aynı kartların tam olarak üst üste (aynı r, c farklı l) gelmesini engelle
+  let conflict = true;
+  let attempts = 0;
+  while (conflict && attempts < 20) {
+    conflict = false;
+    for (let i = 0; i < tiles.length; i++) {
+        for (let j = i + 1; j < tiles.length; j++) {
+            const t1 = tiles[i];
+            const t2 = tiles[j];
+            if (t1.kart.id === t2.kart.id && t1.row === t2.row && t1.col === t2.col) {
+                conflict = true;
+                const rIdx = Math.floor(Math.random() * tiles.length);
+                const temp = tiles[j].kart;
+                tiles[j].kart = tiles[rIdx].kart;
+                tiles[rIdx].kart = temp;
+            }
+        }
+    }
+    attempts++;
+  }
 
   // Special tiles based on difficulty
   const frozenRate = bolum < 8 ? 0 : bolum < 15 ? 0.12 : bolum < 25 ? 0.18 : 0.22;
@@ -473,11 +497,7 @@ function MjGoktArka() {
 function display(kart) {
   const isMit = kart.kategori === 'mitoloji';
   const isHay = kart.kategori === 'hayvan';
-  if (kart.displayMode === 'latin' && !isMit && !isHay) {
-    return { isGokt: false, main: temizYazi(kart.ses).split(' ')[0], sub: temizYazi(kart.fonetik), isMit: false, isHay: false, isLatin: true, isOzel: false };
-  }
   if (!isMit && !isHay) return { isGokt: true, main: kart.tamga, sub: temizYazi(kart.ses), isMit: false, isHay: false, isLatin: false, isOzel: false };
-  // Mitoloji/hayvan: doğrudan emoji/tamga kullan, monogram üretme
   return { isGokt: false, main: kart.tamga, sub: temizYazi(kart.ses), isMit, isHay, isLatin: false, isOzel: true };
 }
 
@@ -535,7 +555,7 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
     ? (d.isGokt ? 'mj-tepsi-gokt' : 'mj-tepsi-ana')
     : buyuk
       ? (d.isGokt ? 'cp-tamga' : 'cp-ozel')
-      : (d.isGokt ? 'mj-ana mj-ana-gokt' : (d.isLatin ? 'mj-ana mj-ana-latin' : 'mj-ana mj-ana-ozel'));
+      : (d.isGokt ? 'mj-ana mj-ana-gokt' : 'mj-ana mj-ana-ozel');
   if (!tepsi && !buyuk && kart.gorsel) {
     return (
       <>
@@ -583,12 +603,50 @@ export default function EslestirmeScreen() {
   const bonusRef = useRef(false);
   const blocked = useRef(false);
 
-  // Gizli kelimeler
-  const gizliKelimeler = useMemo(() => shuffle([...GK_KELIMELER]).slice(0, 3), []);
+  // Combo sistemi
+  const [combo, setCombo] = useState(0);
+  const [comboMesaj, setComboMesaj] = useState(null);
+  const sonEslesmeRef = useRef(0);
+  const COMBO_SURESI = 4000; // ms — combo süresi
+  function comboÇarpan(c) { return c <= 1 ? 1 : c <= 2 ? 2 : c <= 4 ? 3 : 5; }
+
+  // Gizli kelimeler (sadece tahtada bulunan harflerden oluşanları seç)
+  const gizliKelimeler = useMemo(() => {
+    const boardLetters = new Set();
+    tiles.forEach(t => { if (t.kart && t.kart.tamga) boardLetters.add(t.kart.tamga); });
+    const yapilabilirler = GK_KELIMELER.filter(gk => gk.harfler.every(h => boardLetters.has(h)));
+    return shuffle(yapilabilirler).slice(0, 3);
+  }, []); // Sadece bölüm başında 1 kere çalışır
   const [acikHarfler, setAcikHarfler] = useState(new Set());
   const kelimeAvciRef = useRef(false);
   const [kelimeAvciGoster, setKelimeAvciGoster] = useState(false);
   const bombPatladiRef = useRef(0);
+
+  // Liderlik Tablosu için skor kaydetme stateleri
+  const [isimGiris, setIsimGiris] = useState(state.kullaniciAdi || '');
+  const [skorKaydedildi, setSkorKaydedildi] = useState(false);
+  const [skorKaydediliyor, setSkorKaydediliyor] = useState(false);
+
+  async function skoruKaydet(finalSkor) {
+    if (!isimGiris.trim() || skorKaydedildi) return;
+    setSkorKaydediliyor(true);
+    try {
+      const { db } = await import('../firebase');
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+      await addDoc(collection(db, 'liderlik'), {
+        isim: isimGiris.trim(),
+        puan: finalSkor,
+        seviye: ozelSeviye ? (aktifSeviye + 1) : startBolum,
+        tarih: serverTimestamp()
+      });
+      setSkorKaydedildi(true);
+    } catch (e) {
+      console.error("Skor kaydedilemedi", e);
+      alert("Skor kaydedilemedi. Firebase ayarlarınızı kontrol edin.");
+    } finally {
+      setSkorKaydediliyor(false);
+    }
+  }
 
   useEffect(() => {
     unlockAudio();
@@ -607,9 +665,15 @@ export default function EslestirmeScreen() {
 
   useEffect(() => {
     if (bitti) return;
-    if (sure <= 0) { setBitti(true); return; }
-    const t = setTimeout(() => {
-      setSure(s => s - 1);
+    const interval = setInterval(() => {
+      setSure(s => {
+        if (s <= 1) {
+          clearInterval(interval);
+          setTimeout(() => setBitti(true), 0);
+          return 0;
+        }
+        return s - 1;
+      });
       setTiles(prev => {
         let count = 0;
         const next = prev.map(tile => {
@@ -625,19 +689,25 @@ export default function EslestirmeScreen() {
         const count = bombPatladiRef.current;
         if (count > 0) {
           bombPatladiRef.current = 0;
-          setBozkurtCan(c => Math.max(0, c - count));
+          setBozkurtCan(c => {
+            const yeniCan = Math.max(0, c - count);
+            if (yeniCan <= 0) {
+              setTimeout(() => { showMsg('💣 Bomba! Oyun bitti.', 1200); setBitti(true); }, 100);
+            }
+            return yeniCan;
+          });
           showMsg(`💣 PATLADI! -${count} Can`, 1500);
         }
       }, 0);
     }, 1000);
-    return () => clearTimeout(t);
-  }, [sure, bitti]);
+    return () => clearInterval(interval);
+  }, [bitti]);
 
   // Kazanma kontrolÃ¼
   useEffect(() => {
     if (bitti) return;
     const onTahtaCount = tiles.filter(t => !t.removed && !t.inTray).length;
-    if (onTahtaCount === 0 && tiles.every(t => t.removed)) {
+    if (onTahtaCount === 0 && tepsi.length === 0 && tiles.every(t => t.removed)) {
       setBitti(true);
       const finalSkor = skor + sure * 5;
       dispatch({
@@ -648,12 +718,12 @@ export default function EslestirmeScreen() {
         kazandi: true
       });
     }
-  }, [tiles, bitti]);
+  }, [tiles, bitti, tepsi]);
 
   // Kilit tamga: null iken sonraki aktivasyonu planla
   useEffect(() => {
     if (bitti || bonusTamga !== null) return;
-    const delay = bonusRef.current ? (12000 + Math.random() * 6000) : 9000;
+    const delay = bonusRef.current ? (25000 + Math.random() * 10000) : 20000;
     const t = setTimeout(() => {
       bonusRef.current = true;
       const freeTiles = tiles.filter(tile => !tile.removed && !tile.inTray && isFree(tile, tiles));
@@ -664,21 +734,24 @@ export default function EslestirmeScreen() {
     return () => clearTimeout(t);
   }, [bitti, bonusTamga]);
 
-  // Kilit tamga: 4s sonra kaybolur, ceza -8 saniye
+  // Kilit tamga: 6s sonra kaybolur, ceza -5 saniye
   useEffect(() => {
     if (!bonusTamga) return;
     const t = setTimeout(() => {
       setBonusTamga(null);
-      setSure(s => Math.max(0, s - 8));
-      showMsg('💀 KİLİT KAÇTI! -8 SANİYE', 1600);
-    }, 4000);
+      setSure(s => Math.max(0, s - 5));
+      showMsg('💀 KİLİT KAÇTI! -5 SANİYE', 1600);
+    }, 6000);
     return () => clearTimeout(t);
   }, [bonusTamga]);
 
   // Kelime avcısı: tüm gizli kelimeler açılınca bonus
   useEffect(() => {
-    if (kelimeAvciRef.current || bitti || acikHarfler.size === 0) return;
-    if (gizliKelimeler.every(k => k.harfler.every(h => acikHarfler.has(h)))) {
+    if (kelimeAvciRef.current || bitti || acikHarfler.size === 0 || gizliKelimeler.length === 0) return;
+    const tumuBulundu = gizliKelimeler.every(gk =>
+      gk.harfler.every(harf => acikHarfler.has(harf))
+    );
+    if (tumuBulundu) {
       kelimeAvciRef.current = true;
       setKelimeAvciGoster(true);
       setSkor(s => s + 300);
@@ -810,7 +883,6 @@ export default function EslestirmeScreen() {
     if (tepsi.find(t => t.tileId === tileId)) return;
 
     playTas();
-    playClick();
     setHamle(m => m + 1);
 
     const yeniEleman = { id: Date.now() + Math.random(), kart: tile.kart, tileId, eslesti: false };
@@ -832,16 +904,41 @@ export default function EslestirmeScreen() {
 
       const isMit = tile.kart.kategori === 'mitoloji';
       const isHay = tile.kart.kategori === 'hayvan';
-      const isCombo = ['t_back', 'oe_ue', 'r_back', 'k_back'].includes(tile.kart.id) || isMit || isHay;
+      const isOzelTas = ['t_back', 'oe_ue', 'r_back', 'k_back'].includes(tile.kart.id) || isMit || isHay;
+
+      // Combo hesapla
+      const simdi = Date.now();
+      const comboDahil = (simdi - sonEslesmeRef.current) < COMBO_SURESI;
+      sonEslesmeRef.current = simdi;
+      const yeniCombo = comboDahil ? combo + 1 : 1;
+      setCombo(yeniCombo);
+      const carpan = comboÇarpan(yeniCombo);
+
       const tabanPuan = 100 + Math.floor(sure / 5);
-      const puan = isCombo ? tabanPuan * 3 : tabanPuan;
-      if (isCombo) {
+      const ozelCarpan = isOzelTas ? 3 : 1;
+      const puan = tabanPuan * ozelCarpan * carpan;
+
+      if (isOzelTas) {
         playCombo();
         if (isMit) showMsg(SAMAN_SOZLERI[tile.kart.id] || '🔥 ŞAMAN ESLEŞMESİ!', 2000);
         else if (isHay) showMsg(`🐺 ${temizYazi(tile.kart.ses).toUpperCase()} RUHU! Güç aktif!`, 1800);
-        else showMsg('MUKEMMEL ESLEME!');
+        else showMsg('MÜKEMMEL EŞLEŞME!');
       } else { playMatch(); }
+
+      // Combo mesajı
+      if (yeniCombo >= 2) {
+        const comboIsim = yeniCombo >= 5 ? '🐺 BOZKURT COMBO!' : yeniCombo >= 3 ? '🔥 SÜPER COMBO!' : '⚡ COMBO!';
+        setComboMesaj(`${comboIsim} ${carpan}x`);
+        setTimeout(() => setComboMesaj(null), 1200);
+      }
+
       setSkor(s => s + puan);
+
+      // Günlük görev ilerlemesi
+      dispatch({ type: 'GUNLUK_GOREV_ILERLE', gorevTip: 'eslestirme', miktar: 1 });
+      if (isMit) dispatch({ type: 'GUNLUK_GOREV_ILERLE', gorevTip: 'mitoloji', miktar: 1 });
+      if (isHay) dispatch({ type: 'GUNLUK_GOREV_ILERLE', gorevTip: 'hayvan', miktar: 1 });
+      if (yeniCombo >= 2) dispatch({ type: 'GUNLUK_GOREV_ILERLE', gorevTip: 'combo', miktar: 1 });
 
       // Kelime avcısı — eşleşen tamgayı kaydet
       const matchedTamga = tile.kart.tamga;
@@ -853,12 +950,13 @@ export default function EslestirmeScreen() {
       setTepsi(yeniTepsi.map((t) =>
         t.tileId === a.tileId || t.tileId === b.tileId ? { ...t, eslesti: true } : t
       ));
-      setCarpisma({ kart1: a.kart, kart2: b.kart, isCombo });
+      setCarpisma({ kart1: a.kart, kart2: b.kart, isCombo: yeniCombo >= 2 });
 
       // Capture positions before setTimeout for frozen unfreeze logic
       const tileAPoz = tiles.find(t => t.id === a.tileId);
       const tileBPoz = tile;
 
+      const carpismaSure = (isMit || isHay) ? 1700 : 1300;
       setTimeout(() => {
         setCarpisma(null);
         setTiles(prev => {
@@ -879,11 +977,11 @@ export default function EslestirmeScreen() {
         setTepsi(prev => prev.filter(t => t.tileId !== a.tileId && t.tileId !== b.tileId));
         blocked.current = false;
         applyPower(tile.kart);
-      }, ESLESTI_MS);
+      }, carpismaSure);
     } else {
       setTepsi(yeniTepsi);
       if (yeniTepsi.length >= MAX_TEPSI) {
-        if (bozkurtCan > 1) {
+        if (bozkurtCan > 0) {
           setBozkurtCan(c => c - 1);
           showMsg('🐺 Bozkurt korudu! Can azaldı.', 1800);
           blocked.current = true;
@@ -894,7 +992,7 @@ export default function EslestirmeScreen() {
             blocked.current = false;
           }, 1800);
         } else {
-          showMsg('🐺 Son can! Oyun bitti.', 1000);
+          showMsg('🐺 Can kalmadı! Oyun bitti.', 1000);
           setTimeout(() => setBitti(true), 1200);
         }
       }
@@ -903,7 +1001,7 @@ export default function EslestirmeScreen() {
 
   function geriAl() {
     if (tepsi.length === 0 || blocked.current || carpisma) return;
-    if (bozkurtCan <= 1) { showMsg('🐺 Son can! Geri alamazsın.', 1200); return; }
+    if (bozkurtCan <= 0) { showMsg('🐺 Can kalmadı! Geri alamazsın.', 1200); return; }
     setBozkurtCan(c => c - 1);
     const last = tepsi[tepsi.length - 1];
     setTiles(prev => prev.map(t => t.id === last.tileId ? { ...t, inTray: false } : t));
@@ -952,6 +1050,34 @@ export default function EslestirmeScreen() {
             <div className="mj-stat"><span className="mj-stat-sayi">{hamle}</span><span className="mj-stat-etiket">hamle</span></div>
             <div className="mj-stat"><span className="mj-stat-sayi">{sure}s</span><span className="mj-stat-etiket">kalan</span></div>
           </div>
+
+          {/* Liderlik Tablosuna Kaydet Modal Bölümü */}
+          {finalSkor > 0 && kazandi && !ozelSeviye && (
+             <div className="liderlik-kayit-alani" style={{ background: 'rgba(0,0,0,0.5)', padding: '15px', borderRadius: '10px', marginTop: '15px', marginBottom: '15px' }}>
+               {skorKaydedildi ? (
+                 <div style={{ color: '#4a9e6a', fontWeight: 'bold' }}>✓ Skor Liderlik Tablosuna Eklendi!</div>
+               ) : (
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                   <p style={{ margin: 0, fontSize: '0.9rem', color: '#ffd700' }}>Adını Tarihe Yazdır!</p>
+                   <input 
+                     type="text" 
+                     placeholder="İsmin veya Unvanın" 
+                     value={isimGiris} 
+                     onChange={(e) => setIsimGiris(e.target.value)} 
+                     style={{ padding: '10px', borderRadius: '5px', border: '1px solid #c8820a', background: 'rgba(0,0,0,0.8)', color: '#fff' }}
+                   />
+                   <button 
+                     className="btn btn-altin" 
+                     onClick={() => skoruKaydet(finalSkor)}
+                     disabled={skorKaydediliyor || !isimGiris.trim()}
+                   >
+                     {skorKaydediliyor ? 'Kaydediliyor...' : 'Skoru Gönder 🏆'}
+                   </button>
+                 </div>
+               )}
+             </div>
+          )}
+
           {kazandi ? (
             ozelSeviye ? (
               <button className="btn btn-birincil" style={{ width: '100%' }} onClick={() => {
@@ -1012,6 +1138,7 @@ export default function EslestirmeScreen() {
             {ozelSeviye ? `Lv${aktifSeviye + 1}/15` : `B${bolum}/50`}
           </span>
           {skor} &#10022;
+          {combo >= 2 && <span className="mj-combo-badge">{comboÇarpan(combo)}x</span>}
         </div>
       </div>
 
@@ -1042,26 +1169,29 @@ export default function EslestirmeScreen() {
       </div>
 
       {/* Gizli Kelimeler */}
-      <div className="mj-kelime-panel">
-        {gizliKelimeler.map((kelime, ki) => (
-          <div key={ki} className="mj-kelime-grup">
-            <div className="mj-kelime-slotlar">
-              {kelime.harfler.map((harf, hi) => {
-                const acik = acikHarfler.has(harf);
-                return (
-                  <div key={hi} className={`mj-kelime-slot ${acik ? 'mj-kelime-slot-acik' : 'mj-kelime-slot-buz'}`}>
-                    <span className="mj-kelime-harf">{harf}</span>
-                  </div>
-                );
-              })}
+      {gizliKelimeler.length > 0 && (
+        <div className="mj-kelime-panel">
+          {gizliKelimeler.map((kelime, ki) => (
+            <div key={ki} className="mj-kelime-grup">
+              <div className="mj-kelime-slotlar">
+                {kelime.harfler.map((harf, hi) => {
+                  const acik = acikHarfler.has(harf);
+                  return (
+                    <div key={hi} className={`mj-kelime-slot ${acik ? 'mj-kelime-slot-acik' : 'mj-kelime-slot-buz'}`}>
+                      <span className="mj-kelime-harf">{harf}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <span className="mj-kelime-latin">{kelime.latin}</span>
             </div>
-            <span className="mj-kelime-latin">{kelime.latin}</span>
-          </div>
-        ))}
-        {kelimeAvciGoster && <span className="mj-kelime-avci">🔑</span>}
-      </div>
+          ))}
+          {kelimeAvciGoster && <span className="mj-kelime-avci">🔑</span>}
+        </div>
+      )}
 
       {efektMesaj && <div className="mj-efekt-mesaj">{efektMesaj}</div>}
+      {comboMesaj && <div className="mj-combo-efekt">{comboMesaj}</div>}
 
       {/* Carpışma sahnesi */}
       {carpisma && (() => {

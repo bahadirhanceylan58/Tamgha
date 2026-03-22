@@ -88,6 +88,11 @@ export default function ProfilScreen() {
 
   const [adDuzenle, setAdDuzenle] = useState(false);
   const [adInput, setAdInput] = useState(state.kullaniciAdi || '');
+  const [gorevModalAcik, setGorevModalAcik] = useState(false);
+
+  // Görev verileri
+  const gorevler = state.gunlukGorevler?.gorevler || [];
+  const tumToplandi = gorevler.length > 0 && gorevler.every(g => g.toplandi);
 
   const toplamKart = TAMGALAR.length + HAYVANLAR.length + MITOLOJI.length + 1; // +1 YADA
   const tamamlanma = Math.round((state.kazanilanKartlar.length / toplamKart) * 100);
@@ -185,6 +190,27 @@ export default function ProfilScreen() {
               <div className="profil-ilerleme-dolgu" style={{ width: `${tamamlanma}%` }} />
             </div>
             <span className="profil-kart-yuzde">{tamamlanma}%</span>
+          </div>
+        </div>
+
+        {/* Görevler ve Liderlik */}
+        <div className="profil-bolum">
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              className="btn btn-altin"
+              onClick={() => dispatch({ type: 'NAVIGATE', ekran: 'liderlik' })}
+              style={{ flex: 1, padding: '12px', fontSize: '1rem' }}
+            >
+              <span className="btn-simge">🏆</span> Liderlik
+            </button>
+            <button
+              className="btn btn-altin"
+              onClick={() => setGorevModalAcik(true)}
+              style={{ flex: 1, padding: '12px', fontSize: '1rem' }}
+            >
+              <span className="btn-simge">📜</span> Görevler
+              {tumToplandi && <span style={{ color: '#4a9e6a', marginLeft: '6px', fontWeight: 'bold' }}>✓</span>}
+            </button>
           </div>
         </div>
 
@@ -318,6 +344,55 @@ export default function ProfilScreen() {
           </a>
         </div>
       </div>
+
+      {/* Görevler Modal */}
+      {gorevModalAcik && (
+        <div className="modal-overlay" onClick={() => setGorevModalAcik(false)}>
+          <div className="modal-content" style={{ background: 'var(--bg)', padding: '1.5rem', width: '90%', maxWidth: '400px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid var(--sinir)', paddingBottom: '0.5rem' }}>
+              <h3 style={{ fontFamily: 'Cinzel, serif', color: 'var(--altin)', margin: 0, fontSize: '1.2rem' }}>📜 Günlük Görevler</h3>
+              <button onClick={() => setGorevModalAcik(false)} style={{ background: 'none', border: 'none', color: 'var(--metin-soluk)', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            </div>
+            
+            {gorevler.length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--metin-soluk)', margin: '2rem 0' }}>Görevler yükleniyor...</p>
+            ) : (
+              <div className="gunluk-gorev-liste">
+                {gorevler.map((gorev, idx) => {
+                  const yuzde = Math.min(100, Math.round((gorev.ilerleme / gorev.hedef) * 100));
+                  return (
+                    <div key={gorev.id} className={`gunluk-gorev-kart ${gorev.tamamlandi ? 'gunluk-kart-tamam' : ''} ${gorev.toplandi ? 'gunluk-kart-toplandi' : ''}`}>
+                      <div className="gunluk-gorev-ust">
+                        <span className="gunluk-gorev-ikon">{gorev.ikon}</span>
+                        <span className="gunluk-gorev-aciklama">{gorev.aciklama}</span>
+                        <span className="gunluk-gorev-odul">+{gorev.odul}</span>
+                      </div>
+                      <div className="gunluk-gorev-bar">
+                        <div className="gunluk-gorev-bar-ic" style={{ width: `${yuzde}%` }} />
+                      </div>
+                      <div className="gunluk-gorev-alt">
+                        <span>{gorev.ilerleme}/{gorev.hedef}</span>
+                        {gorev.tamamlandi && !gorev.toplandi && (
+                          <button className="gunluk-topla-btn" onClick={() => dispatch({ type: 'GUNLUK_GOREV_TOPLA', gorevIdx: idx })}>
+                            Topla! ✦
+                          </button>
+                        )}
+                        {gorev.toplandi && <span className="gunluk-toplandi-yazi">✓ Toplandı</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            
+            {tumToplandi && (
+              <div style={{ textAlign: 'center', marginTop: '1.2rem', color: '#4a9e6a', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                🎉 Tüm görevler tamamlandı!
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

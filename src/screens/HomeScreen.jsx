@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { TAMGALAR, HAYVANLAR, findKartById, NADIRLIK } from '../data/tamgalar';
 import { getT } from '../i18n/translations';
@@ -107,6 +107,14 @@ export default function HomeScreen() {
   // Doğum hayvanı verisi
   const dogumHayvani = state.dogumHayvaniId ? findKartById(state.dogumHayvaniId) : null;
   const dogumNadirlik = dogumHayvani ? (NADIRLIK[dogumHayvani.nadirlik] || NADIRLIK.demir) : null;
+
+  // Günlük görevleri oluştur
+  useEffect(() => {
+    dispatch({ type: 'GUNLUK_GOREV_OLUSTUR' });
+  }, []);
+
+  const gorevler = state.gunlukGorevler?.gorevler || [];
+  const tumToplandi = gorevler.length > 0 && gorevler.every(g => g.toplandi);
 
   function gunlukKartAl() {
     const kilitsiTamgalar = TAMGALAR.filter((t) => !state.kazanilanKartlar.includes(t.id));
@@ -220,6 +228,8 @@ export default function HomeScreen() {
         </div>
       </div>
 
+      {/* Günlük Görevler Paneli (Modal'a taşındı) */}
+
       {/* Butonlar */}
       <div className="home-butonlar">
         <button
@@ -230,17 +240,14 @@ export default function HomeScreen() {
           {t('oynaBtn')}
         </button>
 
-        <div className="home-ikincil-butonlar">
-          <button
-            className={`btn ${gunlukAlindi ? 'btn-kapali' : 'btn-altin'}`}
-            style={{ gridColumn: '1 / -1' }}
-            onClick={gunlukAlindi ? null : gunlukKartAl}
-            disabled={gunlukAlindi}
-          >
-            <span className="btn-simge">{'\u2605'}</span>
-            {gunlukAlindi ? t('gunlukAlindi') : t('gunlukKartBtn')}
-          </button>
-        </div>
+        <button
+          className={`btn ${gunlukAlindi ? 'btn-kapali' : 'btn-altin'}`}
+          onClick={gunlukAlindi ? null : gunlukKartAl}
+          disabled={gunlukAlindi}
+          style={{ fontSize: '1rem', width: '100%', marginBottom: '10px' }}
+        >
+          {gunlukAlindi ? t('gunlukAlindi') : t('gunlukKartBtn')}
+        </button>
 
         {/* Takvim ruhu butonu */}
         <button
@@ -291,4 +298,3 @@ export default function HomeScreen() {
     </div>
   );
 }
-

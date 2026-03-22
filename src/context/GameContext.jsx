@@ -42,6 +42,8 @@ const INITIAL_STATE = {
   seferSayaci: 0,
   // Günlük haklar (karıştır vb.)
   gunlukHaklar: { tarih: null, karistirKalan: 3 },
+  // Günlük görevler
+  gunlukGorevler: { tarih: null, gorevler: [], toplamOdul: 0 },
 };
 
 function yukleKayit() {
@@ -67,7 +69,7 @@ function yukleKayit() {
           bolgeIlerlemesi[k] = { ...bolgeIlerlemesi[k], yildizlar: [...y, ...Array(15 - y.length).fill(0)] };
         }
       }
-      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false }, eslestirmeBolum: parsed.eslestirmeBolum ?? 1, gunlukHaklar: parsed.gunlukHaklar ?? { tarih: null, karistirKalan: 3 } };
+      return { ...INITIAL_STATE, ...parsed, bolgeIlerlemesi, ekran: 'home', yeniKazanilanKartlar: [], aktifGuc: null, dogumYili: parsed.dogumYili ?? null, dogumHayvaniId: parsed.dogumHayvaniId ?? null, kullaniciAdi: parsed.kullaniciAdi ?? '', avatar: parsed.avatar ?? '\u{10C00}', dil: parsed.dil ?? 'tr', sefer: { aktif: false, bolgeId: null, seviye: null, guc: null, asama: 0, ozelSeviye: false }, eslestirmeBolum: parsed.eslestirmeBolum ?? 1, gunlukHaklar: parsed.gunlukHaklar ?? { tarih: null, karistirKalan: 3 }, gunlukGorevler: parsed.gunlukGorevler ?? { tarih: null, gorevler: [], toplamOdul: 0 } };
     }
   } catch (e) {
     // ignore
@@ -285,6 +287,68 @@ function reducer(state, action) {
         },
       };
 
+    case 'GUNLUK_GOREV_OLUSTUR': {
+      const bugun = new Date().toDateString();
+      if (state.gunlukGorevler?.tarih === bugun) return state;
+      const havuz = [
+        { id: 'e10', tip: 'eslestirme', hedef: 10, odul: 200, ikon: '✨', aciklama: '10 taş eşleştir' },
+        { id: 'e20', tip: 'eslestirme', hedef: 20, odul: 400, ikon: '✨', aciklama: '20 taş eşleştir' },
+        { id: 'e30', tip: 'eslestirme', hedef: 30, odul: 600, ikon: '✨', aciklama: '30 taş eşleştir' },
+        { id: 'c3', tip: 'combo', hedef: 3, odul: 300, ikon: '🔥', aciklama: '3 combo yap' },
+        { id: 'c5', tip: 'combo', hedef: 5, odul: 500, ikon: '🔥', aciklama: '5 combo yap' },
+        { id: 'm2', tip: 'mitoloji', hedef: 2, odul: 500, ikon: '⚡', aciklama: '2 mitoloji taşı eşleştir' },
+        { id: 'm4', tip: 'mitoloji', hedef: 4, odul: 1000, ikon: '⚡', aciklama: '4 mitoloji taşı eşleştir' },
+        { id: 'h2', tip: 'hayvan', hedef: 2, odul: 500, ikon: '🐺', aciklama: '2 hayvan taşı eşleştir' },
+        { id: 'h4', tip: 'hayvan', hedef: 4, odul: 1000, ikon: '🐺', aciklama: '4 hayvan taşı eşleştir' },
+        { id: 's1', tip: 'seviye', hedef: 1, odul: 300, ikon: '⭐', aciklama: '1 seviye tamamla' },
+        { id: 's3', tip: 'seviye', hedef: 3, odul: 800, ikon: '⭐', aciklama: '3 seviye tamamla' },
+        { id: 'b1', tip: 'bomba', hedef: 1, odul: 200, ikon: '💣', aciklama: '1 bomba imha et' },
+      ];
+      const karisik = [...havuz].sort(() => Math.random() - 0.5);
+      // Farklı tiplerden seç — 3 görev
+      const secilen = [];
+      const secilenTipler = new Set();
+      for (const g of karisik) {
+        if (secilen.length >= 3) break;
+        if (secilenTipler.has(g.tip)) continue;
+        secilenTipler.add(g.tip);
+        secilen.push({ ...g, ilerleme: 0, tamamlandi: false, toplandi: false });
+      }
+      return { ...state, gunlukGorevler: { tarih: bugun, gorevler: secilen, toplamOdul: 0 } };
+    }
+
+    case 'GUNLUK_GOREV_ILERLE': {
+      if (!state.gunlukGorevler?.gorevler?.length) return state;
+      const { gorevTip, miktar = 1 } = action;
+      const yeniGorevler = state.gunlukGorevler.gorevler.map(g => {
+        if (g.tip !== gorevTip || g.tamamlandi) return g;
+        const yeniIlerleme = Math.min(g.hedef, g.ilerleme + miktar);
+        return { ...g, ilerleme: yeniIlerleme, tamamlandi: yeniIlerleme >= g.hedef };
+      });
+      return { ...state, gunlukGorevler: { ...state.gunlukGorevler, gorevler: yeniGorevler } };
+    }
+
+    case 'GUNLUK_GOREV_TOPLA': {
+      if (!state.gunlukGorevler?.gorevler?.length) return state;
+      const gorevIdx = action.gorevIdx;
+      const gorev = state.gunlukGorevler.gorevler[gorevIdx];
+      if (!gorev || !gorev.tamamlandi || gorev.toplandi) return state;
+      const yeniGorevler = [...state.gunlukGorevler.gorevler];
+      yeniGorevler[gorevIdx] = { ...gorev, toplandi: true };
+      return {
+        ...state,
+        toplamPuan: state.toplamPuan + gorev.odul,
+        gunlukGorevler: {
+          ...state.gunlukGorevler,
+          gorevler: yeniGorevler,
+          toplamOdul: (state.gunlukGorevler.toplamOdul || 0) + gorev.odul
+        }
+      };
+    }
+
+    case 'GUNLUK_GOREV_SEVIYE':
+      return state; // GUNLUK_GOREV_ILERLE zaten seviye tipini destekliyor
+
     default:
       return state;
   }
@@ -306,9 +370,10 @@ export function GameProvider({ children }) {
       dil: state.dil,
       eslestirmeBolum: state.eslestirmeBolum,
       gunlukHaklar: state.gunlukHaklar,
+      gunlukGorevler: state.gunlukGorevler,
     };
     localStorage.setItem('tamgha_kayit', JSON.stringify(kayit));
-  }, [state.kazanilanKartlar, state.bolgeIlerlemesi, state.toplamPuan, state.gunlukKartTalep, state.dogumYili, state.dogumHayvaniId, state.kullaniciAdi, state.avatar, state.dil, state.eslestirmeBolum, state.gunlukHaklar]);
+  }, [state.kazanilanKartlar, state.bolgeIlerlemesi, state.toplamPuan, state.gunlukKartTalep, state.dogumYili, state.dogumHayvaniId, state.kullaniciAdi, state.avatar, state.dil, state.eslestirmeBolum, state.gunlukHaklar, state.gunlukGorevler]);
 
   return <GameContext.Provider value={{ state, dispatch }}>{children}</GameContext.Provider>;
 }

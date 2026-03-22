@@ -21,6 +21,26 @@ const NASIL_OYNANIR = [
     aciklama: 'Taş tahtasında serbest taşlara dokun — tepside biriken taşlardan çift bul, eşleştir ve tahtayı temizle.',
   },
   {
+    ikon: '⚡',
+    baslik: 'Bozkurt Combo',
+    aciklama: 'Arka arkaya hızlı eşleştirmeler yap (4 saniye içinde) ve x2, x3, x5 puan çarpanı kazan!',
+  },
+  {
+    ikon: '🔑',
+    baslik: 'Kelime Avcısı',
+    aciklama: 'Eşleştirme yaparken alt kısımdaki gizli Göktürkçe kelimelerin (KUT, SU vb.) harflerini açarak bonus altın kazan.',
+  },
+  {
+    ikon: '📜',
+    baslik: 'Günlük Görevler',
+    aciklama: 'Ana menüdeki görevler penceresini aç. Her gün verilen 3 özel mücadeleyi (Combo yap, mitoloji taşı bul vb.) tamamla ve ödülleri topla.',
+  },
+  {
+    ikon: '🔮',
+    baslik: 'İsim Çarkı',
+    aciklama: 'Ana menüden İsim Çarkı\'na girerek yüzlerce otantik Göktürk ismini keşfet ve anlamlarını öğren.',
+  },
+  {
     ikon: '📝',
     baslik: 'Quiz Çöz',
     aciklama: 'Tamga sesini duyunca doğru Göktürk harfini seç. 5 soruda 3 yıldız kazan.',
@@ -28,17 +48,12 @@ const NASIL_OYNANIR = [
   {
     ikon: '🃏',
     baslik: 'Kart Topla',
-    aciklama: 'Her oyunda kart kazanırsın. Hayvan Ruhu ve Mitoloji kartları sana güçler verir.',
+    aciklama: 'Her oyunda kart kazanırsın. Hayvan Ruhu ve Mitoloji kartları sana özel güçler verir.',
   },
   {
     ikon: '⚔',
     baslik: 'Ruh Arenası',
     aciklama: 'Hayvan ve Mitoloji ruhlarını güçleriyle eşleştir. 90 saniyede maksimum combo yap.',
-  },
-  {
-    ikon: '⭐',
-    baslik: 'Yıldız Kazan',
-    aciklama: 'Seviyeden yıldız kazandıkça yeni bölgeler açılır. 3 yıldız = tam puan!',
   },
 ];
 
