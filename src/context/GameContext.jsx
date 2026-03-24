@@ -152,7 +152,8 @@ function reducer(state, action) {
       const yeniYildizlar = [...oncekiYildizlar];
 
       if (seviye >= 0 && seviye < yeniYildizlar.length) {
-        const yildiz = action.kazandi ? 3 : 0;
+        // kazandi=false ama yildiz verilmişse (örn. ozelSeviye kaybı → 1 yıldız) onu kullan
+        const yildiz = action.yildiz != null ? action.yildiz : (action.kazandi ? 1 : 0);
         yeniYildizlar[seviye] = Math.max(yeniYildizlar[seviye], yildiz);
       }
 

@@ -244,6 +244,112 @@ const MIT_MONO = {
   yada_tasi:   'YDA',
 };
 
+// Hayvan taşları için Latin kısaltma — tepsi küçük gösterim
+const HAY_ABV = {
+  hay_sican:'SIC', hay_ud:'UD', hay_bars:'BAR', hay_tavissgan:'TAV',
+  hay_lu:'LU', hay_yilan:'YIL', hay_yund:'YND', hay_koy:'KOY',
+  hay_bicin:'BIC', hay_takagu:'TAK', hay_it:'IT', hay_tonguz:'TON',
+};
+
+// Hayvan ikonik damgaları — her hayvanın en belirgin özelliği abartılmış
+const HAY_ICON = {
+  hay_sican: (   // Fare: büyük yuvarlak kulak + oval gövde + uzun kıvrık kuyruk
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <ellipse cx="16" cy="20" rx="10" ry="6.5"/>
+      <circle cx="7" cy="10" r="6.5"/>
+      <path d="M26 19 C28 13 29 7 26 3 C25 1 22 2 23 5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  ),
+  hay_ud: (      // Öküz: geniş lir şeklinde U-boynuzlar
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <ellipse cx="14" cy="23" rx="8.5" ry="5"/>
+      <path d="M7 20 Q1 10 4.5 2.5 Q7 0 9.5 5.5 Q11 11 10.5 19Z"/>
+      <path d="M21 20 Q27 10 23.5 2.5 Q21 0 18.5 5.5 Q17 11 17.5 19Z"/>
+    </svg>
+  ),
+  hay_bars: (    // Pars: oval gövde + üçgen kulaklar + belirgin çizgiler
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <ellipse cx="14" cy="18" rx="12" ry="9"/>
+      <polygon points="5,12 9,2 14,12"/>
+      <polygon points="14,12 19,2 23,12"/>
+      <rect x="9" y="13" width="3" height="10" rx="1.5" fill="#000" opacity="0.38"/>
+      <rect x="15" y="12" width="3" height="11" rx="1.5" fill="#000" opacity="0.38"/>
+    </svg>
+  ),
+  hay_tavissgan: ( // Tavışgan: çok uzun iki kulak (gövdenin 3 katı)
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <ellipse cx="14" cy="24" rx="8" ry="4.5"/>
+      <ellipse cx="10" cy="10" rx="3.5" ry="10.5"/>
+      <ellipse cx="18" cy="10" rx="3.5" ry="10.5"/>
+    </svg>
+  ),
+  hay_lu: (      // Lu (ejder): kalın S-gövde + belirgin başlık + boynuzlar
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 27 C5 21 10 19 13 15 C16 11 15 7 11 6 C8 5 7 8 10 11 C13 14 18 12 18 8 C18 5 16 2 19 1" strokeWidth="5.5"/>
+      <polygon points="19,0 15,5 23,5" fill="currentColor" stroke="none"/>
+      <polygon points="24,3 22,7 27,6" fill="currentColor" stroke="none"/>
+    </svg>
+  ),
+  hay_yilan: (   // Yılan: sıkı spiral halka + çatal dil
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeLinecap="round">
+      <path d="M14 25 C7 24 4 18 6 12 C8 7 13 5 17 9 C20 12 18 17 14 18 C10 20 7 16 9 12 C10 9 13 8 15 10" strokeWidth="4.5"/>
+      <path d="M15 10 L12 6" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M15 10 L18 6" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  ),
+  hay_yund: (    // Yund (at): baş profili + kabarık yele
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <path d="M4 26 Q4 18 9 14 Q15 10 21 13 Q26 16 25 22 Q24 26 18 27 Q10 28 4 26Z"/>
+      <path d="M9 14 Q9 7 12 5 Q14 3 14 8 Q13 11 11 14Z"/>
+      <path d="M13 13 Q14 6 17 4 Q19 2 18 8 Q17 11 15 13Z"/>
+      <path d="M17 12 Q19 7 22 5 Q24 3 22 9 Q21 11 19 12Z"/>
+    </svg>
+  ),
+  hay_koy: (     // Koyun: büyük kıvrık koç boynuzları belirgin
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <circle cx="14" cy="20" r="6.5"/>
+      <circle cx="9" cy="17" r="4.5"/>
+      <circle cx="19" cy="17" r="4.5"/>
+      <circle cx="14" cy="13" r="3.5"/>
+      <path d="M10 11 Q5 7 6 3 Q8 0 11 5 Q12 8 11 11Z"/>
+      <path d="M18 11 Q23 7 22 3 Q20 0 17 5 Q16 8 17 11Z"/>
+    </svg>
+  ),
+  hay_bicin: (   // Biçin (maymun): büyük yuvarlak kulaklar + yüz
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <circle cx="14" cy="16" r="9"/>
+      <circle cx="4" cy="13.5" r="5.5"/>
+      <circle cx="24" cy="13.5" r="5.5"/>
+      <ellipse cx="14" cy="20" rx="5.5" ry="3.5" opacity="0.5"/>
+    </svg>
+  ),
+  hay_takagu: (  // Takagu (horoz): sivri ibik + oval gövde + yelpaze kuyruk
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <ellipse cx="10" cy="20" rx="7" ry="5.5"/>
+      <circle cx="19" cy="13" r="5.5"/>
+      <path d="M14 10 L15 4 L18 9 L21 3 L23 8 L24 4 L24 11Z"/>
+      <path d="M3 18 L0 15 L3 11 L1 8 L5 11 L4 8 L7 12 L7 20Z"/>
+    </svg>
+  ),
+  hay_it: (      // İt (köpek): yuvarlak kafa + SARKAN sarkık kulaklar (kedi değil!)
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <circle cx="14" cy="13" r="9"/>
+      <ellipse cx="4.5" cy="19.5" rx="4" ry="6.5"/>
+      <ellipse cx="23.5" cy="19.5" rx="4" ry="6.5"/>
+      <ellipse cx="14" cy="17.5" rx="5.5" ry="3.5" opacity="0.4"/>
+    </svg>
+  ),
+  hay_tonguz: (  // Tonguz (domuz): öne çıkan burun + yukarı kıvrık dişler
+    <svg viewBox="0 0 28 28" fill="currentColor">
+      <ellipse cx="17" cy="19" rx="9.5" ry="7"/>
+      <ellipse cx="5.5" cy="18" rx="4.5" ry="3.5"/>
+      <path d="M2.5 15.5 Q0 9 5 7" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"/>
+      <path d="M4 19.5 Q1 18 2 14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+      <path d="M14 12 L13 6 M18 11 L18 5 M22 12 L22 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.75"/>
+    </svg>
+  ),
+};
+
 // Mitoloji taşları için benzersiz semboller
 const MIT_SEMBOL = {
   mit_tengri:  '⚡',
@@ -297,7 +403,7 @@ function createBoard(bolgeId, bolum = 1, layoutOverride = null) {
   const tiles = shuffle([...layout]).map((pos, i) => ({
     id: i, row: pos.r, col: pos.c, layer: pos.l,
     kart: doubled[i], removed: false, inTray: false,
-    isBomb: false, bombSure: 0, isFrozen: false,
+    isBomb: false, isFrozen: false,
   }));
 
   // Aynı kartların tam olarak üst üste (aynı r, c farklı l) gelmesini engelle
@@ -323,14 +429,12 @@ function createBoard(bolgeId, bolum = 1, layoutOverride = null) {
 
   // Special tiles based on difficulty
   const frozenRate = bolum < 8 ? 0 : bolum < 15 ? 0.12 : bolum < 25 ? 0.18 : 0.22;
-  const bombRate = bolum < 15 ? 0 : bolum < 25 ? 0.06 : 0.10;
   tiles.forEach(tile => {
     if (tile.kart.kategori === 'mitoloji' || tile.kart.kategori === 'hayvan') return;
-    const r = Math.random();
-    if (r < bombRate) {
-      tile.isBomb = true;
-      tile.bombSure = 8 + Math.floor(Math.random() * 7); // 8-14s
-    } else if (r < bombRate + frozenRate) {
+    // Donmuş taş sadece her iki yanında komşusu olan taşlara yerleştirilir
+    const solVar = tiles.some(t => t.layer === tile.layer && t.row === tile.row && t.col === tile.col - 1);
+    const sagVar = tiles.some(t => t.layer === tile.layer && t.row === tile.row && t.col === tile.col + 1);
+    if (Math.random() < frozenRate && solVar && sagVar) {
       tile.isFrozen = true;
     }
   });
@@ -527,13 +631,23 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
     );
   }
 
-  // Hayvan — emoji (taş oyması görünümünde)
+  // Hayvan — ikonik damga silüeti (board)
   if (d.isHay && !tepsi && !buyuk) {
     return (
       <>
-        <span className="mj-ruh-emoji mj-ruh-hay">{d.main}</span>
-        <span className="mj-ruh-isim">{d.sub}</span>
+        <span className="mj-hay-ikon">{HAY_ICON[kart.id]}</span>
+        <span className="mj-hay-isim">{d.sub}</span>
         <span className="mj-ruh-bant-hay" />
+      </>
+    );
+  }
+
+  // Hayvan buyuk (çarpışma sahnesi)
+  if (d.isHay && buyuk) {
+    return (
+      <>
+        <span className="cp-hay-ikon">{HAY_ICON[kart.id]}</span>
+        <span className="cp-ses">{d.sub}</span>
       </>
     );
   }
@@ -544,7 +658,7 @@ function TasIcerik({ kart, buyuk = false, tepsi = false }) {
       <>
         {d.isMit
           ? <span className={`mj-tepsi-mit-sembol mj-mit-${kart.id}`}>{MIT_SEMBOL[kart.id] || MIT_MONO[kart.id] || '✦'}</span>
-          : <span className="mj-tepsi-ruh-emoji">{d.main}</span>
+          : <span className="mj-tepsi-hay-abv">{HAY_ABV[kart.id] || kart.ses.slice(0, 3)}</span>
         }
         <span className="mj-tepsi-ses">{d.sub}</span>
       </>
@@ -588,7 +702,9 @@ export default function EslestirmeScreen() {
   );
   const [tiles, setTiles] = useState(() => createBoard(state.seciliBolge, bolum, ozelSeviye ? startLayout : null));
   const boardDims = getBoardDims(startLayout);
-  const [tepsi, setTepsi] = useState([]);   // [{id, kart, tileId, eslesti}]
+  const tahtaKapRef = useRef(null);
+  const [boardScale, setBoardScale] = useState(1);
+  const [tepsi, setTepsi] = useState(() => Array(MAX_TEPSI).fill(null));   // sabit slotlu: [kart|null, ...]
   const [carpisma, setCarpisma] = useState(null);
   const maxSure = ozelSeviye && state.seciliBolge
     ? getSureBolgeSeviye(state.seciliBolge, aktifSeviye)
@@ -599,9 +715,24 @@ export default function EslestirmeScreen() {
   const [bitti, setBitti] = useState(false);
   const [efektMesaj, setEfektMesaj] = useState(null);
   const [bozkurtCan, setBozkurtCan] = useState(MAX_CAN);
-  const [bonusTamga, setBonusTamga] = useState(null); // { harf, x, y }
-  const bonusRef = useRef(false);
   const blocked = useRef(false);
+
+  // Tahta scale: konteyner yüksekliğine sığacak şekilde küçült
+  useEffect(() => {
+    const el = tahtaKapRef.current;
+    if (!el) return;
+    const calc = () => {
+      const avW = el.clientWidth - 10;
+      const avH = el.clientHeight - 10;
+      const scaleH = avH > 0 ? avH / boardDims.h : 1;
+      const scaleW = avW > 0 ? avW / boardDims.w : 1;
+      setBoardScale(Math.min(1, scaleH, scaleW));
+    };
+    calc();
+    const ro = new ResizeObserver(calc);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [boardDims.h, boardDims.w]);
 
   // Combo sistemi
   const [combo, setCombo] = useState(0);
@@ -620,7 +751,6 @@ export default function EslestirmeScreen() {
   const [acikHarfler, setAcikHarfler] = useState(new Set());
   const kelimeAvciRef = useRef(false);
   const [kelimeAvciGoster, setKelimeAvciGoster] = useState(false);
-  const bombPatladiRef = useRef(0);
 
   // Liderlik Tablosu için skor kaydetme stateleri
   const [isimGiris, setIsimGiris] = useState(state.kullaniciAdi || '');
@@ -630,6 +760,11 @@ export default function EslestirmeScreen() {
   async function skoruKaydet(finalSkor) {
     if (!isimGiris.trim() || skorKaydedildi) return;
     setSkorKaydediliyor(true);
+    const zaman = setTimeout(() => {
+      setSkorKaydediliyor(false);
+      setSkorKaydedildi(true); // Timeout'ta da butonu kilitle (tekrar tıklanmasın)
+      alert('Bağlantı zaman aşımı. Skor kaydedilemedi.');
+    }, 6000);
     try {
       const { db } = await import('../firebase');
       const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
@@ -639,10 +774,12 @@ export default function EslestirmeScreen() {
         seviye: ozelSeviye ? (aktifSeviye + 1) : startBolum,
         tarih: serverTimestamp()
       });
+      clearTimeout(zaman);
       setSkorKaydedildi(true);
     } catch (e) {
+      clearTimeout(zaman);
       console.error("Skor kaydedilemedi", e);
-      alert("Skor kaydedilemedi. Firebase ayarlarınızı kontrol edin.");
+      alert("Skor kaydedilemedi. İnternet bağlantısını kontrol et.");
     } finally {
       setSkorKaydediliyor(false);
     }
@@ -674,76 +811,64 @@ export default function EslestirmeScreen() {
         }
         return s - 1;
       });
-      setTiles(prev => {
-        let count = 0;
-        const next = prev.map(tile => {
-          if (tile.removed || tile.inTray || !tile.isBomb || tile.bombSure <= 0) return tile;
-          const yeni = tile.bombSure - 1;
-          if (yeni <= 0) { count++; return { ...tile, removed: true, isBomb: false, bombSure: 0 }; }
-          return { ...tile, bombSure: yeni };
-        });
-        bombPatladiRef.current = count;
-        return next;
-      });
-      setTimeout(() => {
-        const count = bombPatladiRef.current;
-        if (count > 0) {
-          bombPatladiRef.current = 0;
-          setBozkurtCan(c => {
-            const yeniCan = Math.max(0, c - count);
-            if (yeniCan <= 0) {
-              setTimeout(() => { showMsg('💣 Bomba! Oyun bitti.', 1200); setBitti(true); }, 100);
-            }
-            return yeniCan;
-          });
-          showMsg(`💣 PATLADI! -${count} Can`, 1500);
-        }
-      }, 0);
     }, 1000);
     return () => clearInterval(interval);
   }, [bitti]);
 
-  // Kazanma kontrolÃ¼
+  // Kazanma kontrolü
   useEffect(() => {
     if (bitti) return;
     const onTahtaCount = tiles.filter(t => !t.removed && !t.inTray).length;
-    if (onTahtaCount === 0 && tepsi.length === 0 && tiles.every(t => t.removed)) {
+    if (onTahtaCount === 0 && tepsi.every(t => t === null) && tiles.every(t => t.removed)) {
       setBitti(true);
       const finalSkor = skor + sure * 5;
+      // Yıldız: kalan süreye göre (maxSure'un yüzdesi)
+      const surePct = sure / maxSure;
+      const yildiz = surePct >= 0.45 ? 3 : surePct >= 0.18 ? 2 : 1;
       dispatch({
         type: 'ESLESTIRME_TAMAMLA',
         bolgeId: state.seciliBolge || 'orhun',
         seviye: aktifSeviye,
         puan: finalSkor,
-        kazandi: true
+        kazandi: true,
+        yildiz,
       });
     }
   }, [tiles, bitti, tepsi]);
 
-  // Kilit tamga: null iken sonraki aktivasyonu planla
+  // Kaybetme durumunda ozelSeviye modunda 1 yıldız kaydet (bir sonraki seviye açılsın)
   useEffect(() => {
-    if (bitti || bonusTamga !== null) return;
-    const delay = bonusRef.current ? (25000 + Math.random() * 10000) : 20000;
-    const t = setTimeout(() => {
-      bonusRef.current = true;
-      const freeTiles = tiles.filter(tile => !tile.removed && !tile.inTray && isFree(tile, tiles));
-      if (freeTiles.length < 3) return;
-      const target = freeTiles[Math.floor(Math.random() * freeTiles.length)];
-      setBonusTamga({ tileId: target.id, harf: MJ_GOKT_HARFLER[Math.floor(Math.random() * MJ_GOKT_HARFLER.length)] });
-    }, delay);
-    return () => clearTimeout(t);
-  }, [bitti, bonusTamga]);
+    if (!bitti) return;
+    const kazandi = tiles.every(t => t.removed);
+    if (!kazandi && ozelSeviye) {
+      dispatch({
+        type: 'ESLESTIRME_TAMAMLA',
+        bolgeId: state.seciliBolge || 'orhun',
+        seviye: aktifSeviye,
+        puan: 0,
+        kazandi: false,
+        yildiz: 1,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bitti]);
 
-  // Kilit tamga: 6s sonra kaybolur, ceza -5 saniye
+  // Güvenlik ağı: orphan taş kalmışsa (güç hatası vb.) sessizce temizle
   useEffect(() => {
-    if (!bonusTamga) return;
-    const t = setTimeout(() => {
-      setBonusTamga(null);
-      setSure(s => Math.max(0, s - 5));
-      showMsg('💀 KİLİT KAÇTI! -5 SANİYE', 1600);
-    }, 6000);
-    return () => clearTimeout(t);
-  }, [bonusTamga]);
+    if (bitti || blocked.current) return;
+    const alive = tiles.filter(t => !t.removed);
+    if (alive.length === 0) return;
+    const sayac = {};
+    alive.forEach(t => { sayac[t.kart.tamga] = (sayac[t.kart.tamga] || 0) + 1; });
+    const orphanlar = alive.filter(t => sayac[t.kart.tamga] === 1);
+    if (orphanlar.length > 0 && orphanlar.length === alive.length) {
+      // Tüm kalan taşlar orphan — sessizce sil
+      const orphanIds = new Set(orphanlar.map(t => t.id));
+      setTiles(prev => prev.map(t => orphanIds.has(t.id) ? { ...t, removed: true, inTray: false } : t));
+      setTepsi(Array(MAX_TEPSI).fill(null));
+    }
+  }, [tiles, bitti]);
+
 
   // Kelime avcısı: tüm gizli kelimeler açılınca bonus
   useEffect(() => {
@@ -759,13 +884,6 @@ export default function EslestirmeScreen() {
       showMsg('🔑 KELİME AVCISI! +300 +15s', 2500);
     }
   }, [acikHarfler, bitti]);
-
-  function handleBonusTamga() {
-    if (!bonusTamga) return;
-    setBonusTamga(null);
-    setSkor(s => s + 150);
-    showMsg('🔓 KİLİT KIRDI! +150', 1200);
-  }
 
   function showMsg(msg, dur = 1500) {
     setEfektMesaj(msg);
@@ -783,7 +901,7 @@ export default function EslestirmeScreen() {
         blocked.current = true;
         setTimeout(() => {
           setTiles(prev => prev.map(t => ({ ...t, inTray: false })));
-          setTepsi([]);
+          setTepsi(Array(MAX_TEPSI).fill(null));
           blocked.current = false;
         }, 600);
         break;
@@ -842,7 +960,7 @@ export default function EslestirmeScreen() {
         blocked.current = true;
         setTimeout(() => {
           setTiles(prev => prev.map(t => ({ ...t, inTray: false })));
-          setTepsi([]);
+          setTepsi(Array(MAX_TEPSI).fill(null));
           blocked.current = false;
         }, 400);
         break;
@@ -854,7 +972,12 @@ export default function EslestirmeScreen() {
           const serbest = prev.filter(t => !t.removed && !t.inTray && isFree(t, prev));
           if (!serbest.length) return prev;
           const hedef = serbest[Math.floor(Math.random() * serbest.length)];
-          return prev.map(t => t.id === hedef.id ? { ...t, removed: true } : t);
+          // Hedef taşı ve çiftini birlikte sil (orphan oluşmasın)
+          return prev.map(t => {
+            if (t.id === hedef.id) return { ...t, removed: true };
+            if (!t.removed && t.kart.tamga === hedef.kart.tamga) return { ...t, removed: true };
+            return t;
+          });
         });
         break;
       case 'bonus_kart':
@@ -880,26 +1003,31 @@ export default function EslestirmeScreen() {
     const tile = tiles.find(t => t.id === tileId);
     if (!tile || tile.removed || tile.inTray || !isFree(tile, tiles)) return;
     if (tile.isFrozen) { showMsg('❄️ Yanındaki taşı eşleştir!', 1200); return; }
-    if (tepsi.find(t => t.tileId === tileId)) return;
+    if (tepsi.find(t => t?.tileId === tileId)) return;
 
     playTas();
     setHamle(m => m + 1);
 
     const yeniEleman = { id: Date.now() + Math.random(), kart: tile.kart, tileId, eslesti: false };
-    const yeniTepsi = [...tepsi, yeniEleman];
+    // Sabit slot: ilk boş slota yerleştir
+    const emptySlotIdx = tepsi.findIndex(t => t === null);
+    if (emptySlotIdx === -1) return;
+    const yeniTepsi = [...tepsi];
+    yeniTepsi[emptySlotIdx] = yeniEleman;
     setTiles(prev => prev.map(t => t.id === tileId ? { ...t, inTray: true } : t));
 
-    // Tepside çift ara (yeni eklenenle eÅŸleÅŸen)
+    // Tepside çift ara (yeni eklenenle eşleşen)
     let pairIdx = -1;
-    for (let i = 0; i < yeniTepsi.length - 1; i++) {
-      if (yeniTepsi[i].kart.tamga === yeniTepsi[yeniTepsi.length - 1].kart.tamga) {
+    for (let i = 0; i < MAX_TEPSI; i++) {
+      if (i === emptySlotIdx || !yeniTepsi[i]) continue;
+      if (yeniTepsi[i].kart.tamga === yeniEleman.kart.tamga) {
         pairIdx = i; break;
       }
     }
 
     if (pairIdx >= 0) {
       const a = yeniTepsi[pairIdx];
-      const b = yeniTepsi[yeniTepsi.length - 1];
+      const b = yeniEleman;
       blocked.current = true;
 
       const isMit = tile.kart.kategori === 'mitoloji';
@@ -927,7 +1055,7 @@ export default function EslestirmeScreen() {
 
       // Combo mesajı
       if (yeniCombo >= 2) {
-        const comboIsim = yeniCombo >= 5 ? '🐺 BOZKURT COMBO!' : yeniCombo >= 3 ? '🔥 SÜPER COMBO!' : '⚡ COMBO!';
+        const comboIsim = 'ULU ALTAY';
         setComboMesaj(`${comboIsim} ${carpan}x`);
         setTimeout(() => setComboMesaj(null), 1200);
       }
@@ -946,9 +1074,9 @@ export default function EslestirmeScreen() {
         setAcikHarfler(prev => prev.has(matchedTamga) ? prev : new Set([...prev, matchedTamga]));
       }
 
-      // Esleseni parlat
-      setTepsi(yeniTepsi.map((t) =>
-        t.tileId === a.tileId || t.tileId === b.tileId ? { ...t, eslesti: true } : t
+      // Eşleşeni parlat (sabit slotta)
+      setTepsi(yeniTepsi.map(t =>
+        t === null ? null : (t.tileId === a.tileId || t.tileId === b.tileId ? { ...t, eslesti: true } : t)
       ));
       setCarpisma({ kart1: a.kart, kart2: b.kart, isCombo: yeniCombo >= 2 });
 
@@ -974,21 +1102,24 @@ export default function EslestirmeScreen() {
             return coz ? { ...t, isFrozen: false } : t;
           });
         });
-        setTepsi(prev => prev.filter(t => t.tileId !== a.tileId && t.tileId !== b.tileId));
+        // Eşleşen slotları null yap (diğerleri yerinde kalır)
+        setTepsi(prev => prev.map(t =>
+          t?.tileId === a.tileId || t?.tileId === b.tileId ? null : t
+        ));
         blocked.current = false;
         applyPower(tile.kart);
       }, carpismaSure);
     } else {
       setTepsi(yeniTepsi);
-      if (yeniTepsi.length >= MAX_TEPSI) {
+      if (!yeniTepsi.includes(null)) { // Tüm slotlar dolu, eşleşme yok
         if (bozkurtCan > 0) {
           setBozkurtCan(c => c - 1);
           showMsg('🐺 Bozkurt korudu! Can azaldı.', 1800);
           blocked.current = true;
-          const trayIds = yeniTepsi.map(t => t.tileId);
+          const trayIds = yeniTepsi.filter(Boolean).map(t => t.tileId);
           setTimeout(() => {
             setTiles(prev => prev.map(t => trayIds.includes(t.id) ? { ...t, inTray: false } : t));
-            setTepsi([]);
+            setTepsi(Array(MAX_TEPSI).fill(null));
             blocked.current = false;
           }, 1800);
         } else {
@@ -1000,12 +1131,14 @@ export default function EslestirmeScreen() {
   }
 
   function geriAl() {
-    if (tepsi.length === 0 || blocked.current || carpisma) return;
+    if (!tepsi.some(Boolean) || blocked.current || carpisma) return;
     if (bozkurtCan <= 0) { showMsg('🐺 Can kalmadı! Geri alamazsın.', 1200); return; }
     setBozkurtCan(c => c - 1);
-    const last = tepsi[tepsi.length - 1];
+    // En son eklenen taşı bul (en büyük id = en son)
+    const dolu = tepsi.map((t, i) => [t, i]).filter(([t]) => t !== null);
+    const [last, lastIdx] = dolu.sort((a, b) => b[0].id - a[0].id)[0];
     setTiles(prev => prev.map(t => t.id === last.tileId ? { ...t, inTray: false } : t));
-    setTepsi(prev => prev.slice(0, -1));
+    setTepsi(prev => { const next = [...prev]; next[lastIdx] = null; return next; });
     showMsg('🐺 -1 Can', 900);
   }
 
@@ -1038,11 +1171,20 @@ export default function EslestirmeScreen() {
   if (bitti) {
     const kazandi = tiles.every(t => t.removed);
     const finalSkor = skor + (kazandi ? sure * 5 : 0);
+    const surePctBitis = sure / maxSure;
+    const kazanilanYildiz = kazandi ? (surePctBitis >= 0.45 ? 3 : surePctBitis >= 0.18 ? 2 : 1) : 0;
     return (
       <div className="screen mj-screen">
         <div className="mj-bitis">
           <div className="mj-bitis-ikon">{kazandi ? '\u{1F3C6}' : eslendi >= toplamCift * 0.7 ? '\u{2B50}' : '\u{23F1}'}</div>
-          <h2 className="mj-baslik">{kazandi ? 'TEMIZLEDIN!' : tepsi.length >= MAX_TEPSI ? 'TEPSI DOLDU' : 'SURE DOLDU'}</h2>
+          <h2 className="mj-baslik">{kazandi ? 'TEMIZLEDIN!' : tepsi.every(t => t !== null) ? 'TEPSI DOLDU' : 'SURE DOLDU'}</h2>
+          {kazandi && (
+            <div className="mj-bitis-yildizlar">
+              {[1,2,3].map(i => (
+                <span key={i} className={`mj-bitis-yildiz ${i <= kazanilanYildiz ? 'mj-yildiz-dolu' : 'mj-yildiz-bos'}`}>★</span>
+              ))}
+            </div>
+          )}
           <div className="mj-bitis-skor">{finalSkor}</div>
           <p style={{ opacity: 0.6, fontSize: '0.82rem', marginTop: '-0.2rem' }}>puan</p>
           <div className="mj-bitis-istatlar">
@@ -1222,41 +1364,34 @@ export default function EslestirmeScreen() {
       })()}
 
       {/* Tahta */}
-      <div className="mj-tahta-kap">
+      <div className="mj-tahta-kap" ref={tahtaKapRef}>
         <MjGoktArka />
-        <div className="mj-tahta" style={{ width: boardDims.w, height: boardDims.h }}>
+        <div style={{ width: boardDims.w * boardScale, height: boardDims.h * boardScale, overflow: 'hidden', flexShrink: 0 }}>
+        <div className="mj-tahta" style={{ width: boardDims.w, height: boardDims.h, transform: boardScale < 1 ? `scale(${boardScale})` : undefined, transformOrigin: 'top left' }}>
           {onTahta.map(tile => {
             const free = isFree(tile, tiles);
             const d = display(tile.kart);
             const pos = tilePos(tile.col, tile.row, tile.layer, boardDims.maxL * LOY);
-            const isKilitli = bonusTamga?.tileId === tile.id;
             return (
               <div
                 key={tile.id}
                 className={[
                   'mj-tas',
-                  free && !isKilitli ? 'mj-tas-serbest' : 'mj-tas-kapali',
+                  free ? 'mj-tas-serbest' : 'mj-tas-kapali',
                   d.isMit ? 'mj-tas-mit' : '',
                   d.isMit ? `mj-tas-${tile.kart.id}` : '',
                   d.isHay ? 'mj-tas-hay' : '',
-                  tile.isBomb ? 'mj-tas-bomba' : '',
                   tile.isFrozen ? 'mj-tas-donmus' : '',
-                  tile.isBomb && tile.bombSure <= 3 ? 'mj-tas-bomba-kritik' : '',
                 ].filter(Boolean).join(' ')}
-                style={{ left: pos.left, top: pos.top, zIndex: isKilitli ? pos.zIndex + 10 : pos.zIndex }}
-                onClick={() => isKilitli ? handleBonusTamga() : tasTikla(tile.id)}
+                style={{ left: pos.left, top: pos.top, zIndex: pos.zIndex }}
+                onClick={() => tasTikla(tile.id)}
               >
                 <TasIcerik kart={tile.kart} />
-                {tile.isBomb && <span className="mj-bomba-sayac">{tile.bombSure}</span>}
                 {tile.isFrozen && <span className="mj-donmus-overlay">❄</span>}
-                {isKilitli && (
-                  <div className="mj-kilit-overlay">
-                    <span className="mj-kilit-harf">{bonusTamga.harf}</span>
-                  </div>
-                )}
               </div>
             );
           })}
+        </div>
         </div>
       </div>
 
@@ -1265,7 +1400,7 @@ export default function EslestirmeScreen() {
         <button
           className="mj-guc-btn"
           onClick={geriAl}
-          disabled={tepsi.length === 0 || !!carpisma || bozkurtCan <= 1}
+          disabled={!tepsi.some(Boolean) || !!carpisma || bozkurtCan <= 1}
         >
           <span className="mj-guc-ikon">&#8617;</span>
           <span className="mj-guc-yazi">Geri Al 🐺</span>

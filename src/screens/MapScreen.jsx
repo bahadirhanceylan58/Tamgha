@@ -41,16 +41,33 @@ export default function MapScreen() {
     dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null, ozelSeviye: true });
   }
 
+  function tumSeviyelerBitti(bid) {
+    const bolge = BOLGELER.find(b => b.id === bid);
+    if (!bolge) return false;
+    const ilerleme = state.bolgeIlerlemesi[bid];
+    if (!ilerleme?.yildizlar) return false;
+    for (let i = 0; i < bolge.seviyeSayisi; i++) {
+      if ((ilerleme.yildizlar[i] || 0) === 0) return false;
+    }
+    return true;
+  }
+
   function bolgeKilidiHesapla(bolgeId) {
     if (bolgeId === 'orhun') return false;
-    if (bolgeId === 'selenga') return aktifBolum < 10;
-    if (bolgeId === 'altay') return aktifBolum < 20;
-    if (bolgeId === 'tengri_yurdu') return aktifBolum < 30;
+    if (bolgeId === 'selenga') return !tumSeviyelerBitti('orhun');
+    if (bolgeId === 'altay') return !tumSeviyelerBitti('selenga');
+    if (bolgeId === 'tengri_yurdu') return !tumSeviyelerBitti('altay');
     return true;
   }
 
   function baslatSonrakiBolum() {
-    dispatch({ type: 'SEFER_BASLAT', bolgeId: 'orhun', seviye: 0, guc: null, bolum: aktifBolum });
+    const b = aktifBolum;
+    let bolgeId = 'orhun', seviye = 0;
+    if (b <= 15)      { bolgeId = 'orhun';        seviye = b - 1; }
+    else if (b <= 30) { bolgeId = 'selenga';       seviye = b - 16; }
+    else if (b <= 45) { bolgeId = 'altay';         seviye = b - 31; }
+    else              { bolgeId = 'tengri_yurdu';  seviye = Math.min(b - 46, 14); }
+    dispatch({ type: 'SEFER_BASLAT', bolgeId, seviye, guc: null, ozelSeviye: true });
   }
 
   return (
@@ -100,8 +117,8 @@ export default function MapScreen() {
                   {kilit ? (
                     <p className="bolge-kilit-mesaj">
                       &#128274;{' '}
-                      {bolge.id === 'selenga' ? "Bölüm 10'da açılır" :
-                       bolge.id === 'altay' ? "Bölüm 20'de açılır" : "Bölüm 30'da açılır"}
+                      {bolge.id === 'selenga' ? 'Orhun tamamlanınca açılır' :
+                       bolge.id === 'altay' ? 'Selenga tamamlanınca açılır' : 'Altay tamamlanınca açılır'}
                     </p>
                   ) : (
                     <p className="bolge-tamga-sayisi">
